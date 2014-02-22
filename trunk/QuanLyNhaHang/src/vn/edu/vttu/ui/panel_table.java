@@ -8,6 +8,7 @@ package vn.edu.vttu.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -17,12 +18,14 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -33,6 +36,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.Service_Cost;
 import vn.edu.vttu.data.Table;
@@ -66,6 +70,8 @@ public class panel_table extends javax.swing.JPanel {
     private int idTableService;
     private String sv_name;
     private int rowTableService_selectEdit;
+    private int total;
+    private int statusTable;
 
     public panel_table() {
         initComponents();
@@ -86,98 +92,163 @@ public class panel_table extends javax.swing.JPanel {
                     setTextLable(idTable);
                 }
             }));
+            popup.addSeparator();
             BufferedImage bImg2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/reservationTable.png"));
             Image image2 = bImg2.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
             popup.add(new JMenuItem(new AbstractAction("Đặt Bàn", new ImageIcon(image2)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showOptionDialog(getRootPane(),new panel_table_reservatio(),"Đặt Bàn",JOptionPane.DEFAULT_OPTION,JOptionPane.PLAIN_MESSAGE,null,new Object[]{},null);
+                    loadTable();
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã save");
+                   /*
+                    if (result == JOptionPane.OK_OPTION) {
+                        
 
+                    }
+                    */
                 }
-            }));
+            }
+            ));
+            BufferedImage bImg2_1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/cancelUseTable.png"));
+            Image image2_1 = bImg2_1.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+            popup.add(
+                    new JMenuItem(new AbstractAction("Xem Thông Tin Đặt Bàn", new ImageIcon(image2_1)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
+            BufferedImage bImg2_2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/cancelUseTable.png"));
+            Image image2_2 = bImg2_2.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+            popup.add(
+                    new JMenuItem(new AbstractAction("Đặt Nhiều Bàn", new ImageIcon(image2_2)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
+            popup.addSeparator();
             BufferedImage bImg3 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/cancelUseTable.png"));
             Image image3 = bImg3.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Hủy Sử Dụng", new ImageIcon(image3)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Hủy Sử Dụng", new ImageIcon(image3)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg4 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Stop-reservationtable-icon.png"));
             Image image4 = bImg4.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Hủy Đặt Bàn", new ImageIcon(image4)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Hủy Đặt Bàn", new ImageIcon(image4)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg5 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));
             Image image5 = bImg5.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+
             popup.addSeparator();
-            popup.add(new JMenuItem(new AbstractAction("Thanh Toán", new ImageIcon(image5)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Thanh Toán", new ImageIcon(image5)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg6 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/print-icon.png"));
             Image image6 = bImg6.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("In Trước Hóa Đơn", new ImageIcon(image6)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("In Trước Hóa Đơn", new ImageIcon(image6)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg7 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/move-icon.png"));
             Image image7 = bImg7.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+
             popup.addSeparator();
-            popup.add(new JMenuItem(new AbstractAction("Chuyển Bàn", new ImageIcon(image7)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Chuyển Bàn", new ImageIcon(image7)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg8 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/merge-icon.png"));
             Image image8 = bImg8.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Ghép Bàn", new ImageIcon(image8)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Ghép Bàn", new ImageIcon(image8)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg9 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/add-icon.png"));
             Image image9 = bImg9.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+
             popup.addSeparator();
-            popup.add(new JMenuItem(new AbstractAction("Thêm Bàn", new ImageIcon(image9)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Thêm Bàn", new ImageIcon(image9)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg10 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
             Image image10 = bImg10.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Đổi Tên Bàn", new ImageIcon(image10)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Đổi Tên Bàn", new ImageIcon(image10)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg11 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/delete-icon.png"));
             Image image11 = bImg11.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Xóa Bàn", new ImageIcon(image11)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Xóa Bàn", new ImageIcon(image11)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
             BufferedImage bImg12 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/khuvuc-icon.png"));
             Image image12 = bImg12.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+
             popup.addSeparator();
-            popup.add(new JMenuItem(new AbstractAction("Quản Lý Khu Vực", new ImageIcon(image12)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //new frmAddService(room_id).setVisible(true);
-                }
-            }));
+
+            popup.add(
+                    new JMenuItem(new AbstractAction("Quản Lý Khu Vực", new ImageIcon(image12)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            //new frmAddService(room_id).setVisible(true);
+                        }
+                    }));
         } catch (Exception e) {
         }
 
@@ -234,6 +305,7 @@ public class panel_table extends javax.swing.JPanel {
                 // bt[i].add(popup);
                 final int idtb = table[i].getID();
                 final int status = table[i].getSTATUS();
+
                 final int x = i;
                 bt[i].addMouseListener(new MouseAdapter() {
                     @Override
@@ -243,77 +315,96 @@ public class panel_table extends javax.swing.JPanel {
                             popup.show(e.getComponent(), e.getX(), e.getY());
 
                             popup.getComponent(0).setEnabled(false);// Sử dụng
-                            popup.getComponent(1).setEnabled(false); //Đặt Bàn
-                            popup.getComponent(2).setEnabled(false); //Hủy Sử Dụng
-                            popup.getComponent(3).setEnabled(false);// Hủy Đặt Bàn
+                            //line
+                            popup.getComponent(2).setEnabled(false); //Đặt Bàn
+                            popup.getComponent(3).setEnabled(false); //Xem Thông tin đặt bàn
+                            popup.getComponent(4).setEnabled(false); //Đặt nhiều bàn
+                            //line
+                            popup.getComponent(6).setEnabled(false); //Hủy Sử Dụng
+                            popup.getComponent(7).setEnabled(false);// Hủy Đặt Bàn
                             // line
-                            popup.getComponent(5).setEnabled(false);//Thanh Toán
-                            popup.getComponent(6).setEnabled(false);//In Trước Hóa Đơn
+                            popup.getComponent(9).setEnabled(false);//Thanh Toán
+                            popup.getComponent(10).setEnabled(false);//In Trước Hóa Đơn
                             //line
-                            popup.getComponent(8).setEnabled(false);// Chuyển Bàn
-                            popup.getComponent(9).setEnabled(false);// Ghép Bàn
+                            popup.getComponent(12).setEnabled(false);// Chuyển Bàn
+                            popup.getComponent(13).setEnabled(false);// Ghép Bàn
                             //line
-                            popup.getComponent(11).setEnabled(false);//Thêm Bàn
-                            popup.getComponent(12).setEnabled(false);// Đổi Tên Bàn
-                            popup.getComponent(13).setEnabled(false);// Xóa Bàn  
+                            popup.getComponent(15).setEnabled(false);//Thêm Bàn
+                            popup.getComponent(16).setEnabled(false);// Đổi Tên Bàn
+                            popup.getComponent(17).setEnabled(false);// Xóa Bàn  
                             //line
-                            popup.getComponent(15).setEnabled(false);// Quản lý khu vực      
+                            popup.getComponent(19).setEnabled(false);// Quản lý khu vực      
                             if (status == 1) { // bàn đang được sử dụng
                                 popup.getComponent(0).setEnabled(false);// Sử dụng
-                                popup.getComponent(1).setEnabled(false); //Đặt Bàn
-                                popup.getComponent(2).setEnabled(true); //Hủy Sử Dụng
-                                popup.getComponent(3).setEnabled(false);// Hủy Đặt Bàn
+                                //line
+                                popup.getComponent(2).setEnabled(true); //Đặt Bàn
+                                popup.getComponent(3).setEnabled(true); //Xem Thông tin đặt bàn
+                                popup.getComponent(4).setEnabled(true); //Đặt nhiều bàn
+                                //line
+                                popup.getComponent(6).setEnabled(true); //Hủy Sử Dụng
+                                popup.getComponent(7).setEnabled(false);// Hủy Đặt Bàn
                                 // line
-                                popup.getComponent(5).setEnabled(true);//Thanh Toán
-                                popup.getComponent(6).setEnabled(true);//In Trước Hóa Đơn
+                                popup.getComponent(9).setEnabled(true);//Thanh Toán
+                                popup.getComponent(10).setEnabled(true);//In Trước Hóa Đơn
                                 //line
-                                popup.getComponent(8).setEnabled(true);// Chuyển Bàn
-                                popup.getComponent(9).setEnabled(true);// Ghép Bàn
+                                popup.getComponent(12).setEnabled(true);// Chuyển Bàn
+                                popup.getComponent(13).setEnabled(true);// Ghép Bàn
                                 //line
-                                popup.getComponent(11).setEnabled(true);//Thêm Bàn
-                                popup.getComponent(12).setEnabled(true);// Đổi Tên Bàn
-                                popup.getComponent(13).setEnabled(false);// Xóa Bàn  
+                                popup.getComponent(15).setEnabled(true);//Thêm Bàn
+                                popup.getComponent(16).setEnabled(true);// Đổi Tên Bàn
+                                popup.getComponent(17).setEnabled(false);// Xóa Bàn  
                                 //line
-                                popup.getComponent(15).setEnabled(true);// Quản lý khu vực                    
+                                popup.getComponent(19).setEnabled(true);// Quản lý khu vực                    
                             } else if (status == 2) { // bàn được đặt
                                 popup.getComponent(0).setEnabled(true);// Sử dụng
-                                popup.getComponent(1).setEnabled(true); //Đặt Bàn
-                                popup.getComponent(2).setEnabled(false); //Hủy Sử Dụng
-                                popup.getComponent(3).setEnabled(true);// Hủy Đặt Bàn
+                                //line
+                                popup.getComponent(2).setEnabled(true); //Đặt Bàn
+                                popup.getComponent(3).setEnabled(true); //Xem Thông tin đặt bàn
+                                popup.getComponent(4).setEnabled(true); //Đặt nhiều bàn
+                                //line
+                                popup.getComponent(6).setEnabled(false); //Hủy Sử Dụng
+                                popup.getComponent(7).setEnabled(true);// Hủy Đặt Bàn
                                 // line
-                                popup.getComponent(5).setEnabled(false);//Thanh Toán
-                                popup.getComponent(6).setEnabled(false);//In Trước Hóa Đơn
+                                popup.getComponent(9).setEnabled(false);//Thanh Toán
+                                popup.getComponent(10).setEnabled(false);//In Trước Hóa Đơn
                                 //line
-                                popup.getComponent(8).setEnabled(false);// Chuyển Bàn
-                                popup.getComponent(9).setEnabled(false);// Ghép Bàn
+                                popup.getComponent(12).setEnabled(true);// Chuyển Bàn
+                                popup.getComponent(13).setEnabled(false);// Ghép Bàn
                                 //line
-                                popup.getComponent(11).setEnabled(true);//Thêm Bàn
-                                popup.getComponent(12).setEnabled(true);// Đổi Tên Bàn
-                                popup.getComponent(13).setEnabled(false);// Xóa Bàn  
+                                popup.getComponent(15).setEnabled(true);//Thêm Bàn
+                                popup.getComponent(16).setEnabled(true);// Đổi Tên Bàn
+                                popup.getComponent(17).setEnabled(false);// Xóa Bàn  
                                 //line
-                                popup.getComponent(15).setEnabled(true);// Quản lý khu vực   
+                                popup.getComponent(19).setEnabled(true);// Quản lý khu vực   
                             } else { //bàn chưa sử dụng
-                                popup.getComponent(0).setEnabled(true);// Sử dụng
-                                popup.getComponent(1).setEnabled(true); //Đặt Bàn
-                                popup.getComponent(2).setEnabled(false); //Hủy Sử Dụng
-                                popup.getComponent(3).setEnabled(false);// Hủy Đặt Bàn
+                                popup.getComponent(0).setEnabled(false);// Sử dụng
+                                //line
+                                popup.getComponent(2).setEnabled(true); //Đặt Bàn
+                                popup.getComponent(3).setEnabled(false); //Xem Thông tin đặt bàn
+                                popup.getComponent(4).setEnabled(true); //Đặt nhiều bàn
+                                //line
+                                popup.getComponent(6).setEnabled(false); //Hủy Sử Dụng
+                                popup.getComponent(7).setEnabled(false);// Hủy Đặt Bàn
                                 // line
-                                popup.getComponent(5).setEnabled(false);//Thanh Toán
-                                popup.getComponent(6).setEnabled(false);//In Trước Hóa Đơn
+                                popup.getComponent(9).setEnabled(false);//Thanh Toán
+                                popup.getComponent(10).setEnabled(false);//In Trước Hóa Đơn
                                 //line
-                                popup.getComponent(8).setEnabled(false);// Chuyển Bàn
-                                popup.getComponent(9).setEnabled(false);// Ghép Bàn
+                                popup.getComponent(12).setEnabled(false);// Chuyển Bàn
+                                popup.getComponent(13).setEnabled(false);// Ghép Bàn
                                 //line
-                                popup.getComponent(11).setEnabled(true);//Thêm Bàn
-                                popup.getComponent(12).setEnabled(true);// Đổi Tên Bàn
-                                popup.getComponent(13).setEnabled(true);// Xóa Bàn  
+                                popup.getComponent(15).setEnabled(true);//Thêm Bàn
+                                popup.getComponent(16).setEnabled(true);// Đổi Tên Bàn
+                                popup.getComponent(17).setEnabled(true);// Xóa Bàn  
                                 //line
-                                popup.getComponent(15).setEnabled(true);// Quản lý khu vực   
+                                popup.getComponent(19).setEnabled(true);// Quản lý khu vực
                             }
                         }
                         if (SwingUtilities.isLeftMouseButton(e)) {
                             if (status == 1) {
                                 enableButton(true);
+                            } else if (status == 2) {
+                                btnAddCustomer.setEnabled(true);
+                                btnChangeTable.setEnabled(true);
                             } else {
                                 enableButton(false);
                             }
@@ -327,9 +418,13 @@ public class panel_table extends javax.swing.JPanel {
                             bt[x].setBorder(border);
                             statusBG = x;
                             bt[x].repaint();
+                            statusTable = status;
                             setTextLable(idTable);
                             loadTableInvoice();
                             totalPay();
+                            Table.setIDTABLE(idTable);
+                            Table.setTABLENAME(Table.getByID(idTable).getNAME());
+
                         }
                     }
                 });
@@ -359,6 +454,7 @@ public class panel_table extends javax.swing.JPanel {
                     if (Table_Service.getServiceByIdService_ByIdReservation(idService, idTableReservation)) {
                         if (Table_Service.insert(idTableReservation, idService, Integer.parseInt(number), cost)) {
                             loadTableInvoice();
+                            totalPay();
                         }
                     } else {
                         if (Table_Service.update(idTableReservation, idService, Integer.parseInt(number))) {
@@ -382,14 +478,7 @@ public class panel_table extends javax.swing.JPanel {
             popupMenu.add(new JMenuItem(new AbstractAction("Đổi Tên", new ImageIcon(imageServiceChangeName)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    /*
-                     int result = JOptionPane.showConfirmDialog(null,new pn() ,
-                     "Please Enter X and Y Values", JOptionPane.OK_CANCEL_OPTION);
-                     if (result == JOptionPane.OK_OPTION) {
-                     System.out.println("x value: " );
-                     System.out.println("y value: " );
-                     }
-                     */
+
                     String name = JOptionPane.showInputDialog(tbService, "Nhập tên dịch vụ", sv_name);
                     if (name != null) {
                         if (Service.updateName(name, idService)) {
@@ -428,6 +517,7 @@ public class panel_table extends javax.swing.JPanel {
                     String num = JOptionPane.showInputDialog(tb_invoice, "Nhập số lượng", numberOfServiceInvoice);
                     if (Table_Service.update(idTableService, Integer.parseInt(num))) {
                         loadTableInvoice();
+                        totalPay();
                     } else {
                         JOptionPane.showMessageDialog(getRootPane(), "Lỗi, Vui lòng thực hiện lại");
                     }
@@ -441,6 +531,7 @@ public class panel_table extends javax.swing.JPanel {
                     if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn hủy dịch vụ này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         if (Table_Service.delete(idTableService)) {
                             loadTableInvoice();
+                            totalPay();
                         } else {
                             JOptionPane.showMessageDialog(tb_invoice, "Đã xảy ra lỗi. Vui lòng thực hiên lại");
                         }
@@ -454,31 +545,45 @@ public class panel_table extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     loadTableInvoice();
+                    totalPay();
                 }
             }));
             tb_invoice.setComponentPopupMenu(popupMenuTableInvoice);
         } catch (Exception e) {
 
         }
-
     }
 
     private void useTable() {
         Date dt = new Date();
-        if (Table.updateStatus(idTable, 1) && Table_Reservation.insert(true)) {
-            int maxid_reservation = Table_Reservation.getMaxID().getID();
-            JOptionPane.showMessageDialog(getRootPane(), maxid_reservation);
-            if (Table_Reservation_Detail.insert(idTable, maxid_reservation)) {
-                loadTable();
+        if (statusTable == 0) {
+            if (Table_Reservation.insert(true)) {
+                int maxid_reservation = Table_Reservation.getMaxID().getID();
+                JOptionPane.showMessageDialog(getRootPane(), maxid_reservation);
+                if (Table_Reservation_Detail.insert(idTable, maxid_reservation)) {
+                    if (Table.updateStatus(idTable, 1)) {
+                        loadTable();
+                    } else {
+                        JOptionPane.showMessageDialog(getRootPane(), "Không Thành Công");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Không Thành Công");
+                }
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Không Thành Công");
             }
-
-        } else {
-            JOptionPane.showMessageDialog(getRootPane(), "Không thành công");
+        }
+        if (statusTable == 2) {
+            if (Table_Reservation.updateStatus(idTable)) {
+                if (Table.updateStatus(idTable, 1)) {
+                    loadTable();
+                }
+            }
         }
     }
 
     private void setTextLable(int id) {
-        Table_Reservation tbReser = Table_Reservation.getByTable(id);
+        Table_Reservation tbReser = Table_Reservation.getByTableByStatus(id, statusTable);
         beginDate = tbReser.getBeginDate();
         idCustomer = tbReser.getCUSTOMER();
         nameCustomer = tbReser.getCUSTOMER_NAME();
@@ -518,15 +623,51 @@ public class panel_table extends javax.swing.JPanel {
     }
 
     private void totalPay() {
-        DecimalFormat df = new DecimalFormat("#,###,##0");
-        int total = Table_Service.totalPayment(idTableReservation);
-        int service_Charges = Integer.parseInt(txtService_Charges.getText());
-        int discount_money = Integer.parseInt(txtDiscountMoney.getText());
-        int discount_percent = Integer.parseInt(txtDiscountPercent.getText());
-        int customer_pay = Integer.parseInt(txtCustomerPay.getText());
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        float service_Charges = 0;
+        int discount_money = 0;
+        int discount_percent = 0;
+        int customer_pay = 0;
+        double x;
+        if (!txtService_Price.getText().equals("")) {
+            service_Charges = Integer.parseInt(txtService_Price.getText());
+
+        }
+        if (!txtService_Price.getText().equals("")) {
+            service_Charges = Float.parseFloat(txtService_Price.getText());
+
+        }
+        if (!txtDiscountMoney.getText().equals("")) {
+            discount_money = Integer.parseInt(txtDiscountMoney.getText());
+
+        }
+        if (!txtDiscountPercent.getText().equals("")) {
+            discount_percent = Integer.parseInt(txtDiscountPercent.getText());
+        }
+        if (!txtCustomerPay.getText().equals("")) {
+            customer_pay = Integer.parseInt(txtCustomerPay.getText());
+        }
+
+        float total = Table_Service.totalPayment(idTableReservation);
+        //JOptionPane.showMessageDialog(getRootPane(), service_Charges);
         lbTotal.setText(String.valueOf(df.format(total)));
-        int totalPay = (total + service_Charges) - (discount_money);
-        lbTotalPay.setText(String.valueOf(totalPay));
+        float discount = (discount_percent * total) / 100;
+        float totalPay = 0;
+        if (total == 0) {
+            totalPay = 0;
+        } else {
+            totalPay = ((total + service_Charges) - (discount_money + discount));
+        }
+
+        lbTotalPay.setText(String.valueOf(df.format(totalPay)));
+        total = Table_Service.totalPayment(idTableReservation);
+        lbTotal.setText(String.valueOf(df.format(total)));
+        if (customer_pay < totalPay) {
+            lbChangeForCustomer.setText("Thiếu: " + String.valueOf(df.format(Math.abs(customer_pay - totalPay))));
+        } else {
+            lbChangeForCustomer.setText(df.format(customer_pay - totalPay));
+        }
+
     }
 
     /**
@@ -563,7 +704,6 @@ public class panel_table extends javax.swing.JPanel {
         tb_invoice = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        txtService_Charges = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         txtDiscountMoney = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
@@ -578,13 +718,14 @@ public class panel_table extends javax.swing.JPanel {
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
+        lbChangeForCustomer = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
         lbTotalPay = new javax.swing.JLabel();
         jLabel27 = new javax.swing.JLabel();
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
         jSeparator7 = new javax.swing.JSeparator();
+        txtService_Price = new javax.swing.JTextField();
         btnPayment = new javax.swing.JButton();
         btnCancelTableUse = new javax.swing.JButton();
         btnPrintPreviewInvoice = new javax.swing.JButton();
@@ -676,6 +817,11 @@ public class panel_table extends javax.swing.JPanel {
         btnAddCustomer.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnAddCustomer.setForeground(new java.awt.Color(0, 204, 102));
         btnAddCustomer.setText("+");
+        btnAddCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddCustomerActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel7.setText("NV:");
@@ -805,16 +951,6 @@ public class panel_table extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Phí Dịch Vụ:");
 
-        txtService_Charges.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        txtService_Charges.setForeground(new java.awt.Color(0, 102, 255));
-        txtService_Charges.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtService_Charges.setText("0");
-        txtService_Charges.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtService_ChargesKeyTyped(evt);
-            }
-        });
-
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(0, 102, 255));
         jLabel11.setText("VNĐ");
@@ -822,10 +958,9 @@ public class panel_table extends javax.swing.JPanel {
         txtDiscountMoney.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         txtDiscountMoney.setForeground(new java.awt.Color(0, 102, 255));
         txtDiscountMoney.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtDiscountMoney.setText("0");
         txtDiscountMoney.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtDiscountMoneyKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtDiscountMoneyKeyReleased(evt);
             }
         });
 
@@ -839,10 +974,9 @@ public class panel_table extends javax.swing.JPanel {
         txtDiscountPercent.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         txtDiscountPercent.setForeground(new java.awt.Color(0, 102, 255));
         txtDiscountPercent.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtDiscountPercent.setText("0");
         txtDiscountPercent.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtDiscountPercentKeyTyped(evt);
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtDiscountPercentKeyReleased(evt);
             }
         });
 
@@ -856,7 +990,11 @@ public class panel_table extends javax.swing.JPanel {
         txtCustomerPay.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         txtCustomerPay.setForeground(new java.awt.Color(0, 102, 255));
         txtCustomerPay.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtCustomerPay.setText("0");
+        txtCustomerPay.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCustomerPayKeyReleased(evt);
+            }
+        });
 
         jLabel17.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(0, 102, 255));
@@ -880,10 +1018,10 @@ public class panel_table extends javax.swing.JPanel {
         jLabel23.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel23.setText("Trả Lại");
 
-        jLabel24.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel24.setForeground(new java.awt.Color(0, 102, 255));
-        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel24.setText("0");
+        lbChangeForCustomer.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lbChangeForCustomer.setForeground(new java.awt.Color(0, 102, 255));
+        lbChangeForCustomer.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbChangeForCustomer.setText("0");
 
         jLabel25.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(0, 102, 255));
@@ -898,6 +1036,14 @@ public class panel_table extends javax.swing.JPanel {
         jLabel27.setForeground(new java.awt.Color(255, 51, 51));
         jLabel27.setText("VNĐ");
 
+        txtService_Price.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtService_Price.setForeground(new java.awt.Color(51, 51, 255));
+        txtService_Price.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtService_PriceKeyReleased1(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -908,12 +1054,12 @@ public class panel_table extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addComponent(jLabel14)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGap(21, 21, 21)
                             .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addComponent(jLabel1)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtService_Charges, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtService_Price)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel16)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -945,8 +1091,8 @@ public class panel_table extends javax.swing.JPanel {
                     .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel23)
-                        .addGap(43, 43, 43)
-                        .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lbChangeForCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -957,11 +1103,11 @@ public class panel_table extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(txtService_Charges, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
                     .addComponent(jLabel12)
                     .addComponent(lbTotal)
-                    .addComponent(jLabel19))
+                    .addComponent(jLabel19)
+                    .addComponent(txtService_Price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
@@ -991,7 +1137,7 @@ public class panel_table extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel23)
-                            .addComponent(jLabel24)
+                            .addComponent(lbChangeForCustomer)
                             .addComponent(jLabel25))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -1046,7 +1192,7 @@ public class panel_table extends javax.swing.JPanel {
             .addGroup(layout_invoiceLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1109,22 +1255,39 @@ public class panel_table extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtSearchKeyTyped
 
-    private void txtService_ChargesKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_ChargesKeyTyped
-        if (txtService_Charges.getText().equals("")) {
-            txtService_Charges.setText("0");
-            totalPay();
-        } else {
-            totalPay();
+    private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
+        totalPay();
+    }//GEN-LAST:event_txtService_PriceKeyReleased
+
+    private void txtDiscountMoneyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyReleased
+        totalPay();
+    }//GEN-LAST:event_txtDiscountMoneyKeyReleased
+
+    private void txtDiscountPercentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyReleased
+        totalPay();
+    }//GEN-LAST:event_txtDiscountPercentKeyReleased
+
+    private void txtCustomerPayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyReleased
+        totalPay();
+    }//GEN-LAST:event_txtCustomerPayKeyReleased
+
+    private void txtService_PriceKeyReleased1(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased1
+        totalPay();
+    }//GEN-LAST:event_txtService_PriceKeyReleased1
+
+    private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCustomerActionPerformed
+
+        int result = JOptionPane.showConfirmDialog(null, new panel_select_customer(),
+                "Chọn Khách Hàng", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            JOptionPane.showMessageDialog(getRootPane(), Customer.getID());
+            if (Customer.getID() > 0) {
+                if (Table_Reservation.updateCustomer(Customer.getID(), idTableReservation)) {
+                    setTextLable(idTable);
+                }
+            }
         }
-    }//GEN-LAST:event_txtService_ChargesKeyTyped
-
-    private void txtDiscountMoneyKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyTyped
-        totalPay();
-    }//GEN-LAST:event_txtDiscountMoneyKeyTyped
-
-    private void txtDiscountPercentKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyTyped
-        totalPay();
-    }//GEN-LAST:event_txtDiscountPercentKeyTyped
+    }//GEN-LAST:event_btnAddCustomerActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1145,7 +1308,6 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel3;
@@ -1168,6 +1330,7 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JPanel layout_service;
     private javax.swing.JPanel layout_table;
     private javax.swing.JLabel lbBeginDate;
+    private javax.swing.JLabel lbChangeForCustomer;
     private javax.swing.JLabel lbCustomerName;
     private javax.swing.JLabel lbStaff;
     private javax.swing.JLabel lbTableName;
@@ -1179,6 +1342,6 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JTextField txtDiscountMoney;
     private javax.swing.JTextField txtDiscountPercent;
     private javax.swing.JTextField txtSearch;
-    private javax.swing.JTextField txtService_Charges;
+    private javax.swing.JTextField txtService_Price;
     // End of variables declaration//GEN-END:variables
 }

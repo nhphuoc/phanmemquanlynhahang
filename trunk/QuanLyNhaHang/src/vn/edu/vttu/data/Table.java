@@ -20,6 +20,24 @@ import net.proteanit.sql.DbUtils;
 public class Table {
 
     private int ID;
+    private static int IDTABLE; //// use for reservation table
+
+    public static int getIDTABLE() {
+        return IDTABLE;
+    }
+
+    public static void setIDTABLE(int IDTABLE) {
+        Table.IDTABLE = IDTABLE;
+    }
+
+    public static String getTABLENAME() {
+        return TABLENAME;
+    }
+
+    public static void setTABLENAME(String TABLENAME) {
+        Table.TABLENAME = TABLENAME;
+    }
+    private static String TABLENAME; // use for reservation table
     private String NAME;
     private int TYPE;
     private int LOCATION;
@@ -33,11 +51,15 @@ public class Table {
     public int getID() {
         return ID;
     }
-
+    public void setID(int ID) {
+        this.ID = ID;
+    }
     public String getNAME() {
         return NAME;
     }
-
+    public void setNAME(String NAME) {
+        this.NAME = NAME;
+    }
     public int getTYPE() {
         return TYPE;
     }
