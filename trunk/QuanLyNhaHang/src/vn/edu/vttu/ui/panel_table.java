@@ -266,7 +266,7 @@ public class panel_table extends javax.swing.JPanel {
         layout_table.add(panel);
         scrollpane = new JScrollPane(panel);
         layout_table.add(scrollpane, BorderLayout.CENTER);
-        // chua set auto scroll
+        
 
         try {
             Table table[] = Table.getAll();

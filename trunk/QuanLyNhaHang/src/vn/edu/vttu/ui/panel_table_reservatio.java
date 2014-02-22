@@ -5,6 +5,9 @@
  */
 package vn.edu.vttu.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,7 +16,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.omg.IOP.TAG_RMI_CUSTOM_MAX_STREAM_FORMAT;
@@ -35,7 +41,8 @@ public class panel_table_reservatio extends javax.swing.JPanel {
     private int idCustomer;
     int index = 0;
     String x;
-    
+    JScrollPane scrollpane;
+
     public panel_table_reservatio() {
         initComponents();
         lbTableName.setText(Table.getTABLENAME());
@@ -47,7 +54,30 @@ public class panel_table_reservatio extends javax.swing.JPanel {
         btnSave.setEnabled(true);
         Date dt = new Date();
         cobHour.setSelectedItem(dt.getDate());
-        
+        loadTableMatrix();
+
+    }
+
+    private void loadTableMatrix() {
+        layout_table.removeAll();
+        JPanel panel = new JPanel(new GridLayout(0, 3, 5, 5));
+        panel.setFont(new Font("Serif", Font.BOLD, 18));
+        layout_table.add(panel);
+        scrollpane = new JScrollPane(panel);
+        layout_table.add(scrollpane, BorderLayout.CENTER);
+        try {
+            Table table[] = Table.getByDate(22, 2, 2014);
+            int numberTable = table.length;
+            final JLabel bt[] = new JLabel[numberTable];
+            for (int i = 0; i < numberTable; i++) {
+                bt[i] = new JLabel(table[i].getNAME());
+                panel.add(bt[i]);
+            }
+            layout_table.updateUI();
+            layout_table.repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadTable() {
@@ -77,8 +107,8 @@ public class panel_table_reservatio extends javax.swing.JPanel {
             int maxid_reservation = Table_Reservation.getMaxID().getID();
             if (Table_Reservation_Detail.insert(idTable, maxid_reservation)) {
                 if (Table.updateStatus(idTable, 2)) {
-                    BufferedImage bImg2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));                    
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.OK_OPTION,new ImageIcon(bImg2));
+                    BufferedImage bImg2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.OK_OPTION, new ImageIcon(bImg2));
                     btnSave.setEnabled(false);
                 }
             }
@@ -107,6 +137,7 @@ public class panel_table_reservatio extends javax.swing.JPanel {
         btnSave = new javax.swing.JButton();
         cobHour = new javax.swing.JComboBox();
         cobMin = new javax.swing.JComboBox();
+        layout_table = new javax.swing.JPanel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setText("Bàn Số");
@@ -175,43 +206,48 @@ public class panel_table_reservatio extends javax.swing.JPanel {
 
         cobMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "5", "10", "15", "20", "25", "30", "25", "40", "45", "50", "55", " " }));
 
+        layout_table.setMinimumSize(new java.awt.Dimension(200, 200));
+        layout_table.setLayout(new javax.swing.BoxLayout(layout_table, javax.swing.BoxLayout.LINE_AXIS));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel4))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbTableName, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cobHour, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cobMin, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dtTableReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(txtCustomerName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(150, 150, 150)
-                .addComponent(btnSave)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(layout_table, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnSave)
+                        .addGap(169, 169, 169))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel4))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(lbTableName, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(cobHour, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cobMin, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(dtTableReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(txtCustomerName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
                     .addComponent(lbTableName))
@@ -228,11 +264,10 @@ public class panel_table_reservatio extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txtCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(17, 17, 17)
+                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(layout_table, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -282,6 +317,7 @@ public class panel_table_reservatio extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel layout_table;
     private javax.swing.JLabel lbTableName;
     private javax.swing.JTable tbCustomer;
     private javax.swing.JTextField txtCustomerName;
