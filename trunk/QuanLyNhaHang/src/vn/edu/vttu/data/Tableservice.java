@@ -156,6 +156,26 @@ public class Tableservice {
         return flag;
     }
 
+    public static boolean updateStstus(int idReservation) {
+        boolean flag = false;
+        try {
+            Statement state = connectDB.conn().createStatement();
+            String sql = "CALL table_service_update_status_byIdReservation(?)";
+            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            callstate.setInt(1, idReservation);
+            int x = callstate.executeUpdate();
+            if (x > 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
     public static boolean delete(int id_tableReservation) {
         boolean flag = false;
         try {
@@ -185,16 +205,16 @@ public class Tableservice {
             Statement state = connectDB.conn().createStatement();
             CallableStatement calState = connectDB.conn().prepareCall("{CALL table_service_total_payment(?)}");
             calState.setInt(1, idReservation);
-            rs = calState.executeQuery(); 
+            rs = calState.executeQuery();
             rs.last();
-            if (rs.getString("total")!=null) {
+            if (rs.getString("total") != null) {
                 total = rs.getInt("total");
             } else {
                 total = 0;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            total =0;
+            total = 0;
         }
         return total;
     }

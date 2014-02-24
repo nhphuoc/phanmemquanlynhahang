@@ -21,21 +21,23 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import org.codehaus.groovy.ast.Variable;
 
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.Tablelocation;
 import vn.edu.vttu.data.Tablereservation;
 import vn.edu.vttu.data.Tablereservationdetail;
+import vn.edu.vttu.data.VariableStatic;
 
 /**
  *
  * @author nhphuoc
  */
-public class panel_table_reservatio extends javax.swing.JPanel {
+public class panel_table_reservation extends javax.swing.JPanel {
 
     /**
-     * Creates new form panel_table_reservatio
+     * Creates new form panel_table_reservation
      */
     private int idTable;
     private int idCustomer;
@@ -43,44 +45,15 @@ public class panel_table_reservatio extends javax.swing.JPanel {
     String x;
     JScrollPane scrollpane;
 
-    public panel_table_reservatio() {
+    public panel_table_reservation() {
         initComponents();
-        lbTableName.setText(Table.getTABLENAME());
-        idTable = Table.getIDTABLE();
-        dtTableReservation.setDate(new Date());
-        loadTable();
-        tbCustomer.requestFocus();
+        lbTableName.setText(VariableStatic.getNameTable());  
+        loadCustomer();
         getTime();
-        btnSave.setEnabled(true);
-        Date dt = new Date();
-        cobHour.setSelectedItem(dt.getDate());
-        loadTableMatrix();
+        VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
 
-    }
-
-    private void loadTableMatrix() {
-        layout_table.removeAll();
-        JPanel panel = new JPanel(new GridLayout(0, 3, 5, 5));
-        panel.setFont(new Font("Serif", Font.BOLD, 18));
-        layout_table.add(panel);
-        scrollpane = new JScrollPane(panel);
-        layout_table.add(scrollpane, BorderLayout.CENTER);
-        try {
-            Table table[] = Table.getByDate(22, 2, 2014);
-            int numberTable = table.length;
-            final JLabel bt[] = new JLabel[numberTable];
-            for (int i = 0; i < numberTable; i++) {
-                bt[i] = new JLabel(table[i].getNAME());
-                panel.add(bt[i]);
-            }
-            layout_table.updateUI();
-            layout_table.repaint();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadTable() {
+    }   
+    private void loadCustomer() {
         tbCustomer.setModel(Customer.getLimit());
         tbCustomer.setRowSelectionInterval(0, 0);
     }
@@ -97,23 +70,7 @@ public class panel_table_reservatio extends javax.swing.JPanel {
         Object mim = cobMin.getSelectedItem();
         x = y + "-" + m + "-" + d + " " + h.toString() + ":" + mim.toString() + ":00";
         return x;
-    }
-
-    private void reservationTable() throws IOException {
-        panel_table_reservatio tb = new panel_table_reservatio();
-        String s = Tablereservation.getDateReservation();
-        JOptionPane.showMessageDialog(getRootPane(), getTime());
-        if (Tablereservation.insert(false, Customer.getID(), getTime())) {
-            int maxid_reservation = Tablereservation.getMaxID().getID();
-            if (Tablereservationdetail.insert(idTable, maxid_reservation)) {
-                if (Table.updateStatus(idTable, 2)) {
-                    BufferedImage bImg2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.OK_OPTION, new ImageIcon(bImg2));
-                    btnSave.setEnabled(false);
-                }
-            }
-        }
-    }
+    }    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -134,10 +91,8 @@ public class panel_table_reservatio extends javax.swing.JPanel {
         tbCustomer = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        btnSave = new javax.swing.JButton();
         cobHour = new javax.swing.JComboBox();
         cobMin = new javax.swing.JComboBox();
-        layout_table = new javax.swing.JPanel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setText("Bàn Số");
@@ -194,55 +149,38 @@ public class panel_table_reservatio extends javax.swing.JPanel {
 
         jLabel5.setText("phút");
 
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
-        btnSave.setText("Lưu Lại");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed(evt);
-            }
-        });
-
         cobHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
 
         cobMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "5", "10", "15", "20", "25", "30", "25", "40", "45", "50", "55", " " }));
-
-        layout_table.setMinimumSize(new java.awt.Dimension(200, 200));
-        layout_table.setLayout(new javax.swing.BoxLayout(layout_table, javax.swing.BoxLayout.LINE_AXIS));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(layout_table, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnSave)
-                        .addGap(169, 169, 169))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel4))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(lbTableName, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel4))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lbTableName, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(cobHour, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(cobMin, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel5)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(dtTableReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addComponent(txtCustomerName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap())))
+                                .addComponent(cobHour, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cobMin, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(dtTableReservation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtCustomerName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -265,15 +203,13 @@ public class panel_table_reservatio extends javax.swing.JPanel {
                     .addComponent(jLabel4)
                     .addComponent(txtCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(17, 17, 17)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(layout_table, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void tbCustomerMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCustomerMousePressed
         index = tbCustomer.getSelectedRow();
-        Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(index, 0))));
+        VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(index, 0))));
         txtCustomerName.setText((String) tbCustomer.getValueAt(index, 1));
     }//GEN-LAST:event_tbCustomerMousePressed
 
@@ -281,33 +217,24 @@ public class panel_table_reservatio extends javax.swing.JPanel {
         try {
             tbCustomer.setModel(Customer.searchNamePhone(txtCustomerName.getText()));
             tbCustomer.setRowSelectionInterval(0, 0);
-            Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+            VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
         } catch (Exception e) {
             e.printStackTrace();
             tbCustomer.setModel(Customer.getLimit());
-            Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+            VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
         }
     }//GEN-LAST:event_txtCustomerNameKeyReleased
 
     private void tbCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCustomerMouseClicked
-
+        
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void dtTableReservationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtTableReservationPropertyChange
-        Tablereservation.setDateReservation(x);
+        VariableStatic.setDateTimeReservation(getTime());
     }//GEN-LAST:event_dtTableReservationPropertyChange
-
-    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        try {
-            reservationTable();
-        } catch (IOException ex) {
-            Logger.getLogger(panel_table_reservatio.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_btnSaveActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnSave;
     private javax.swing.JComboBox cobHour;
     private javax.swing.JComboBox cobMin;
     private com.toedter.calendar.JDateChooser dtTableReservation;
@@ -317,7 +244,6 @@ public class panel_table_reservatio extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JPanel layout_table;
     private javax.swing.JLabel lbTableName;
     private javax.swing.JTable tbCustomer;
     private javax.swing.JTextField txtCustomerName;

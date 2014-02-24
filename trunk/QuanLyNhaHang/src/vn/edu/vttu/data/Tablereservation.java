@@ -9,6 +9,8 @@ import java.sql.CallableStatement;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -99,14 +101,13 @@ public class Tablereservation {
         }
         return null;
     }
-    public static Tablereservation getByTableByStatus(int idTable, int st) {
+    public static Tablereservation getByTableByStatus(int idTable) {
        Tablereservation table_reservation;
         try {
             Statement state = connectDB.conn().createStatement();
-            String sql = "call table_reservation_getIdTable_status(?,?)";
+            String sql = "call table_reservation_getby_IdTable(?)";
             CallableStatement callstate = connectDB.conn().prepareCall(sql);
-            callstate.setInt(1, idTable);
-            callstate.setInt(2, st);
+            callstate.setInt(1, idTable);            
             ResultSet rs = callstate.executeQuery();
             
             while (rs.next()) {
@@ -203,5 +204,39 @@ public class Tablereservation {
         }
         return flag;
     }
+    public static boolean updateEndDate(int idReservation) {
+        boolean flag = false;
+        try {
+            Statement state = connectDB.conn().createStatement();
+            String sql = "CALL table_reservation_update_enddate(?)";
+            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            callstate.setInt(1, idReservation);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static int countidTableReservation(int idTable) {
+        int count=0;
+        ResultSet rs;
+        try {
+            Statement state = connectDB.conn().createStatement();            
+            CallableStatement calState = connectDB.conn().prepareCall("{CALL table_reservation_select_list_table_reservation(?)}");            
+            calState.setInt(1, idTable);
+            rs = calState.executeQuery();
+            count=rs.getRow();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+    
 
 }

@@ -49,6 +49,7 @@ import vn.edu.vttu.data.Tablelocation;
 import vn.edu.vttu.data.Tablereservation;
 import vn.edu.vttu.data.Tablereservationdetail;
 import vn.edu.vttu.data.Tableservice;
+import vn.edu.vttu.data.VariableStatic;
 
 /**
  *
@@ -103,15 +104,30 @@ public class panel_table extends javax.swing.JPanel {
             popup.add(new JMenuItem(new AbstractAction("Đặt Bàn", new ImageIcon(image2)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showOptionDialog(getRootPane(), new panel_table_reservatio(), "Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
-                    loadTable();
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã save");
-                    /*
-                     if (result == JOptionPane.OK_OPTION) {
-                        
-
-                     }
-                     */
+                    int result = JOptionPane.showConfirmDialog(null, new panel_table_reservation(),
+                            "Đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                    if (result == JOptionPane.OK_OPTION) {
+                        JOptionPane.showMessageDialog(getRootPane(), VariableStatic.getIdCustomer() + "--" + VariableStatic.getDateTimeReservation());
+                        if (Tablereservation.insert(false, VariableStatic.getIdCustomer(), VariableStatic.getDateTimeReservation())) {
+                            int maxid_reservation = Tablereservation.getMaxID().getID();
+                            if (Tablereservationdetail.insert(idTable, maxid_reservation)) {
+                                int stt;
+                                if (statusTable == 1) {
+                                    stt = 1;
+                                } else {
+                                    stt = 2;
+                                }
+                                if (Table.updateStatus(idTable, stt)) {
+                                    try {
+                                        BufferedImage bImgsucc = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.OK_OPTION, new ImageIcon(bImgsucc));
+                                        loadTable();
+                                    } catch (IOException ex) {
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             ));
@@ -245,7 +261,6 @@ public class panel_table extends javax.swing.JPanel {
             Image image12 = bImg12.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
 
             popup.addSeparator();
-
             popup.add(
                     new JMenuItem(new AbstractAction("Quản Lý Khu Vực", new ImageIcon(image12)) {
                         @Override
@@ -408,7 +423,6 @@ public class panel_table extends javax.swing.JPanel {
                             } else {
                                 enableButton(false);
                             }
-
                             Border border = LineBorder.createGrayLineBorder();
                             if (statusBG != -1) {
                                 bt[statusBG].setBackground(Color.getColor("#F0F0F0"));
@@ -418,13 +432,13 @@ public class panel_table extends javax.swing.JPanel {
                             bt[x].setBorder(border);
                             statusBG = x;
                             bt[x].repaint();
+
                             statusTable = status;
                             setTextLable(idTable);
                             loadTableInvoice();
                             totalPay();
-                            Table.setIDTABLE(idTable);
-                            Table.setTABLENAME(Table.getByID(idTable).getNAME());
-
+                            VariableStatic.setIdTable(idTable);
+                            VariableStatic.setNameTable(Table.getByID(idTable).getNAME());
                         }
                     }
                 });
@@ -583,11 +597,12 @@ public class panel_table extends javax.swing.JPanel {
     }
 
     private void setTextLable(int id) {
-        Tablereservation tbReser = Tablereservation.getByTableByStatus(id, statusTable);
+        Tablereservation tbReser = Tablereservation.getByTableByStatus(id);
         beginDate = tbReser.getBeginDate();
         idCustomer = tbReser.getCUSTOMER();
         nameCustomer = tbReser.getCUSTOMER_NAME();
         idTableReservation = tbReser.getID();
+        JOptionPane.showMessageDialog(getRootPane(), idTableReservation);
         // setText lable 
         if (beginDate.equals("Chưa sử dụng")) {
             lbBeginDate.setText(beginDate);
@@ -662,7 +677,7 @@ public class panel_table extends javax.swing.JPanel {
         if (!txtDiscountPercent.getText().equals("")) {
             if (Integer.parseInt(txtDiscountPercent.getText()) < 100 && Integer.parseInt(txtDiscountPercent.getText()) >= 0) {
                 discount_percent = Integer.parseInt(txtDiscountPercent.getText());
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(txtDiscountPercent, "Nhập sai phần trăm");
                 txtDiscountPercent.setText("100");
             }
@@ -693,11 +708,34 @@ public class panel_table extends javax.swing.JPanel {
         }
 
     }
-    private void billing(){
+
+    private boolean billing() {
         /*
-            1. update cac dich vu cua ban ve trang thai isActive=false
-        */
-        
+         1. update cac dich vu cua ban ve trang thai status=false
+         2. update ngay ket thuc endDate cua table_reservation=now()
+         3. update status ban
+         3.1. Neu ban do khong co dat truoc. status=0
+         3.2. Neu ban do co dat truoc. status=2
+         */
+        boolean flag = false;
+        try {
+            if (Tableservice.updateStstus(idTableReservation)
+                    && Tablereservation.updateEndDate(idTableReservation)) {
+                if(Tablereservation.countidTableReservation(idTable)>0){
+                    if(Table.updateStatus(idTable, 2)){
+                        flag = true;
+                    }      
+                }else{
+                    if(Table.updateStatus(idTable, 0)){
+                        flag = true;
+                    }
+                }                
+            }
+        } catch (Exception e) {
+            flag = false;
+        }
+        return flag;
+
     }
 
     /**
@@ -761,6 +799,8 @@ public class panel_table extends javax.swing.JPanel {
         btnPrintPreviewInvoice = new javax.swing.JButton();
         btnChangeTable = new javax.swing.JButton();
         layout_table = new javax.swing.JPanel();
+        btnReloadTable = new javax.swing.JButton();
+        jProgressBar1 = new javax.swing.JProgressBar();
 
         tbService.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         tbService.setModel(new javax.swing.table.DefaultTableModel(
@@ -820,7 +860,7 @@ public class panel_table extends javax.swing.JPanel {
                 .addGap(12, 12, 12)
                 .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1190,7 +1230,7 @@ public class panel_table extends javax.swing.JPanel {
                             .addComponent(jLabel25))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         btnPayment.setBackground(new java.awt.Color(0, 204, 255));
@@ -1199,6 +1239,11 @@ public class panel_table extends javax.swing.JPanel {
         btnPayment.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Ok-icon.png"))); // NOI18N
         btnPayment.setText("Thanh Toán");
         btnPayment.setToolTipText("Click tiến hành thao tác thanh toán hóa đơn cho khách hàng");
+        btnPayment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPaymentActionPerformed(evt);
+            }
+        });
 
         btnCancelTableUse.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnCancelTableUse.setForeground(new java.awt.Color(51, 51, 255));
@@ -1241,7 +1286,7 @@ public class panel_table extends javax.swing.JPanel {
             .addGroup(layout_invoiceLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1255,15 +1300,27 @@ public class panel_table extends javax.swing.JPanel {
 
         layout_table.setLayout(new javax.swing.BoxLayout(layout_table, javax.swing.BoxLayout.LINE_AXIS));
 
+        btnReloadTable.setText("Cập Nhật Danh Sách Bàn");
+        btnReloadTable.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadTableActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(layout_table, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(layout_invoice, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(layout_table, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnReloadTable)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(layout_invoice, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(layout_service, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1273,7 +1330,10 @@ public class panel_table extends javax.swing.JPanel {
             .addComponent(layout_invoice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(layout_table, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnReloadTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1427,6 +1487,24 @@ public class panel_table extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtCustomerPayKeyTyped
 
+    private void btnReloadTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadTableActionPerformed
+        loadTable();
+    }//GEN-LAST:event_btnReloadTableActionPerformed
+
+    private void btnPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaymentActionPerformed
+        if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (billing()) {
+                if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công!\nBạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    loadTableInvoice();
+                    loadTable();
+                } else {
+                    loadTableInvoice();
+                    loadTable();
+                }
+            }
+        }
+    }//GEN-LAST:event_btnPaymentActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddCustomer;
@@ -1434,6 +1512,7 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JButton btnChangeTable;
     private javax.swing.JButton btnPayment;
     private javax.swing.JButton btnPrintPreviewInvoice;
+    private javax.swing.JButton btnReloadTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1454,6 +1533,7 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
