@@ -13,7 +13,7 @@ import java.sql.Statement;
  *
  * @author nhphuoc
  */
-public class Table_Reservation_Detail {
+public class Tablereservationdetail {
     private int ID;
     private int ID_TABLE;
     private int ID_RESERVATION;

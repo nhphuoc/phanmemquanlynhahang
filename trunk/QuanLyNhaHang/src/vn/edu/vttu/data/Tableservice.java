@@ -15,7 +15,7 @@ import net.proteanit.sql.DbUtils;
  *
  * @author nhphuoc
  */
-public class Table_Service {
+public class Tableservice {
 
     private int ID;
     private int ID_SERVICE;

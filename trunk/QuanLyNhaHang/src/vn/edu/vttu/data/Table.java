@@ -145,10 +145,10 @@ public class Table {
         }
         return null;
     }
-
+// nay gio ban viec dau em chay lai cho nao goi ham nay coi
     public static Table[] getByDate(int day, int month, int year) throws SQLException {
         Statement state = connectDB.conn().createStatement();
-        String sql = "call table_get_by_date_reservation(?)";
+        String sql = "call abc(?)";
         CallableStatement calState = connectDB.conn().prepareCall(sql);
         calState.setInt(1, day);
         //calState.setInt(2, month);

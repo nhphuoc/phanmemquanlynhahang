@@ -19,7 +19,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -36,14 +39,16 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Service;
-import vn.edu.vttu.data.Service_Cost;
+import vn.edu.vttu.data.Servicecost;
 import vn.edu.vttu.data.Table;
-import vn.edu.vttu.data.Table_Location;
-import vn.edu.vttu.data.Table_Reservation;
-import vn.edu.vttu.data.Table_Reservation_Detail;
-import vn.edu.vttu.data.Table_Service;
+import vn.edu.vttu.data.Tablelocation;
+import vn.edu.vttu.data.Tablereservation;
+import vn.edu.vttu.data.Tablereservationdetail;
+import vn.edu.vttu.data.Tableservice;
 
 /**
  *
@@ -98,15 +103,15 @@ public class panel_table extends javax.swing.JPanel {
             popup.add(new JMenuItem(new AbstractAction("Đặt Bàn", new ImageIcon(image2)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showOptionDialog(getRootPane(),new panel_table_reservatio(),"Đặt Bàn",JOptionPane.DEFAULT_OPTION,JOptionPane.PLAIN_MESSAGE,null,new Object[]{},null);
+                    JOptionPane.showOptionDialog(getRootPane(), new panel_table_reservatio(), "Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
                     loadTable();
                     JOptionPane.showMessageDialog(getRootPane(), "Đã save");
-                   /*
-                    if (result == JOptionPane.OK_OPTION) {
+                    /*
+                     if (result == JOptionPane.OK_OPTION) {
                         
 
-                    }
-                    */
+                     }
+                     */
                 }
             }
             ));
@@ -254,10 +259,6 @@ public class panel_table extends javax.swing.JPanel {
 
     }
 
-    /**
-     * Load danh sách bàn từ cơ sở dữ liệu tạo thành 1 sơ đồ bàn
-     *
-     */
     private void loadTable() {
         layout_table.removeAll();
         enableButton(false);
@@ -266,7 +267,6 @@ public class panel_table extends javax.swing.JPanel {
         layout_table.add(panel);
         scrollpane = new JScrollPane(panel);
         layout_table.add(scrollpane, BorderLayout.CENTER);
-        
 
         try {
             Table table[] = Table.getAll();
@@ -377,7 +377,7 @@ public class panel_table extends javax.swing.JPanel {
                                 //line
                                 popup.getComponent(19).setEnabled(true);// Quản lý khu vực   
                             } else { //bàn chưa sử dụng
-                                popup.getComponent(0).setEnabled(false);// Sử dụng
+                                popup.getComponent(0).setEnabled(true);// Sử dụng
                                 //line
                                 popup.getComponent(2).setEnabled(true); //Đặt Bàn
                                 popup.getComponent(3).setEnabled(false); //Xem Thông tin đặt bàn
@@ -451,13 +451,13 @@ public class panel_table extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);
-                    if (Table_Service.getServiceByIdService_ByIdReservation(idService, idTableReservation)) {
-                        if (Table_Service.insert(idTableReservation, idService, Integer.parseInt(number), cost)) {
+                    if (Tableservice.getServiceByIdService_ByIdReservation(idService, idTableReservation)) {
+                        if (Tableservice.insert(idTableReservation, idService, Integer.parseInt(number), cost)) {
                             loadTableInvoice();
                             totalPay();
                         }
                     } else {
-                        if (Table_Service.update(idTableReservation, idService, Integer.parseInt(number))) {
+                        if (Tableservice.update(idTableReservation, idService, Integer.parseInt(number))) {
                             loadTableInvoice();
                         }
                     }
@@ -494,7 +494,7 @@ public class panel_table extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     String costnew = JOptionPane.showInputDialog(tbService, "Nhập Giá", cost);
                     if (costnew != null) {
-                        if (Service_Cost.insert(idService, Integer.parseInt(costnew))) {
+                        if (Servicecost.insert(idService, Integer.parseInt(costnew))) {
                             loadTableService();
                         }
                     }
@@ -515,7 +515,7 @@ public class panel_table extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String num = JOptionPane.showInputDialog(tb_invoice, "Nhập số lượng", numberOfServiceInvoice);
-                    if (Table_Service.update(idTableService, Integer.parseInt(num))) {
+                    if (Tableservice.update(idTableService, Integer.parseInt(num))) {
                         loadTableInvoice();
                         totalPay();
                     } else {
@@ -529,7 +529,7 @@ public class panel_table extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn hủy dịch vụ này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        if (Table_Service.delete(idTableService)) {
+                        if (Tableservice.delete(idTableService)) {
                             loadTableInvoice();
                             totalPay();
                         } else {
@@ -557,10 +557,10 @@ public class panel_table extends javax.swing.JPanel {
     private void useTable() {
         Date dt = new Date();
         if (statusTable == 0) {
-            if (Table_Reservation.insert(true)) {
-                int maxid_reservation = Table_Reservation.getMaxID().getID();
+            if (Tablereservation.insert(true)) {
+                int maxid_reservation = Tablereservation.getMaxID().getID();
                 JOptionPane.showMessageDialog(getRootPane(), maxid_reservation);
-                if (Table_Reservation_Detail.insert(idTable, maxid_reservation)) {
+                if (Tablereservationdetail.insert(idTable, maxid_reservation)) {
                     if (Table.updateStatus(idTable, 1)) {
                         loadTable();
                     } else {
@@ -574,7 +574,7 @@ public class panel_table extends javax.swing.JPanel {
             }
         }
         if (statusTable == 2) {
-            if (Table_Reservation.updateStatus(idTable)) {
+            if (Tablereservation.updateStatus(idTable)) {
                 if (Table.updateStatus(idTable, 1)) {
                     loadTable();
                 }
@@ -583,7 +583,7 @@ public class panel_table extends javax.swing.JPanel {
     }
 
     private void setTextLable(int id) {
-        Table_Reservation tbReser = Table_Reservation.getByTableByStatus(id, statusTable);
+        Tablereservation tbReser = Tablereservation.getByTableByStatus(id, statusTable);
         beginDate = tbReser.getBeginDate();
         idCustomer = tbReser.getCUSTOMER();
         nameCustomer = tbReser.getCUSTOMER_NAME();
@@ -616,10 +616,28 @@ public class panel_table extends javax.swing.JPanel {
     }
 
     private void loadTableInvoice() {
-        tb_invoice.setModel(Table_Service.getByIdReservation(idTableReservation));
+        tb_invoice.setModel(Tableservice.getByIdReservation(idTableReservation));
         if (tb_invoice.getRowCount() > 0) {
             tb_invoice.setRowSelectionInterval(0, 0);
         }
+    }
+
+    private boolean testNumber(String num) {
+        boolean test = false;
+        if (num.equals("")) {
+            test = false;
+        } else {
+            for (int i = 0; i < num.length(); i++) {
+                if (Character.isLetter(num.charAt(i))) {
+                    test = false;
+                    break;
+                }
+                if (i + 1 == num.length()) {
+                    test = true;
+                }
+            }
+        }
+        return test;
     }
 
     private void totalPay() {
@@ -629,26 +647,32 @@ public class panel_table extends javax.swing.JPanel {
         int discount_percent = 0;
         int customer_pay = 0;
         double x;
-        if (!txtService_Price.getText().equals("")) {
-            service_Charges = Integer.parseInt(txtService_Price.getText());
+        if (!txtService_Price.getText().equals("") && testNumber(txtService_Price.getText())) {
+            service_Charges = Float.parseFloat(txtService_Price.getValue().toString());
 
         }
         if (!txtService_Price.getText().equals("")) {
-            service_Charges = Float.parseFloat(txtService_Price.getText());
+            service_Charges = Float.parseFloat(txtService_Price.getValue().toString());
 
         }
         if (!txtDiscountMoney.getText().equals("")) {
-            discount_money = Integer.parseInt(txtDiscountMoney.getText());
+            discount_money = Integer.parseInt(txtDiscountMoney.getValue().toString());
 
         }
         if (!txtDiscountPercent.getText().equals("")) {
-            discount_percent = Integer.parseInt(txtDiscountPercent.getText());
+            if (Integer.parseInt(txtDiscountPercent.getText()) < 100 && Integer.parseInt(txtDiscountPercent.getText()) >= 0) {
+                discount_percent = Integer.parseInt(txtDiscountPercent.getText());
+            }else{
+                JOptionPane.showMessageDialog(txtDiscountPercent, "Nhập sai phần trăm");
+                txtDiscountPercent.setText("100");
+            }
+
         }
         if (!txtCustomerPay.getText().equals("")) {
-            customer_pay = Integer.parseInt(txtCustomerPay.getText());
+            customer_pay = Integer.parseInt(txtCustomerPay.getValue().toString());
         }
 
-        float total = Table_Service.totalPayment(idTableReservation);
+        float total = Tableservice.totalPayment(idTableReservation);
         //JOptionPane.showMessageDialog(getRootPane(), service_Charges);
         lbTotal.setText(String.valueOf(df.format(total)));
         float discount = (discount_percent * total) / 100;
@@ -660,7 +684,7 @@ public class panel_table extends javax.swing.JPanel {
         }
 
         lbTotalPay.setText(String.valueOf(df.format(totalPay)));
-        total = Table_Service.totalPayment(idTableReservation);
+        total = Tableservice.totalPayment(idTableReservation);
         lbTotal.setText(String.valueOf(df.format(total)));
         if (customer_pay < totalPay) {
             lbChangeForCustomer.setText("Thiếu: " + String.valueOf(df.format(Math.abs(customer_pay - totalPay))));
@@ -668,6 +692,12 @@ public class panel_table extends javax.swing.JPanel {
             lbChangeForCustomer.setText(df.format(customer_pay - totalPay));
         }
 
+    }
+    private void billing(){
+        /*
+            1. update cac dich vu cua ban ve trang thai isActive=false
+        */
+        
     }
 
     /**
@@ -705,13 +735,11 @@ public class panel_table extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        txtDiscountMoney = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         txtDiscountPercent = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
-        txtCustomerPay = new javax.swing.JTextField();
         jLabel17 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         lbTotal = new javax.swing.JLabel();
@@ -725,7 +753,9 @@ public class panel_table extends javax.swing.JPanel {
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
         jSeparator7 = new javax.swing.JSeparator();
-        txtService_Price = new javax.swing.JTextField();
+        txtService_Price = new javax.swing.JFormattedTextField();
+        txtDiscountMoney = new javax.swing.JFormattedTextField();
+        txtCustomerPay = new javax.swing.JFormattedTextField();
         btnPayment = new javax.swing.JButton();
         btnCancelTableUse = new javax.swing.JButton();
         btnPrintPreviewInvoice = new javax.swing.JButton();
@@ -955,15 +985,6 @@ public class panel_table extends javax.swing.JPanel {
         jLabel11.setForeground(new java.awt.Color(0, 102, 255));
         jLabel11.setText("VNĐ");
 
-        txtDiscountMoney.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        txtDiscountMoney.setForeground(new java.awt.Color(0, 102, 255));
-        txtDiscountMoney.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtDiscountMoney.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtDiscountMoneyKeyReleased(evt);
-            }
-        });
-
         jLabel13.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(0, 102, 255));
         jLabel13.setText("VNĐ");
@@ -978,6 +999,9 @@ public class panel_table extends javax.swing.JPanel {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtDiscountPercentKeyReleased(evt);
             }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDiscountPercentKeyTyped(evt);
+            }
         });
 
         jLabel15.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -986,15 +1010,6 @@ public class panel_table extends javax.swing.JPanel {
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel16.setText("Khách Đưa:");
-
-        txtCustomerPay.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        txtCustomerPay.setForeground(new java.awt.Color(0, 102, 255));
-        txtCustomerPay.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        txtCustomerPay.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtCustomerPayKeyReleased(evt);
-            }
-        });
 
         jLabel17.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(0, 102, 255));
@@ -1036,11 +1051,45 @@ public class panel_table extends javax.swing.JPanel {
         jLabel27.setForeground(new java.awt.Color(255, 51, 51));
         jLabel27.setText("VNĐ");
 
+        txtService_Price.setForeground(new java.awt.Color(0, 51, 255));
+        txtService_Price.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0"))));
+        txtService_Price.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtService_Price.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        txtService_Price.setForeground(new java.awt.Color(51, 51, 255));
         txtService_Price.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtService_PriceKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtService_PriceKeyReleased1(evt);
+                txtService_PriceKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtService_PriceKeyTyped(evt);
+            }
+        });
+
+        txtDiscountMoney.setForeground(new java.awt.Color(0, 0, 255));
+        txtDiscountMoney.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0"))));
+        txtDiscountMoney.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtDiscountMoney.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtDiscountMoney.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtDiscountMoneyKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDiscountMoneyKeyTyped(evt);
+            }
+        });
+
+        txtCustomerPay.setForeground(new java.awt.Color(51, 0, 255));
+        txtCustomerPay.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#,##0"))));
+        txtCustomerPay.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtCustomerPay.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtCustomerPay.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCustomerPayKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCustomerPayKeyTyped(evt);
             }
         });
 
@@ -1049,24 +1098,24 @@ public class panel_table extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addComponent(jLabel14)
-                            .addGap(21, 21, 21)
-                            .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtService_Price)))
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel16)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtDiscountPercent, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                            .addComponent(txtCustomerPay))
+                        .addGap(5, 5, 5))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtCustomerPay, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDiscountPercent, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel14))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDiscountMoney)
+                            .addComponent(txtService_Price, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel15)
                     .addComponent(jLabel17)
@@ -1112,17 +1161,17 @@ public class panel_table extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel13))
+                            .addComponent(jLabel13)
+                            .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel15)
                             .addComponent(txtDiscountPercent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtCustomerPay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel16)
-                            .addComponent(jLabel17)))
+                            .addComponent(jLabel17)
+                            .addComponent(txtCustomerPay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1141,7 +1190,7 @@ public class panel_table extends javax.swing.JPanel {
                             .addComponent(jLabel25))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         btnPayment.setBackground(new java.awt.Color(0, 204, 255));
@@ -1192,7 +1241,7 @@ public class panel_table extends javax.swing.JPanel {
             .addGroup(layout_invoiceLayout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1256,24 +1305,21 @@ public class panel_table extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSearchKeyTyped
 
     private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
-        totalPay();
-    }//GEN-LAST:event_txtService_PriceKeyReleased
+        try {
+            txtService_Price.commitEdit();
+            txtService_Price.setText(txtService_Price.getValue().toString());
+            totalPay();
 
-    private void txtDiscountMoneyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyReleased
-        totalPay();
-    }//GEN-LAST:event_txtDiscountMoneyKeyReleased
+        } catch (ParseException ex) {
+            Logger.getLogger(panel_table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_txtService_PriceKeyReleased
 
     private void txtDiscountPercentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyReleased
         totalPay();
     }//GEN-LAST:event_txtDiscountPercentKeyReleased
-
-    private void txtCustomerPayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyReleased
-        totalPay();
-    }//GEN-LAST:event_txtCustomerPayKeyReleased
-
-    private void txtService_PriceKeyReleased1(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased1
-        totalPay();
-    }//GEN-LAST:event_txtService_PriceKeyReleased1
 
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCustomerActionPerformed
 
@@ -1282,12 +1328,104 @@ public class panel_table extends javax.swing.JPanel {
         if (result == JOptionPane.OK_OPTION) {
             JOptionPane.showMessageDialog(getRootPane(), Customer.getID());
             if (Customer.getID() > 0) {
-                if (Table_Reservation.updateCustomer(Customer.getID(), idTableReservation)) {
+                if (Tablereservation.updateCustomer(Customer.getID(), idTableReservation)) {
                     setTextLable(idTable);
                 }
             }
         }
     }//GEN-LAST:event_btnAddCustomerActionPerformed
+
+    private void txtService_PriceKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyPressed
+        totalPay();
+    }//GEN-LAST:event_txtService_PriceKeyPressed
+
+    private void txtDiscountMoneyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyReleased
+        try {
+            txtDiscountMoney.commitEdit();
+            totalPay();
+        } catch (ParseException ex) {
+            Logger.getLogger(panel_table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_txtDiscountMoneyKeyReleased
+    private void txtCustomerPayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyReleased
+        try {
+            txtCustomerPay.commitEdit();
+            totalPay();
+        } catch (ParseException ex) {
+            Logger.getLogger(panel_table.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_txtCustomerPayKeyReleased
+
+    private void txtService_PriceKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyTyped
+        int key = evt.getKeyChar();
+        String st = txtService_Price.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtService_PriceKeyTyped
+
+    private void txtDiscountMoneyKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyTyped
+        int key = evt.getKeyChar();
+        String st = txtDiscountMoney.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtDiscountMoneyKeyTyped
+
+    private void txtDiscountPercentKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyTyped
+        int key = evt.getKeyChar();
+        String st = txtDiscountPercent.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtDiscountPercentKeyTyped
+
+    private void txtCustomerPayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyTyped
+        int key = evt.getKeyChar();
+        String st = txtCustomerPay.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtCustomerPayKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1338,10 +1476,10 @@ public class panel_table extends javax.swing.JPanel {
     private javax.swing.JLabel lbTotalPay;
     private javax.swing.JTable tbService;
     private javax.swing.JTable tb_invoice;
-    private javax.swing.JTextField txtCustomerPay;
-    private javax.swing.JTextField txtDiscountMoney;
+    private javax.swing.JFormattedTextField txtCustomerPay;
+    private javax.swing.JFormattedTextField txtDiscountMoney;
     private javax.swing.JTextField txtDiscountPercent;
     private javax.swing.JTextField txtSearch;
-    private javax.swing.JTextField txtService_Price;
+    private javax.swing.JFormattedTextField txtService_Price;
     // End of variables declaration//GEN-END:variables
 }

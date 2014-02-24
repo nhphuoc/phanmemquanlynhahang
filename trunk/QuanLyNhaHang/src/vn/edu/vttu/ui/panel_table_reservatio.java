@@ -21,12 +21,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import org.omg.IOP.TAG_RMI_CUSTOM_MAX_STREAM_FORMAT;
+
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Table;
-import vn.edu.vttu.data.Table_Reservation;
-import vn.edu.vttu.data.Table_Reservation_Detail;
+import vn.edu.vttu.data.Tablelocation;
+import vn.edu.vttu.data.Tablereservation;
+import vn.edu.vttu.data.Tablereservationdetail;
 
 /**
  *
@@ -101,11 +101,11 @@ public class panel_table_reservatio extends javax.swing.JPanel {
 
     private void reservationTable() throws IOException {
         panel_table_reservatio tb = new panel_table_reservatio();
-        String s = Table_Reservation.getDateReservation();
+        String s = Tablereservation.getDateReservation();
         JOptionPane.showMessageDialog(getRootPane(), getTime());
-        if (Table_Reservation.insert(false, Customer.getID(), getTime())) {
-            int maxid_reservation = Table_Reservation.getMaxID().getID();
-            if (Table_Reservation_Detail.insert(idTable, maxid_reservation)) {
+        if (Tablereservation.insert(false, Customer.getID(), getTime())) {
+            int maxid_reservation = Tablereservation.getMaxID().getID();
+            if (Tablereservationdetail.insert(idTable, maxid_reservation)) {
                 if (Table.updateStatus(idTable, 2)) {
                     BufferedImage bImg2 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Ok-icon.png"));
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.OK_OPTION, new ImageIcon(bImg2));
@@ -294,7 +294,7 @@ public class panel_table_reservatio extends javax.swing.JPanel {
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void dtTableReservationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtTableReservationPropertyChange
-        Table_Reservation.setDateReservation(x);
+        Tablereservation.setDateReservation(x);
     }//GEN-LAST:event_dtTableReservationPropertyChange
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed

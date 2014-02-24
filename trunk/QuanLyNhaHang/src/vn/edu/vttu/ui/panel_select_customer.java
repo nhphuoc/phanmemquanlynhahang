@@ -15,8 +15,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import vn.edu.vttu.data.Customer;
-import vn.edu.vttu.data.Table_Reservation;
-import vn.edu.vttu.data.Table_Service;
+import vn.edu.vttu.data.Tablereservation;
+import vn.edu.vttu.data.Tableservice;
 
 /**
  *

@@ -14,7 +14,7 @@ import java.sql.Statement;
  *
  * @author nhphuoc
  */
-public class Table_Reservation {
+public class Tablereservation {
 
     private int ID;
     private int CUSTOMER;
@@ -30,7 +30,7 @@ public class Table_Reservation {
     }
 
     public static void setDateReservation(String DateReservation) {
-        Table_Reservation.DateReservation = DateReservation;
+        Tablereservation.DateReservation = DateReservation;
     }
 
     public int getID() {
@@ -57,50 +57,50 @@ public class Table_Reservation {
         return STATUS;
     }
 
-    public Table_Reservation(int id) {
+    public Tablereservation(int id) {
         this.ID = id;
     }
 
-    public Table_Reservation(int id, int customer_id, String customer_name, String beginDate) {
+    public Tablereservation(int id, int customer_id, String customer_name, String beginDate) {
         this.ID=id;
         this.CUSTOMER=customer_id;
         this.CUSTOMER_NAME=customer_name;
         this.beginDate=beginDate;
     }
 
-    public static Table_Reservation getMaxID() {
+    public static Tablereservation getMaxID() {
         try {
             Statement state = connectDB.conn().createStatement();
             String sql = "call table_reservation_getMaxID()";
             CallableStatement callstate = connectDB.conn().prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
-            Table_Reservation table_reservation;
+            Tablereservation table_reservation;
             while (rs.next()) {
-                table_reservation = new Table_Reservation(rs.getInt("id"));
+                table_reservation = new Tablereservation(rs.getInt("id"));
                 return table_reservation;
             }
         } catch (Exception e) {
         }
         return null;
     }
-    public static Table_Reservation getMaxIDReservation(int idTable) {
+    public static Tablereservation getMaxIDReservation(int idTable) {
         try {
             Statement state = connectDB.conn().createStatement();
             String sql = "call table_reservation_getmaxid_by_Reservation(?)";
             CallableStatement callstate = connectDB.conn().prepareCall(sql);
             callstate.setInt(1,idTable);
             ResultSet rs = callstate.executeQuery();
-            Table_Reservation table_reservation;
+            Tablereservation table_reservation;
             while (rs.next()) {
-                table_reservation = new Table_Reservation(rs.getInt("id"));
+                table_reservation = new Tablereservation(rs.getInt("id"));
                 return table_reservation;
             }
         } catch (Exception e) {
         }
         return null;
     }
-    public static Table_Reservation getByTableByStatus(int idTable, int st) {
-       Table_Reservation table_reservation;
+    public static Tablereservation getByTableByStatus(int idTable, int st) {
+       Tablereservation table_reservation;
         try {
             Statement state = connectDB.conn().createStatement();
             String sql = "call table_reservation_getIdTable_status(?,?)";
@@ -110,12 +110,12 @@ public class Table_Reservation {
             ResultSet rs = callstate.executeQuery();
             
             while (rs.next()) {
-                table_reservation = new Table_Reservation(rs.getInt("id"),rs.getInt("id_customer_id"),rs.getString("name"),rs.getString("beginDate"));
+                table_reservation = new Tablereservation(rs.getInt("id"),rs.getInt("id_customer_id"),rs.getString("name"),rs.getString("beginDate"));
                 return table_reservation;
             }
         } catch (Exception e) {
         }
-        table_reservation = new Table_Reservation(-1,-1,"Chọn khách hàng","Chưa sử dụng");
+        table_reservation = new Tablereservation(-1,-1,"Chọn khách hàng","Chưa sử dụng");
         return table_reservation;
     }
     public static boolean insert(boolean status) {

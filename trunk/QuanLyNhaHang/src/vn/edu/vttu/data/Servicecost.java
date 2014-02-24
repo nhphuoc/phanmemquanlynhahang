@@ -13,7 +13,7 @@ import java.sql.Statement;
  *
  * @author nhphuoc
  */
-public class Service_Cost {
+public class Servicecost {
     private int ID_SERVICE;
     private String beginDate;
     private int COST;
