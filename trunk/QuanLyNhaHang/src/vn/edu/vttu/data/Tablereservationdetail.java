@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Statement;
 
 /**
@@ -29,12 +30,11 @@ public class Tablereservationdetail {
     public int getID_RESERVATION() {
         return ID_RESERVATION;
     }
-    public static boolean insert(int idTable, int idReservation){
+    public static boolean insert(int idTable, int idReservation, Connection conn){
         boolean flag = false;
         try {
-            Statement state = connectDB.conn().createStatement();
-            String sql = "CALL table_reservation_detail_insert(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            String sql = "CALL table_reservation_detail_insert(?,?)";            
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTable);
             callstate.setInt(2, idReservation);
             int x = callstate.executeUpdate();

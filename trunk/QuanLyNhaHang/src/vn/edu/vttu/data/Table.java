@@ -10,6 +10,7 @@ package vn.edu.vttu.data;
  * @author nhphuoc
  */
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -112,11 +113,10 @@ public class Table {
         this.NAME_LOCATION = NAME_LOCATION;
     }
 
-    public static Table[] getAll() throws SQLException {
-
-        Statement state = connectDB.conn().createStatement();
+    public static Table[] getAll(Connection conn) throws SQLException {
+        
         String sql = "call table_getAll()";
-        CallableStatement calState = connectDB.conn().prepareCall(sql);
+        CallableStatement calState = conn.prepareCall(sql);
         ResultSet rs = calState.executeQuery(sql);
         rs.last();
         Table[] tables = new Table[rs.getRow()];
@@ -129,12 +129,11 @@ public class Table {
         return tables;
     }
 
-    public static Table getByID(int id) {
+    public static Table getByID(int id,Connection conn) {
         Table table;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "call table_getById(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
@@ -146,10 +145,9 @@ public class Table {
         return null;
     }
 // nay gio ban viec dau em chay lai cho nao goi ham nay coi
-    public static Table[] getByDate(int day, int month, int year) throws SQLException {
-        Statement state = connectDB.conn().createStatement();
+    public static Table[] getByDate(int day, int month, int year, Connection conn) throws SQLException {        
         String sql = "call abc(?)";
-        CallableStatement calState = connectDB.conn().prepareCall(sql);
+        CallableStatement calState = conn.prepareCall(sql);
         calState.setInt(1, day);
         //calState.setInt(2, month);
         //calState.setInt(3, year);
@@ -165,12 +163,11 @@ public class Table {
         return tables;
     }
 
-    public static boolean updateStatus(int id, int status) {
+    public static boolean updateStatus(int id, int status, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
-            String sql = "CALL table_update_status(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+        try {                        
+            String sql = "CALL table_update_status(?,?)";            
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
             callstate.setInt(2, status);
             int x = callstate.executeUpdate();

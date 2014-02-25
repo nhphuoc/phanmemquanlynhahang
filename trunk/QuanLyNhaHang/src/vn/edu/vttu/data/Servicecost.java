@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Statement;
 
 /**
@@ -30,12 +31,11 @@ public class Servicecost {
         return COST;
     }
     
-    public static boolean insert(int sv_id, int cost) {
+    public static boolean insert(int sv_id, int cost, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL service_cost_insert(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, sv_id);
             callstate.setInt(2, cost);            
             int x = callstate.executeUpdate();

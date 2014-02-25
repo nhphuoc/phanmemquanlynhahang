@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Statement;
 
 /**
@@ -87,12 +88,11 @@ public class Invoice {
         this.discount=discount;
         this.note=note;
     }
-    public static boolean insert(int id_reservation, int id_staff, int cost, int discount, String note) {
+    public static boolean insert(int id_reservation, int id_staff, int cost, int discount, String note, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL invoice_insert_all(?,?,?,?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id_reservation);
             callstate.setInt(2, id_staff);
             callstate.setInt(3, cost);

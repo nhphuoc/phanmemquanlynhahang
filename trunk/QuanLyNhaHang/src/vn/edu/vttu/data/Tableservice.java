@@ -6,6 +6,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.table.TableModel;
@@ -48,12 +49,11 @@ public class Tableservice {
         return TOTAL;
     }
 
-    public static TableModel getByIdReservation(int id) {
+    public static TableModel getByIdReservation(int id, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL table_service_getByIdReservation(?)}");
+        try {            
+            CallableStatement calState = conn.prepareCall("{CALL table_service_getByIdReservation(?)}");
             calState.setInt(1, id);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
@@ -63,12 +63,11 @@ public class Tableservice {
         return tb;
     }
 
-    public static boolean insert(int id_reservation, int idService, int num, int cost) {
+    public static boolean insert(int id_reservation, int idService, int num, int cost, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_service_insert(?,?,?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id_reservation);
             callstate.setInt(2, idService);
             callstate.setInt(3, num);
@@ -87,14 +86,13 @@ public class Tableservice {
         return flag;
     }
 
-    public static boolean getServiceByIdService_ByIdReservation(int idService, int idReservation) {
+    public static boolean getServiceByIdService_ByIdReservation(int idService, int idReservation, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         String count;
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL table_service_count_service_byIdReservation(?,?)}");
+        try {            
+            CallableStatement calState = conn.prepareCall("{CALL table_service_count_service_byIdReservation(?,?)}");
             calState.setInt(1, idService);
             calState.setInt(2, idReservation);
             rs = calState.executeQuery();
@@ -111,12 +109,11 @@ public class Tableservice {
         return flag;
     }
 
-    public static boolean update(int id_reservation, int idService, int num) {
+    public static boolean update(int id_reservation, int idService, int num, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_service_update(?,?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idService);
             callstate.setInt(2, num);
             callstate.setInt(3, id_reservation);
@@ -134,12 +131,11 @@ public class Tableservice {
         return flag;
     }
 
-    public static boolean update(int idTableService, int num) {
+    public static boolean update(int idTableService, int num, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_service_update_number_byidTableService(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTableService);
             callstate.setInt(2, num);
             int x = callstate.executeUpdate();
@@ -156,12 +152,11 @@ public class Tableservice {
         return flag;
     }
 
-    public static boolean updateStstus(int idReservation) {
+    public static boolean updateStstus(int idReservation, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_service_update_status_byIdReservation(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idReservation);
             int x = callstate.executeUpdate();
             if (x > 0) {
@@ -176,13 +171,12 @@ public class Tableservice {
         return flag;
     }
 
-    public static boolean delete(int id_tableReservation) {
+    public static boolean delete(int idTableService, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_service_delete(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
-            callstate.setInt(1, id_tableReservation);
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idTableService);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -197,13 +191,12 @@ public class Tableservice {
         return flag;
     }
 
-    public static int totalPayment(int idReservation) {
+    public static int totalPayment(int idReservation, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         int total;
-        try {
-            Statement state = connectDB.conn().createStatement();
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL table_service_total_payment(?)}");
+        try {            
+            CallableStatement calState = conn.prepareCall("{CALL table_service_total_payment(?)}");
             calState.setInt(1, idReservation);
             rs = calState.executeQuery();
             rs.last();

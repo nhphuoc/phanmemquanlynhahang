@@ -6,6 +6,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -70,11 +71,11 @@ public class Tablereservation {
         this.beginDate=beginDate;
     }
 
-    public static Tablereservation getMaxID() {
-        try {
-            Statement state = connectDB.conn().createStatement();
+    public static Tablereservation getMaxID(Connection conn) {
+        try {            
+            Statement state = conn.createStatement();
             String sql = "call table_reservation_getMaxID()";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
             Tablereservation table_reservation;
             while (rs.next()) {
@@ -85,11 +86,10 @@ public class Tablereservation {
         }
         return null;
     }
-    public static Tablereservation getMaxIDReservation(int idTable) {
-        try {
-            Statement state = connectDB.conn().createStatement();
+    public static Tablereservation getMaxIDReservation(int idTable, Connection conn) {
+        try {            
             String sql = "call table_reservation_getmaxid_by_Reservation(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1,idTable);
             ResultSet rs = callstate.executeQuery();
             Tablereservation table_reservation;
@@ -101,12 +101,11 @@ public class Tablereservation {
         }
         return null;
     }
-    public static Tablereservation getByTableByStatus(int idTable) {
+    public static Tablereservation getByTableByStatus(int idTable, Connection conn) {
        Tablereservation table_reservation;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "call table_reservation_getby_IdTable(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTable);            
             ResultSet rs = callstate.executeQuery();
             
@@ -119,12 +118,12 @@ public class Tablereservation {
         table_reservation = new Tablereservation(-1,-1,"Chọn khách hàng","Chưa sử dụng");
         return table_reservation;
     }
-    public static boolean insert(boolean status) {
+    public static boolean insert(boolean status, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
-            String sql = "CALL table_reservation_insert(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+        try {            
+            Statement state = conn.createStatement();
+            String sql = "CALL table_reservation_insert(?)";            
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setBoolean(1, status);
             int x = callstate.executeUpdate();
             if (x == 1) {
@@ -140,12 +139,11 @@ public class Tablereservation {
         return flag;
     }
     
-    public static boolean insert(boolean status, int idCustomer, String dt) {
+    public static boolean insert(boolean status, int idCustomer, String dt, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_reservation_insert_customerid(?,?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setBoolean(1, status);
             callstate.setInt(2, idCustomer);
             callstate.setString(3, dt);
@@ -164,12 +162,11 @@ public class Tablereservation {
     }
     
     
-    public static boolean updateCustomer(int idCustomer, int idReservation) {
+    public static boolean updateCustomer(int idCustomer, int idReservation, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_reservation_update_customer(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idCustomer);
             callstate.setInt(2, idReservation);
             int x = callstate.executeUpdate();
@@ -185,12 +182,11 @@ public class Tablereservation {
         return flag;
     }
     
-    public static boolean updateStatus(int idTable) {
+    public static boolean updateStatus(int idTable, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_reservation_update_status(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTable);            
             int x = callstate.executeUpdate();
             if (x == 1) {
@@ -204,12 +200,11 @@ public class Tablereservation {
         }
         return flag;
     }
-    public static boolean updateEndDate(int idReservation) {
+    public static boolean updateEndDate(int idReservation, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL table_reservation_update_enddate(?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idReservation);            
             int x = callstate.executeUpdate();
             if (x == 1) {
@@ -223,12 +218,11 @@ public class Tablereservation {
         }
         return flag;
     }
-    public static int countidTableReservation(int idTable) {
+    public static int countidTableReservation(int idTable, Connection conn) {
         int count=0;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();            
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL table_reservation_select_list_table_reservation(?)}");            
+        try {                        
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_select_list_table_reservation(?)}");            
             calState.setInt(1, idTable);
             rs = calState.executeQuery();
             count=rs.getRow();
@@ -236,6 +230,18 @@ public class Tablereservation {
             e.printStackTrace();
         }
         return count;
+    }
+    public static TableModel getListTableReservation(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list()}");                        
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
     }
     
 

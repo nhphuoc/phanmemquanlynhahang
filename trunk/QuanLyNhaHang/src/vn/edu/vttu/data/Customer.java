@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -55,12 +56,11 @@ public class Customer {
     public String getEMAIL() {
         return EMAIL;
     }
-    public static TableModel getLimit() {
+    public static TableModel getLimit(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();            
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL customer_get_limit()}");            
+        try {                     
+            CallableStatement calState = conn.prepareCall("{CALL customer_get_limit()}");            
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -68,12 +68,11 @@ public class Customer {
         }
         return tb;
     }
-    public static TableModel searchNamePhone(String key) {
+    public static TableModel searchNamePhone(String key, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();            
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL customer_search_name_phone(?)}");            
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL customer_search_name_phone(?)}");            
             calState.setString(1, key);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);

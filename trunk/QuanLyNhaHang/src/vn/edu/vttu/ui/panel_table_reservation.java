@@ -11,6 +11,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import vn.edu.vttu.data.Tablelocation;
 import vn.edu.vttu.data.Tablereservation;
 import vn.edu.vttu.data.Tablereservationdetail;
 import vn.edu.vttu.data.VariableStatic;
+import vn.edu.vttu.data.connectDB;
 
 /**
  *
@@ -44,7 +46,7 @@ public class panel_table_reservation extends javax.swing.JPanel {
     int index = 0;
     String x;
     JScrollPane scrollpane;
-
+    private Connection conn = connectDB.conn();
     public panel_table_reservation() {
         initComponents();
         lbTableName.setText(VariableStatic.getNameTable());  
@@ -54,7 +56,7 @@ public class panel_table_reservation extends javax.swing.JPanel {
 
     }   
     private void loadCustomer() {
-        tbCustomer.setModel(Customer.getLimit());
+        tbCustomer.setModel(Customer.getLimit(conn));
         tbCustomer.setRowSelectionInterval(0, 0);
     }
 
@@ -215,12 +217,12 @@ public class panel_table_reservation extends javax.swing.JPanel {
 
     private void txtCustomerNameKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerNameKeyReleased
         try {
-            tbCustomer.setModel(Customer.searchNamePhone(txtCustomerName.getText()));
+            tbCustomer.setModel(Customer.searchNamePhone(txtCustomerName.getText(),conn));
             tbCustomer.setRowSelectionInterval(0, 0);
             VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
         } catch (Exception e) {
             e.printStackTrace();
-            tbCustomer.setModel(Customer.getLimit());
+            tbCustomer.setModel(Customer.getLimit(conn));
             VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
         }
     }//GEN-LAST:event_txtCustomerNameKeyReleased

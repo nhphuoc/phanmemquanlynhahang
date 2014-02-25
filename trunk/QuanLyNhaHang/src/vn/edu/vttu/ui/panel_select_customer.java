@@ -8,6 +8,7 @@ package vn.edu.vttu.ui;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.sql.Connection;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -17,6 +18,7 @@ import javax.swing.JPopupMenu;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Tablereservation;
 import vn.edu.vttu.data.Tableservice;
+import vn.edu.vttu.data.connectDB;
 
 /**
  *
@@ -28,6 +30,7 @@ public class panel_select_customer extends javax.swing.JPanel {
      * Creates new form pn
      */
     private JPopupMenu popupMenuTableInvoice;
+    private Connection conn=connectDB.conn();
 
     public panel_select_customer() {
         initComponents();
@@ -37,7 +40,7 @@ public class panel_select_customer extends javax.swing.JPanel {
     }
 
     private void loadTable() {
-        tbCustomer.setModel(Customer.getLimit());
+        tbCustomer.setModel(Customer.getLimit(conn));
         tbCustomer.setRowSelectionInterval(0, 0);
         Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
     }
@@ -137,7 +140,7 @@ public class panel_select_customer extends javax.swing.JPanel {
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void txtSearchCustomerKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchCustomerKeyReleased
-        tbCustomer.setModel(Customer.searchNamePhone(txtSearchCustomer.getText()));
+        tbCustomer.setModel(Customer.searchNamePhone(txtSearchCustomer.getText(),conn));
         tbCustomer.setRowSelectionInterval(0, 0);  
         Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
 

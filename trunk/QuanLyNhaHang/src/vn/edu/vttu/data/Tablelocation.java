@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -30,11 +31,9 @@ public class Tablelocation {
         this.ID=ID;
         this.NAME=NAME;
     }
-    public static Tablelocation[] getAll() throws SQLException {
-
-        Statement state = connectDB.conn().createStatement();
+    public static Tablelocation[] getAll(Connection conn) throws SQLException {        
         String sql = "call table_location_getAll()";
-        CallableStatement calState = connectDB.conn().prepareCall(sql);
+        CallableStatement calState = conn.prepareCall(sql);
         ResultSet rs = calState.executeQuery(sql);
         rs.last();
         Tablelocation tables_location[] = new Tablelocation[rs.getRow()];

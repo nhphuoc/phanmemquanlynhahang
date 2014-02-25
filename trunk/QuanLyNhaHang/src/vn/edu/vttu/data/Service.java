@@ -7,6 +7,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.table.TableModel;
@@ -47,12 +48,11 @@ public class Service {
     public String getIMAGES() {
         return IMAGES;
     }
-    public static TableModel getAllService() {
+    public static TableModel getAllService(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();            
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL service_getAll()}");            
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL service_getAll()}");            
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -61,12 +61,11 @@ public class Service {
         return tb;
     }
     
-    public static TableModel searchByName(String key) {
+    public static TableModel searchByName(String key, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {
-            Statement state = connectDB.conn().createStatement();            
-            CallableStatement calState = connectDB.conn().prepareCall("{CALL service_search_byName(?)}");            
+        try {                       
+            CallableStatement calState = conn.prepareCall("{CALL service_search_byName(?)}");            
             calState.setString(1, key);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
@@ -75,12 +74,11 @@ public class Service {
         }
         return tb;
     }
-    public static boolean updateName(String name, int idService) {
+    public static boolean updateName(String name, int idService, Connection conn) {
         boolean flag = false;
-        try {
-            Statement state = connectDB.conn().createStatement();
+        try {            
             String sql = "CALL service_update_name(?,?)";
-            CallableStatement callstate = connectDB.conn().prepareCall(sql);
+            CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
             callstate.setInt(2, idService);            
             int x = callstate.executeUpdate();
