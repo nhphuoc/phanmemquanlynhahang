@@ -11,15 +11,11 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
@@ -29,7 +25,6 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
-import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.data.ConnectDB;
 
@@ -141,16 +136,35 @@ public class PanelViewReservation extends javax.swing.JPanel {
             popupmenu.add(new JMenuItem(new AbstractAction("Hủy Đặt Bàn", new ImageIcon(imageDel)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn muốn hủy đơn đặt bàn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        if (TableReservation.reservationCancel(idreservation, conn)) {
-                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                            loadListTable();
-                        } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
-                            loadListTable();
+                    conn = ConnectDB.conn();
+                    try {
+                        conn.setAutoCommit(false);
+                        if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn muốn hủy đơn đặt bàn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            if (TableReservation.reservationCancel(idreservation, conn)) {
+                                if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                                    if (Table.updateStatus(idTable, 2, conn)) {
+                                        conn.commit();
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                        loadListTable();
+                                    }
+                                } else {
+                                    if (Table.updateStatus(idTable, 0, conn)) {
+                                        conn.commit();
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                        loadListTable();
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        try {
+                            conn.rollback();
+                        } catch (SQLException ex1) {
+                            Logger.getLogger(PanelViewReservation.class.getName()).log(Level.SEVERE, null, ex1);
                         }
                     }
 
+                    conn = null;
                 }
             }));
             BufferedImage bImgUpdate = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));

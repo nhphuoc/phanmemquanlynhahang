@@ -8,7 +8,6 @@ package vn.edu.vttu.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -16,22 +15,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -42,14 +35,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.Table;
-import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
 import vn.edu.vttu.data.TableService;
@@ -111,6 +101,8 @@ public class PanelTable extends javax.swing.JPanel {
                                     + "\nGợi ý: Bạn có thể xem danh sách đặt bàn và thay đổi thông tin đặt bàn!", "Thông Báo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                                 useTable();
                             }
+                        }else{
+                            useTable();
                         }
 
                     } catch (SQLException ex) {
@@ -658,6 +650,7 @@ public class PanelTable extends javax.swing.JPanel {
             }
             conn = null;
         } catch (Exception e) {
+            e.printStackTrace();
             conn.rollback();
             conn = null;
             JOptionPane.showMessageDialog(getRootPane(), "Không Thành Công");
