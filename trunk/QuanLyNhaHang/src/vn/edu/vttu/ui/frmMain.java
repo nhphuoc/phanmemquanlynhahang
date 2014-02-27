@@ -23,7 +23,7 @@ public class frmMain extends javax.swing.JFrame {
     public frmMain() {
         initComponents();
         main.removeAll();
-        panel_table pn_table = new panel_table();
+        PanelTable pn_table = new PanelTable();
         main.add(pn_table);
         main.revalidate();
         main.repaint();
@@ -44,8 +44,9 @@ public class frmMain extends javax.swing.JFrame {
         jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("PHẦN MỀM QUẢN LÝ NHÀ HÀNG - RSM");
 
-        main.setLayout(new java.awt.GridLayout());
+        main.setLayout(new java.awt.GridLayout(1, 0));
 
         jMenu3.setText("File");
         jMenuBar2.add(jMenu3);

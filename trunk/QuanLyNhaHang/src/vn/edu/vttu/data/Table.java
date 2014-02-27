@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Date;
+import java.util.Vector;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -47,7 +48,7 @@ public class Table {
     private int STATUS;
     private String NAME_LOCATION;
 
-    connectDB connect = new connectDB();
+    ConnectDB connect = new ConnectDB();
 
     public int getID() {
         return ID;
@@ -113,25 +114,29 @@ public class Table {
         this.NAME_LOCATION = NAME_LOCATION;
     }
 
-    public static Table[] getAll(Connection conn) throws SQLException {
-        
-        String sql = "call table_getAll()";
-        CallableStatement calState = conn.prepareCall(sql);
-        ResultSet rs = calState.executeQuery(sql);
-        rs.last();
-        Table[] tables = new Table[rs.getRow()];
-        rs.beforeFirst();
-        int i = 0;
-        while (rs.next()) {
-            tables[i] = new Table(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getInt("location"), rs.getInt("numOfChair"), rs.getInt("status"));
-            i++;
+    public static Table[] getAll(Connection conn) {
+        Table[] tables = null;
+        try {
+            String sql = "call table_getAll()";
+            CallableStatement calState = conn.prepareCall(sql);
+            ResultSet rs = calState.executeQuery(sql);
+            rs.last();
+            tables = new Table[rs.getRow()];
+            rs.beforeFirst();
+            int i = 0;
+            while (rs.next()) {
+                tables[i] = new Table(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getInt("location"), rs.getInt("numOfChair"), rs.getInt("status"));
+                i++;
+            }
+
+        } catch (Exception e) {
         }
         return tables;
     }
 
-    public static Table getByID(int id,Connection conn) {
+    public static Table getByID(int id, Connection conn) {
         Table table;
-        try {            
+        try {
             String sql = "call table_getById(?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
@@ -144,8 +149,29 @@ public class Table {
         }
         return null;
     }
-// nay gio ban viec dau em chay lai cho nao goi ham nay coi
-    public static Table[] getByDate(int day, int month, int year, Connection conn) throws SQLException {        
+
+    public static Table[] getByLocation(int idLocation, Connection conn) {
+        Table[] tables = null;
+        try {
+            String sql = "SELECT * FROM `table` WHERE `table`.`type`="+idLocation+" AND `table`.`isActive`=TRUE;";
+            CallableStatement calState = conn.prepareCall(sql);            
+            ResultSet rs = calState.executeQuery(sql);
+            rs.last();
+            tables = new Table[rs.getRow()];
+            rs.beforeFirst();
+            int i = 0;
+            while (rs.next()) {
+                tables[i] = new Table(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getInt("location"), rs.getInt("numOfChair"), rs.getInt("status"));
+                i++;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tables;
+    }
+
+    public static Table[] getByDate(int day, int month, int year, Connection conn) throws SQLException {
         String sql = "call abc(?)";
         CallableStatement calState = conn.prepareCall(sql);
         calState.setInt(1, day);
@@ -165,13 +191,13 @@ public class Table {
 
     public static boolean updateStatus(int id, int status, Connection conn) {
         boolean flag = false;
-        try {                        
-            String sql = "CALL table_update_status(?,?)";            
+        try {
+            String sql = "CALL table_update_status(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
             callstate.setInt(2, status);
             int x = callstate.executeUpdate();
-            if (x == 1) {
+            if (x >=0) {
                 flag = true;
             } else {
                 flag = false;
@@ -182,6 +208,73 @@ public class Table {
         }
 
         return flag;
+    }
+
+    public static boolean updateStatus(String name, int status, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_update_status_by_name(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setInt(2, status);
+            int x = callstate.executeUpdate();
+            if (x >=0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+
+    public static Table getByName(String name, Connection conn) {
+        Table table;
+        try {
+            String sql = "call table_getByName(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                table = new Table(rs.getInt("id"), rs.getString("name_table"), rs.getInt("type"), rs.getInt("location"), rs.getInt("numOfChair"), rs.getInt("status"), rs.getString("name_location"));
+                return table;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
+    public static Vector selectTable(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "call table_getbyStatus()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.Table tb = new vn.edu.vttu.model.Table(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
+    }
+    
+    public static TableModel loadTableByStatus(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                       
+            CallableStatement calState = conn.prepareCall("{CALL table_getbyStatus()}");    
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
     }
 
 }
