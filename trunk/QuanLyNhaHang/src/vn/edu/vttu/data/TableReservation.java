@@ -271,11 +271,40 @@ public class TableReservation {
         }
         return count;
     }
+    public static int countidTableUsing(int idTable, Connection conn) {
+        int count=0;
+        ResultSet rs;
+        try {                        
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_count_table_using(?)}");            
+            calState.setInt(1, idTable);
+            rs = calState.executeQuery();            
+            while(rs.next()){
+                count=count+1;
+            }            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
     public static TableModel getListTableReservation(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {                    
             CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list()}");                        
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+    
+    public static TableModel getListTableReservationSearch(String key,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list_search(?)}");                        
+            calState.setString(1, key);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {

@@ -211,5 +211,24 @@ public class TableService {
         }
         return total;
     }
+    public static boolean updateIdReservation(int idReservation1, int idReservation2,  Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL table_service_update_id_reservation_id(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idReservation1);
+            callstate.setInt(2, idReservation2);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
 }

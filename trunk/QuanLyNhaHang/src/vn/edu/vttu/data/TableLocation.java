@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Vector;
 
 /**
  *
@@ -69,7 +70,42 @@ public class TableLocation {
             e.printStackTrace();
         }
         return tables_location;
-    }  
+    }
+    public static Vector selectTableLocation(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "call table_location_getAll()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.TableLocation tb = new vn.edu.vttu.model.TableLocation(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static boolean insert(String name,String detail, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_location_add(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setString(2, detail);
+            int x = callstate.executeUpdate();
+            if (x ==1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
     
     
 }

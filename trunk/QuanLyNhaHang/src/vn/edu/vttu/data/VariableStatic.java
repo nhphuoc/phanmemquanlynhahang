@@ -19,6 +19,15 @@ public class VariableStatic {
     public static String nameCustomer;    
     public static String dateTimeReservation; 
     public static boolean status;
+    private static int idTable_Change;
+
+    public static int getIdTable_Change() {
+        return idTable_Change;
+    }
+
+    public static void setIdTable_Change(int idTable_Change) {
+        VariableStatic.idTable_Change = idTable_Change;
+    }
 
     public static boolean isStatus() {
         return status;

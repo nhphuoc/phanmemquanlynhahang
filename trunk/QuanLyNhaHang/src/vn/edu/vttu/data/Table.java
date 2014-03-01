@@ -153,7 +153,7 @@ public class Table {
     public static Table[] getByLocation(int idLocation, Connection conn) {
         Table[] tables = null;
         try {
-            String sql = "SELECT * FROM `table` WHERE `table`.`type`="+idLocation+" AND `table`.`isActive`=TRUE;";
+            String sql = "SELECT * FROM `table` WHERE `table`.`location`="+idLocation+" AND `table`.`isActive`=TRUE;";
             CallableStatement calState = conn.prepareCall(sql);            
             ResultSet rs = calState.executeQuery(sql);
             rs.last();
@@ -247,10 +247,10 @@ public class Table {
         return null;
     }
 
-    public static Vector selectTable(Connection conn) {
+    public static Vector selectTableByLocation(int idLocation, int status, Connection conn) {
         Vector result = new Vector();
         try {
-            String sql = "call table_getbyStatus()";
+            String sql = "SELECT * FROM `table` WHERE `table`.`location`="+idLocation+" AND `table`.status ="+status+" and `table`.`isActive`=TRUE;";
             CallableStatement callstate = conn.prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
@@ -263,7 +263,7 @@ public class Table {
         }
         return result;
     }
-    
+            
     public static TableModel loadTableByStatus(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
@@ -275,6 +275,65 @@ public class Table {
             e.printStackTrace();
         }
         return tb;
+    }
+    public static boolean insertNewTable(String name, int type, int location, int chair, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_insert_new_table(?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setInt(2, type);
+            callstate.setInt(3, location);
+            callstate.setInt(4, chair);
+            int x = callstate.executeUpdate();
+            if (x ==1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean testTableName(String name,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean flag=false;
+        try {                       
+            CallableStatement calState = conn.prepareCall("call table_test_table_name(?)");    
+            calState.setString(1, name);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(tb.getRowCount()<=0){
+                flag=true;
+            }else{
+                flag=false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean updateTableName(String name, int idTable,Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_update_name(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setInt(2, idTable);            
+            int x = callstate.executeUpdate();
+            if (x >=0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
     }
 
 }

@@ -142,16 +142,32 @@ public class PanelViewReservation extends javax.swing.JPanel {
                         if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn muốn hủy đơn đặt bàn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                             if (TableReservation.reservationCancel(idreservation, conn)) {
                                 if (TableReservation.countidTableReservation(idTable, conn) > 0) {
-                                    if (Table.updateStatus(idTable, 2, conn)) {
-                                        conn.commit();
-                                        JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                        loadListTable();
+                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                        if (Table.updateStatus(idTable, 1, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                            loadListTable();
+                                        }
+                                    } else {
+                                        if (Table.updateStatus(idTable, 2, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                            loadListTable();
+                                        }
                                     }
                                 } else {
-                                    if (Table.updateStatus(idTable, 0, conn)) {
-                                        conn.commit();
-                                        JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                        loadListTable();
+                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                        if (Table.updateStatus(idTable, 1, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                            loadListTable();
+                                        }
+                                    } else {
+                                        if (Table.updateStatus(idTable, 0, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                            loadListTable();
+                                        }
                                     }
                                 }
                             }
@@ -173,7 +189,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int result = JOptionPane.showConfirmDialog(null, new PanelChangeReservation(),
-                            "Đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                            "Cập nhật thông tin đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (result == JOptionPane.OK_OPTION) {
                         int id = VariableStatic.getIdTable();
                         String date = VariableStatic.getDateTimeReservation();
@@ -184,14 +200,52 @@ public class PanelViewReservation extends javax.swing.JPanel {
                             conn.setAutoCommit(false);
                             if (TableReservation.updateBeginDate(idreservation, date, conn)) {
                                 if (TableReservationDetail.updateTable(idreservation_detail, id, conn)) {
-                                    conn.commit();
-                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
-                                    loadListTable();
+                                    if (TableReservation.countidTableUsing(id, conn) > 0) {
+                                        if (Table.updateStatus(id, 1, conn)) {
+                                            conn.commit();                                            
+                                            loadListTable();
+                                        }
+                                    } else {
+                                        if (TableReservation.countidTableReservation(id, conn) > 0) {
+                                            if (Table.updateStatus(id, 2, conn)) {
+                                                conn.commit();                                                
+                                                loadListTable();
+                                            }
+                                        } else {
+                                            if (Table.updateStatus(id, 0, conn)) {
+                                                conn.commit();                                                
+                                                loadListTable();
+                                            }
+                                        }
+                                    }
+
+                                    conn.setAutoCommit(false);
+                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                        if (Table.updateStatus(idTable, 1, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                            loadListTable();
+                                        }
+                                    } else {
+                                        if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                                            if (Table.updateStatus(idTable, 2, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                                loadListTable();
+                                            }
+                                        } else {
+                                            if (Table.updateStatus(idTable, 0, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                                loadListTable();
+                                            }
+                                        }
+                                    }
                                 } else {
-                                    JOptionPane.showMessageDialog(getRootPane(), "2");
+                                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
                                 }
                             } else {
-                                JOptionPane.showMessageDialog(getRootPane(), "1");
+                                JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
                             }
                         } catch (SQLException ex) {
                             try {
@@ -232,22 +286,34 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tbListTable = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        txtSearchReservation = new javax.swing.JTextField();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
         btnView = new javax.swing.JButton();
 
         tbListTable.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         tbListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, "", "Chưa có", null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID", "Bàn", "Khách Hàng", "SĐT", "Ngày Nhận"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tbListTable.setGridColor(new java.awt.Color(204, 204, 204));
         tbListTable.setRowHeight(25);
         tbListTable.setSelectionBackground(new java.awt.Color(255, 153, 0));
@@ -262,8 +328,19 @@ public class PanelViewReservation extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tbListTable);
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jTextField1.setForeground(new java.awt.Color(0, 204, 51));
+        txtSearchReservation.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        txtSearchReservation.setForeground(new java.awt.Color(0, 204, 51));
+        txtSearchReservation.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchReservationKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchReservationKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSearchReservationKeyTyped(evt);
+            }
+        });
 
         jDateChooser1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
 
@@ -274,7 +351,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtSearchReservation, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -287,7 +364,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSearchReservation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(btnView)
@@ -333,12 +410,46 @@ public class PanelViewReservation extends javax.swing.JPanel {
         //JOptionPane.showMessageDialog(getRootPane(), String.valueOf(tbListTable.getValueAt(index, 1)));
     }//GEN-LAST:event_tbListTableMouseClicked
 
+    private void txtSearchReservationKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchReservationKeyTyped
+
+    }//GEN-LAST:event_txtSearchReservationKeyTyped
+
+    private void txtSearchReservationKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchReservationKeyPressed
+
+    }//GEN-LAST:event_txtSearchReservationKeyPressed
+
+    private void txtSearchReservationKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchReservationKeyReleased
+        conn = ConnectDB.conn();
+        try {
+            tbListTable.setModel(TableReservation.getListTableReservationSearch(txtSearchReservation.getText(), conn));
+            tbListTable.setRowSelectionInterval(0, 0);
+            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+        } catch (Exception e) {
+            tbListTable.setModel(TableReservation.getListTableReservation(conn));
+            tbListTable.setRowSelectionInterval(0, 0);
+            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+        }
+
+    }//GEN-LAST:event_txtSearchReservationKeyReleased
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnView;
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JTable tbListTable;
+    private javax.swing.JTextField txtSearchReservation;
     // End of variables declaration//GEN-END:variables
 }
