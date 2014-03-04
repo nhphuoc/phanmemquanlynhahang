@@ -83,6 +83,11 @@ public class PanelSelectCustomer extends javax.swing.JPanel {
         });
 
         tbCustomer.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        tbCustomer = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbCustomer.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

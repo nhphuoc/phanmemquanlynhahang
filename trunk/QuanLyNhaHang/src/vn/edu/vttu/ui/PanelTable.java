@@ -17,13 +17,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import net.sf.jasperreports.engine.JRException;
+import javax.swing.table.TableModel;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -59,6 +61,7 @@ import vn.edu.vttu.data.TableReservationDetail;
 import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.SystemLog;
 import vn.edu.vttu.data.TableLocation;
 
 /**
@@ -90,6 +93,59 @@ public class PanelTable extends javax.swing.JPanel {
         }
     }
 
+    class TaskReservation extends TimerTask {
+
+        public void run() {
+            conn = ConnectDB.conn();
+            int info1 = VariableStatic.getIdSystemLog();
+            SystemLog[] slog = SystemLog.getRowSystemLog(conn);
+            int info2 = slog.length;
+
+            if (info2 > info1) {
+                System.out.println(info1 + "--" + info2);
+                System.out.println(slog[0].getDate());
+                loadTable(idLocation);
+                VariableStatic.setIdSystemLog(info2);
+            }
+            conn = ConnectDB.conn();
+        }
+    }
+
+    class TaskWarningUser extends TimerTask {
+
+        public void run() {
+            conn = ConnectDB.conn();
+            try {
+                TableModel tb = TableReservation.getByTable_DateTime(conn);
+                if (tb.getRowCount() > 0) {
+                    conn.setAutoCommit(false);
+                    for (int i = 0; i < tb.getRowCount(); i++) {
+                        int idtb = Integer.parseInt(String.valueOf(tb.getValueAt(i, 3)));
+                        if (TableReservation.countidTableUsing(idtb, conn) > 0) {
+                            if (TableReservation.countidTableReservation(idtb, conn) > 0) {
+                                Table.updateStatus(idtb, 4, conn);
+                            } else {
+                                Table.updateStatus(idtb, 1, conn);
+                            }
+                        } else {
+                            Table.updateStatus(idtb, 3, conn);
+                        }
+                    }
+                    conn.commit();
+                    loadTable(idLocation);
+                }
+            } catch (Exception e) {
+                try {
+                    conn.rollback();
+                    JOptionPane.showMessageDialog(getRootPane(), "Có lỗi xảy ra");
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        }
+    }
+
     /**
      * Creates new form panel_main
      */
@@ -102,7 +158,7 @@ public class PanelTable extends javax.swing.JPanel {
     private int idTableReservation = -1;
     private int idCustomer = -1;
     private String nameCustomer = "";
-    private String beginDate = "";
+    private Timestamp beginDate = null;
     private int idService;
     private int cost;
     private int numberOfServiceInvoice;
@@ -123,9 +179,12 @@ public class PanelTable extends javax.swing.JPanel {
         loadTable(idLocation);
         loadTableService();
         fillkhCombo();
-
+        TimerTask taskreservation = new TaskReservation();
+        Timer timer = new Timer();
+        timer.schedule(taskreservation, new Date(), 2000);
+        TimerTask taskwarninguser = new TaskWarningUser();
+        timer.schedule(taskwarninguser, new Date(), 30000);
         try {
-
             popup = new JPopupMenu();
             BufferedImage bImg1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/useTable.png"));
             Image image1 = bImg1.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
@@ -157,6 +216,7 @@ public class PanelTable extends javax.swing.JPanel {
             popup.add(new JMenuItem(new AbstractAction("Đặt Bàn", new ImageIcon(image2)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
                     int result = JOptionPane.showConfirmDialog(null, new PanelTableReservation(),
                             "Đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (result == JOptionPane.OK_OPTION) {
@@ -172,7 +232,9 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-
+                            int result = JOptionPane.showOptionDialog(null, new PanelReservationMultiTable(),
+                                    "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+                            loadTable(idLocation);
                         }
                     }));
             BufferedImage bImg2_1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/calendar.png"));
@@ -210,27 +272,34 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-                            if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                                try {
-                                    if (billing()) {
-                                        if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công!\nBạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            try {
+                                if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                    if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                        printInvoice();
+                                        if (billing()) {
                                             loadTableInvoice();
                                             loadTable(idLocation);
                                             setTextLable(idTable);
                                             totalPay();
-                                            printInvoice();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Thanh toán thành công");
+
                                         } else {
-                                            loadTableInvoice();
-                                            loadTable(idLocation);
-                                            setTextLable(idTable);
-                                            totalPay();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Có lỗi xảy ra");
                                         }
                                     } else {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Có lỗi xảy ra");
+                                        if (billing()) {
+
+                                            loadTableInvoice();
+                                            loadTable(idLocation);
+                                            setTextLable(idTable);
+                                            totalPay();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Thanh toán thành công");
+                                        } else {
+                                            JOptionPane.showMessageDialog(getRootPane(), "Có lỗi xảy ra");
+                                        }
                                     }
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
                                 }
+                            } catch (Exception ex) {
                             }
                         }
                     }));
@@ -246,7 +315,7 @@ public class PanelTable extends javax.swing.JPanel {
                                 printInvoice();
                             } catch (Exception ex) {
                             }
-                            
+
                         }
                     }));
             BufferedImage bImg7 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/move-icon.png"));
@@ -406,6 +475,18 @@ public class PanelTable extends javax.swing.JPanel {
                     ImageIcon icon = new ImageIcon(image);
                     bt[i].setIcon(icon);
                     bt[i].setPreferredSize(new Dimension(50, 50));
+                } else if (table[i].getSTATUS() == 3) {
+                    BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/warningTable.png"));
+                    Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+                    ImageIcon icon = new ImageIcon(image);
+                    bt[i].setIcon(icon);
+                    bt[i].setPreferredSize(new Dimension(50, 50));
+                } else if (table[i].getSTATUS() == 4) {
+                    BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/warningtb.png"));
+                    Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+                    ImageIcon icon = new ImageIcon(image);
+                    bt[i].setIcon(icon);
+                    bt[i].setPreferredSize(new Dimension(50, 50));
                 } else {
                     BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/table_icon.png"));
                     Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
@@ -422,9 +503,15 @@ public class PanelTable extends javax.swing.JPanel {
                 BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/table_icon.png"));
                 Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                 ImageIcon icon = new ImageIcon(image);
-                bt[i].setToolTipText("<html>"
-                        + "<font color='#009900'>Thong tin ban</font>"
-                        + "</html>");
+                String tooltip = "";
+                if (statusTable == 1) {
+                    tooltip = "Bàn đang được thuê";
+                } else if (statusTable == 2) {
+                    tooltip = "Bàn đang được đặt trước";
+                } else {
+                    tooltip = "Bàn đang trống";
+                }
+                bt[i].setToolTipText(tooltip);
                 // bt[i].add(popup);
                 final int idtb = table[i].getID();
                 final int status = table[i].getSTATUS();
@@ -522,8 +609,8 @@ public class PanelTable extends javax.swing.JPanel {
                         if (status == 1) {
                             enableButton(true);
                         } else if (status == 2) {
+                            enableButton(false);
                             btnAddCustomer.setEnabled(true);
-                            btnChangeTable.setEnabled(true);
                         } else {
                             enableButton(false);
                         }
@@ -560,8 +647,12 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void loadTableService() {
         conn = ConnectDB.conn();
-        tbService.setModel(Service.getAllService(conn));
-        tbService.setRowSelectionInterval(0, 0);
+        tbService.setModel(Service.getAllLimit(conn));
+        try {
+            tbService.setRowSelectionInterval(0, 0);
+        } catch (Exception e) {
+        }
+
     }
 
     private void popupTableService() {
@@ -689,14 +780,24 @@ public class PanelTable extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         try {
             Date dt = new Date();
-            conn.setAutoCommit(false);
-            if (TableReservation.insert(true, conn)) {
-                int maxid_reservation = TableReservation.getMaxID(conn).getID();
-                //JOptionPane.showMessageDialog(getRootPane(), maxid_reservation);
-                if (TableReservationDetail.insert(idTable, maxid_reservation, conn)) {
-                    if (Table.updateStatus(idTable, 1, conn)) {
-                        conn.commit();
-                        loadTable(idLocation);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String datetime = formatter.format(dt);
+            Timestamp ts = Timestamp.valueOf(datetime);
+            TableModel tb = TableReservation.getByTable_DateTime(idTable, ts, conn);
+            if (tb.getRowCount() > 0) {
+                JOptionPane.showMessageDialog(getRootPane(), "<html>Xin lỗi bạn không thể sử dụng bàn <b><font color='green'>" + Table.getByID(idTable, conn).getNAME() + "</font></b>ngay bây giờ.<br>"
+                        + "Vì đã có khách hàng <font color='green'><b>" + String.valueOf(tb.getValueAt(0, 2)) + "</b></font> nhận bàn vào lúc <font color='blue'><b>" + String.valueOf(tb.getValueAt(0, 3)) + "</b></font>"
+                        + "<br>Xin vui lòng chọn bàn khác!</html>");
+            } else {
+                conn.setAutoCommit(false);
+                if (TableReservation.insert(true, conn)) {
+                    int maxid_reservation = TableReservation.getMaxID(conn).getID();
+                    //JOptionPane.showMessageDialog(getRootPane(), maxid_reservation);
+                    if (TableReservationDetail.insert(idTable, maxid_reservation, conn)) {
+                        if (Table.updateStatus(idTable, 1, conn)) {
+                            conn.commit();
+                            loadTable(idLocation);
+                        }
                     }
                 }
             }
@@ -710,8 +811,9 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void cancelUseTable() {
+        conn = ConnectDB.conn();
         try {
-            conn = ConnectDB.conn();
+
             conn.setAutoCommit(false);
             int count = tb_invoice.getRowCount();
             if (count < 1) {
@@ -724,6 +826,7 @@ public class PanelTable extends javax.swing.JPanel {
                                 loadTable(idLocation);
                             }
                         } else {
+                            conn.setAutoCommit(false);
                             if (Table.updateStatus(idTable, 0, conn)) {
                                 conn.commit();
                                 JOptionPane.showMessageDialog(getRootPane(), "Đã hủy sử dụng thành công");
@@ -791,11 +894,21 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void reservationTable() {
+        conn = ConnectDB.conn();
         if (testDate(VariableStatic.getDateTimeReservation()) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Thời gian đặt phải lớn hơn thời gian hiện tại");
+            TableModel tb = TableReservation.getByTable_DateTime(idTable, VariableStatic.getDateTimeReservation(), conn);
+            Timestamp ts = VariableStatic.getDateTimeReservation();
+            if (tb.getRowCount() <= 0) {
+                JOptionPane.showMessageDialog(getRootPane(), "Ngày đặt phải lớn hơn ngày hiện tại");
+            } else {
+
+                JOptionPane.showMessageDialog(getRootPane(), "<html>Bạn không thể đặt bàn <b><font color='green'>" + Table.getByID(idTable, conn).getNAME() + "</font></b> trong thời gian này"
+                        + "vì đã có khách hàng đang sử dụng hoặc sẽ nhận bàn vào lúc <font color='blue'><b>" + ts.getHours() + " giờ, ngày " + ts.getDate() + "/" + (ts.getMonth() + 1) + "/" + (ts.getYear() + 1900) + " </b></font>"
+                        + "<br>Xin vui lòng chọn thời gian khác hoặc bàn khác!</html>");
+
+            }
         } else {
             try {
-                conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
                 if (TableReservation.insert(false, VariableStatic.getIdCustomer(), VariableStatic.getDateTimeReservation(), conn)) {
                     int maxid_reservation = TableReservation.getMaxID(conn).getID();
@@ -833,15 +946,11 @@ public class PanelTable extends javax.swing.JPanel {
         nameCustomer = tbReser.getCUSTOMER_NAME();
         idTableReservation = tbReser.getID();
         // setText lable 
-        if (beginDate.equals("Chưa sử dụng")) {
-            lbBeginDate.setText(beginDate);
+        if (beginDate == null) {
+            lbBeginDate.setText("Chưa sử dụng");
         } else {
-            String s[] = beginDate.split(" ");
-            String d = s[0];
-            String t = s[1];
-            String d1[] = d.split("-");
-            String t1[] = t.split(":");
-            String datetime = t1[0] + ":" + t1[1] + " - " + d1[2] + "/" + d1[1] + "/" + d1[0];
+            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+            String datetime = formatter.format(beginDate);
             lbBeginDate.setText(datetime);
 
         }
@@ -850,44 +959,31 @@ public class PanelTable extends javax.swing.JPanel {
         conn = null;
     }
 
-    private boolean testDate(String date) {
+    private boolean testDate(Timestamp date) {
+        conn = ConnectDB.conn();
         boolean flag = false;
-        String arrDateTime[] = date.split(" ");
-        String arrDate[] = arrDateTime[0].split("-");
-        String arrTime[] = arrDateTime[1].split(":");
-
-        int year = Integer.parseInt(arrDate[0]);
-        int month = Integer.parseInt(arrDate[1]);
-        int day = Integer.parseInt(arrDate[2]);
-
-        int hour = Integer.parseInt(arrTime[0]);
-        int min = Integer.parseInt(arrTime[1]);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = formatter.format(new Date());
+        Timestamp ts = Timestamp.valueOf(datetime);
+        TableModel tb = TableReservation.getByTable_DateTime(idTable, date, conn);
         Date dt = new Date();
-        int date1 = year * 12 * 31 + month * 31 + day;// ngày đặt
-        int day1 = dt.getDate();
-        int month1 = dt.getMonth() + 1;
-        int year1 = dt.getYear() + 1900;
-        int date2 = year1 * 12 * 31 + month1 * 31 + day1; // ngày hiện tại        
-        if (date1 - date2 < 0) {
-            return false;
-        }
-        if (date1 - date2 == 0) {
-            if (hour < dt.getHours()) {
-                return false;
-            } else if (hour == dt.getHours()) {
-                if (min < dt.getMinutes()) {
-                    return false;
-                } else {
-                    return true;
-                }
+        if (statusTable == 1) {
+            int ss = date.getDate() + (date.getMonth() + 1) * 31 + (date.getYear() + 1900) * 12 * 31;
+            int dd = dt.getDate() + (dt.getMonth() + 1) * 31 + (dt.getYear() + 1900) * 12 * 31;
+            if (ss <= dd && (date.getHours() <= dt.getHours())) {
+                flag = false;
             } else {
-                return true;
+                flag = true;
+            }
+        } else {
+
+            if (date.compareTo(ts) < 0 || tb.getRowCount() > 0) {
+                flag = false;
+            } else {
+                flag = true;
             }
         }
-        if (date1 - date2 > 0) {
-            return true;
-        }
-        return true;
+        return flag;
     }
 
     private void enableButton(boolean b) {
@@ -1023,28 +1119,28 @@ public class PanelTable extends javax.swing.JPanel {
         return flag;
     }
 
-    private void printInvoice(){
+    private void printInvoice() {
         try {
-            conn=ConnectDB.conn();
+            conn = ConnectDB.conn();
             DecimalFormat df = new DecimalFormat("#,###,###");
-            String servicePay="0";
-            if(!txtService_Price.getText().equals("")){
-                servicePay=txtService_Price.getText();
-            }            
+            String servicePay = "0";
+            if (!txtService_Price.getText().equals("")) {
+                servicePay = txtService_Price.getText();
+            }
             HashMap<String, Object> parameter = new HashMap<String, Object>();
-            parameter.put("idReservation",idTableReservation);            
-            parameter.put("totalFirst",lbTotal.getText());            
-            parameter.put("servicePayment",servicePay);            
-            parameter.put("paymentDown",df.format(discount));            
-            parameter.put("totalLast",df.format(totalPay));
-            parameter.put("customer",lbCustomerName.getText());
-            parameter.put("customer",lbCustomerName.getText());
-            parameter.put("staff",lbStaff.getText());
-            parameter.put("dateUse",lbBeginDate.getText());
-            parameter.put("note",txtNoteinvoice.getText());
-            
+            parameter.put("idReservation", idTableReservation);
+            parameter.put("totalFirst", lbTotal.getText());
+            parameter.put("servicePayment", servicePay);
+            parameter.put("paymentDown", df.format(discount));
+            parameter.put("totalLast", df.format(totalPay));
+            parameter.put("customer", lbCustomerName.getText());
+            parameter.put("customer", lbCustomerName.getText());
+            parameter.put("staff", lbStaff.getText());
+            parameter.put("dateUse", lbBeginDate.getText());
+            parameter.put("note", txtNoteinvoice.getText());
+
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/Invoice.jrxml"));
-            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter,conn);
+            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
             JasperViewer jv = new JasperViewer(jp, false);
             jv.setVisible(true);
         } catch (Exception ex) {
@@ -1134,6 +1230,11 @@ public class PanelTable extends javax.swing.JPanel {
         btnViewTableByLocation = new javax.swing.JButton();
 
         tbService.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        tbService = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;
+            }
+        };
         tbService.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1312,6 +1413,11 @@ public class PanelTable extends javax.swing.JPanel {
         );
 
         tb_invoice.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        tb_invoice = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tb_invoice.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1693,7 +1799,6 @@ public class PanelTable extends javax.swing.JPanel {
                     .addComponent(btnViewTableByLocation)))
         );
     }// </editor-fold>//GEN-END:initComponents
-
     private void tbServiceMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbServiceMousePressed
         try {
             int index = tbService.getSelectedRow();
@@ -1706,14 +1811,12 @@ public class PanelTable extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_tbServiceMousePressed
-
     private void tb_invoiceMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_invoiceMousePressed
         int index = tb_invoice.getSelectedRow();
         numberOfServiceInvoice = (int) tb_invoice.getValueAt(index, 2);
         idTableService = (int) tb_invoice.getValueAt(index, 0);
         //JOptionPane.showMessageDialog(getRootPane(), idTableService);
     }//GEN-LAST:event_tb_invoiceMousePressed
-
     private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
         try {
             tbService.setModel(Service.searchByName(txtSearch.getText(), conn));
@@ -1721,7 +1824,6 @@ public class PanelTable extends javax.swing.JPanel {
         } catch (Exception e) {
         }
     }//GEN-LAST:event_txtSearchKeyTyped
-
     private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
         try {
             txtService_Price.commitEdit();
@@ -1735,11 +1837,9 @@ public class PanelTable extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_txtService_PriceKeyReleased
-
     private void txtDiscountPercentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyReleased
         totalPay();
     }//GEN-LAST:event_txtDiscountPercentKeyReleased
-
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCustomerActionPerformed
         conn = ConnectDB.conn();
         int result = JOptionPane.showConfirmDialog(null, new PanelSelectCustomer(),
@@ -1754,11 +1854,9 @@ public class PanelTable extends javax.swing.JPanel {
         }
         conn = null;
     }//GEN-LAST:event_btnAddCustomerActionPerformed
-
     private void txtService_PriceKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyPressed
         totalPay();
     }//GEN-LAST:event_txtService_PriceKeyPressed
-
     private void txtDiscountMoneyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyReleased
         try {
             txtDiscountMoney.commitEdit();
@@ -1781,7 +1879,6 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_txtCustomerPayKeyReleased
-
     private void txtService_PriceKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyTyped
         int key = evt.getKeyChar();
         String st = txtService_Price.getText();
@@ -1799,7 +1896,6 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtService_PriceKeyTyped
-
     private void txtDiscountMoneyKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountMoneyKeyTyped
         int key = evt.getKeyChar();
         String st = txtDiscountMoney.getText();
@@ -1816,7 +1912,6 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtDiscountMoneyKeyTyped
-
     private void txtDiscountPercentKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDiscountPercentKeyTyped
         int key = evt.getKeyChar();
         String st = txtDiscountPercent.getText();
@@ -1833,7 +1928,6 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtDiscountPercentKeyTyped
-
     private void txtCustomerPayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyTyped
         int key = evt.getKeyChar();
         String st = txtCustomerPay.getText();
@@ -1850,12 +1944,10 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtCustomerPayKeyTyped
-
     private void btnReloadTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadTableActionPerformed
         idLocation = -1;
         loadTable(idLocation);
     }//GEN-LAST:event_btnReloadTableActionPerformed
-
     private void btnPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaymentActionPerformed
         if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             try {
@@ -1875,21 +1967,17 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_btnPaymentActionPerformed
-
     private void btnViewTableByLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewTableByLocationActionPerformed
         vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) jcomboTableLocation.getSelectedItem();
         idLocation = tbLocation.getId();
         loadTable(idLocation);
     }//GEN-LAST:event_btnViewTableByLocationActionPerformed
-
     private void btnChangeTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeTableActionPerformed
         changeTable();
     }//GEN-LAST:event_btnChangeTableActionPerformed
-
     private void btnCancelTableUseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelTableUseActionPerformed
         cancelUseTable();
     }//GEN-LAST:event_btnCancelTableUseActionPerformed
-
     private void btnPrintPreviewInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintPreviewInvoiceActionPerformed
         printInvoice();
     }//GEN-LAST:event_btnPrintPreviewInvoiceActionPerformed

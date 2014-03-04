@@ -6,6 +6,7 @@
 package vn.edu.vttu.ui;
 
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,12 +36,7 @@ public class PanelChangeReservation extends javax.swing.JPanel {
         loadTable();
         //tbChangeReservation.setRowSelectionInterval(0, 0);        
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-        Date date = null;
-        try {
-            date = sdf.parse(VariableStatic.getDateTimeReservation());
-        } catch (ParseException ex) {
-            Logger.getLogger(PanelViewReservation.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Timestamp date = VariableStatic.getDateTimeReservation();
         dtDateReservation.setDate(date);
         //JOptionPane.showMessageDialog(getRootPane(), VariableStatic.getDateTimeReservation());
     }
@@ -81,6 +77,11 @@ public class PanelChangeReservation extends javax.swing.JPanel {
         jLabel2.setText("Chọn Ngày");
 
         tbChangeReservation.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        tbChangeReservation = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;
+            }
+        };
         tbChangeReservation.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -99,6 +100,18 @@ public class PanelChangeReservation extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(tbChangeReservation);
+
+        txtSearchTable.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtSearchTableKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchTableKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSearchTableKeyTyped(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 153, 0));
@@ -134,20 +147,10 @@ public class PanelChangeReservation extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void dtDateReservationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtDateReservationPropertyChange
-        String a, b[], c[], c1, c2, c3, d[], e, f, g;
-        a = dtDateReservation.getDate().toLocaleString();
-        b = a.split(" ");
-        c = b[1].split("-");
-        c1 = c[0];
-        c2 = c[1];
-        c3 = c[2];
-        d = b[0].split(":");
-        e = d[0];
-        f = d[1];
-        //Date dt = new Date(a);
-        String x = c3 + "-" + c2 + "-" + c1 + " " + e + ":" + f + ":00";
-        VariableStatic.setDateTimeReservation(x);
-        //JOptionPane.showMessageDialog(getRootPane(), VariableStatic.getDateTimeReservation());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = formatter.format(dtDateReservation.getDate());
+        Timestamp ts = Timestamp.valueOf(datetime);
+        VariableStatic.setDateTimeReservation(ts);
 
 
     }//GEN-LAST:event_dtDateReservationPropertyChange
@@ -156,6 +159,20 @@ public class PanelChangeReservation extends javax.swing.JPanel {
         int index = tbChangeReservation.getSelectedRow();
         VariableStatic.setIdTable(Integer.parseInt(String.valueOf(tbChangeReservation.getValueAt(index, 0))));
     }//GEN-LAST:event_tbChangeReservationMouseReleased
+
+    private void txtSearchTableKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchTableKeyTyped
+        
+    }//GEN-LAST:event_txtSearchTableKeyTyped
+
+    private void txtSearchTableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchTableKeyPressed
+        
+    }//GEN-LAST:event_txtSearchTableKeyPressed
+
+    private void txtSearchTableKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchTableKeyReleased
+        conn = ConnectDB.conn();
+        tbChangeReservation.setModel(Table.loadTableByStatusSearch(txtSearchTable.getText(), conn));
+        conn = null;
+    }//GEN-LAST:event_txtSearchTableKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

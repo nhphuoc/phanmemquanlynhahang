@@ -9,30 +9,26 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import vn.edu.vttu.data.ConnectDB;
-import static vn.edu.vttu.data.ConnectDB.conn;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableLocation;
-import vn.edu.vttu.data.VariableStatic;
 
 /**
  *
@@ -47,17 +43,22 @@ public class tableMap extends javax.swing.JFrame {
 
     public tableMap() {
         initComponents();
-        loadTable();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = formatter.format(new Date());
+        Timestamp ts = Timestamp.valueOf(datetime);
+        Calendar cal = Calendar.getInstance();
+        cal.set(ts.getYear()+1900, ts.getMonth(), ts.getDate(),ts.getHours(),ts.getMinutes());
+        String x =formatter.format(cal.getTime());
+        Timestamp tx=Timestamp.valueOf(x);
+        System.out.println(tx);
+        cal.add(Calendar.MINUTE, 60);
+        String y =formatter.format(cal.getTime());
+        Timestamp tz=Timestamp.valueOf(y);
+        int z =tx.compareTo(tz);
+        System.out.println(z);
     }
 
     private void loadTable() {
-        conn = ConnectDB.conn();
-        layout_table.removeAll();
-        JScrollPane jscroll = new JScrollPane();
-        layout_table.add(jscroll,BorderLayout.CENTER);
-        layout_table.setAutoscrolls(true);
-       // JPanel jp = new JPanel(new GridLayout(0,1));
-       // layout_table.add(jp);
         
 
         try {

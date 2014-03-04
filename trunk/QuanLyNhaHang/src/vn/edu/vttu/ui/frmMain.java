@@ -39,36 +39,186 @@ public class frmMain extends javax.swing.JFrame {
     private void initComponents() {
 
         main = new javax.swing.JPanel();
-        jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
+        jToolBar1 = new javax.swing.JToolBar();
+        btnSystem = new javax.swing.JButton();
+        btnWaiter = new javax.swing.JButton();
+        btnService = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PHẦN MỀM QUẢN LÝ NHÀ HÀNG - RSM");
 
         main.setLayout(new java.awt.GridLayout(1, 0));
 
-        jMenu3.setText("File");
-        jMenuBar2.add(jMenu3);
+        jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jToolBar1.setRollover(true);
+        jToolBar1.setMaximumSize(new java.awt.Dimension(620, 80));
+        jToolBar1.setMinimumSize(new java.awt.Dimension(620, 80));
 
-        jMenu4.setText("Edit");
-        jMenuBar2.add(jMenu4);
+        btnSystem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/config-icon.png"))); // NOI18N
+        btnSystem.setText("Hệ Thống");
+        btnSystem.setFocusable(false);
+        btnSystem.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSystem.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnSystem.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnSystem.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnSystem.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSystemActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnSystem);
 
-        setJMenuBar(jMenuBar2);
+        btnWaiter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/waiter-icon.png"))); // NOI18N
+        btnWaiter.setText("Phục Vụ");
+        btnWaiter.setFocusable(false);
+        btnWaiter.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnWaiter.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnWaiter.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnWaiter.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnWaiter.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnWaiter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnWaiterActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnWaiter);
+
+        btnService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/menu.png"))); // NOI18N
+        btnService.setText("Dịch Vụ");
+        btnService.setFocusable(false);
+        btnService.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnService.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnService.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnService.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnService.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnService.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnServiceActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnService);
+
+        jButton3.setBackground(new java.awt.Color(51, 153, 255));
+        jButton3.setText("Khuyến Mãi");
+        jButton3.setFocusable(false);
+        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton3.setMaximumSize(new java.awt.Dimension(77, 75));
+        jButton3.setMinimumSize(new java.awt.Dimension(77, 75));
+        jButton3.setPreferredSize(new java.awt.Dimension(77, 75));
+        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton3);
+
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/customer.png"))); // NOI18N
+        jButton4.setText("Khách Hàng");
+        jButton4.setFocusable(false);
+        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton4.setMaximumSize(new java.awt.Dimension(77, 75));
+        jButton4.setMinimumSize(new java.awt.Dimension(77, 75));
+        jButton4.setPreferredSize(new java.awt.Dimension(77, 75));
+        jButton4.setVerifyInputWhenFocusTarget(false);
+        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton4);
+
+        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/staff.png"))); // NOI18N
+        jButton5.setText("Nhân Viên");
+        jButton5.setFocusable(false);
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.setMaximumSize(new java.awt.Dimension(77, 75));
+        jButton5.setMinimumSize(new java.awt.Dimension(77, 75));
+        jButton5.setPreferredSize(new java.awt.Dimension(77, 75));
+        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton5);
+
+        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/statistics.png"))); // NOI18N
+        jButton6.setText("Thống Kê");
+        jButton6.setFocusable(false);
+        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton6.setMaximumSize(new java.awt.Dimension(77, 75));
+        jButton6.setMinimumSize(new java.awt.Dimension(77, 75));
+        jButton6.setPreferredSize(new java.awt.Dimension(77, 75));
+        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton6);
+
+        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
+        jButton7.setText("Trợ Giúp");
+        jButton7.setFocusable(false);
+        jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton7.setMaximumSize(new java.awt.Dimension(77, 75));
+        jButton7.setMinimumSize(new java.awt.Dimension(77, 75));
+        jButton7.setPreferredSize(new java.awt.Dimension(77, 75));
+        jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jButton7);
+
+        jLabel1.setText("Đăng Nhập:nhphuo ");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jLabel1))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(main, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSystemActionPerformed
+        main.removeAll();
+        PanelConfigSystem configSystem = new PanelConfigSystem();
+        main.add(configSystem);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnSystemActionPerformed
+
+    private void btnWaiterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWaiterActionPerformed
+        main.removeAll();
+        PanelTable pn_table = new PanelTable();
+        main.add(pn_table);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnWaiterActionPerformed
+
+    private void btnServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceActionPerformed
+        main.removeAll();
+        PanelService panelservice= new PanelService();
+        main.add(panelservice);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnServiceActionPerformed
 
     /**
      * @param args the command line arguments
@@ -98,17 +248,25 @@ public class frmMain extends javax.swing.JFrame {
                 frmMain frm = new frmMain();
                 frm.setVisible(true);
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                Rectangle bounds = env.getMaximumWindowBounds();                
-                frm.setMaximizedBounds(bounds);                
+                Rectangle bounds = env.getMaximumWindowBounds();
+                frm.setMaximizedBounds(bounds);
                 frm.setExtendedState(frm.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JButton btnService;
+    private javax.swing.JButton btnSystem;
+    private javax.swing.JButton btnWaiter;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel main;
     // End of variables declaration//GEN-END:variables
 }

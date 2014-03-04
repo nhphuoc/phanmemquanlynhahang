@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Vector;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -80,6 +81,22 @@ public class Customer {
             e.printStackTrace();
         }
         return tb;
+    }
+    public static Vector selectCustomer(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql="CALL customer_get_limit()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.Customer tb = new vn.edu.vttu.model.Customer(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
     }
     
 }

@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +38,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
     class ItemRenderer extends BasicComboBoxRenderer {
 
+        @Override
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
@@ -81,14 +84,24 @@ public class PanelViewReservation extends javax.swing.JPanel {
         try {
             conn = ConnectDB.conn();
             tbListTable.setModel(TableReservation.getListTableReservation(conn));
-            tbListTable.setRowSelectionInterval(0, 0);
-            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+            if (tbListTable.getRowCount() <= 0) {
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
 
-            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            } else {
+                tbListTable.setRowSelectionInterval(0, 0);
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            }
         } catch (Exception e) {
         }
 
@@ -192,7 +205,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                             "Cập nhật thông tin đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                     if (result == JOptionPane.OK_OPTION) {
                         int id = VariableStatic.getIdTable();
-                        String date = VariableStatic.getDateTimeReservation();
+                        Timestamp date = VariableStatic.getDateTimeReservation();
                         JOptionPane.showMessageDialog(getRootPane(), "Mã Bàn:" + id + "\nMã Reservation:" + idreservation
                                 + "\nMã Chi tiết:" + idreservation_detail + "\nNgày Đặt: " + date);
                         try {
@@ -202,18 +215,18 @@ public class PanelViewReservation extends javax.swing.JPanel {
                                 if (TableReservationDetail.updateTable(idreservation_detail, id, conn)) {
                                     if (TableReservation.countidTableUsing(id, conn) > 0) {
                                         if (Table.updateStatus(id, 1, conn)) {
-                                            conn.commit();                                            
+                                            conn.commit();
                                             loadListTable();
                                         }
                                     } else {
                                         if (TableReservation.countidTableReservation(id, conn) > 0) {
                                             if (Table.updateStatus(id, 2, conn)) {
-                                                conn.commit();                                                
+                                                conn.commit();
                                                 loadListTable();
                                             }
                                         } else {
                                             if (Table.updateStatus(id, 0, conn)) {
-                                                conn.commit();                                                
+                                                conn.commit();
                                                 loadListTable();
                                             }
                                         }
@@ -266,7 +279,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             popupmenu.add(new JMenuItem(new AbstractAction("Reload", new ImageIcon(imageReload)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
+                    loadListTable();
                 }
             }));
             tbListTable.setComponentPopupMenu(popupmenu);
@@ -287,10 +300,15 @@ public class PanelViewReservation extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbListTable = new javax.swing.JTable();
         txtSearchReservation = new javax.swing.JTextField();
-        jDateChooser1 = new com.toedter.calendar.JDateChooser();
+        dtSearch = new com.toedter.calendar.JDateChooser();
         btnView = new javax.swing.JButton();
 
         tbListTable.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        tbListTable = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, "", "Chưa có", null, null}
@@ -342,9 +360,20 @@ public class PanelViewReservation extends javax.swing.JPanel {
             }
         });
 
-        jDateChooser1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        dtSearch.setDateFormatString("dd/MM/yyyy");
+        dtSearch.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        dtSearch.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dtSearchPropertyChange(evt);
+            }
+        });
 
         btnView.setText("Xem");
+        btnView.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -353,7 +382,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(txtSearchReservation, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(dtSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnView))
             .addGroup(layout.createSequentialGroup()
@@ -368,7 +397,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(btnView)
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(dtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -394,10 +423,9 @@ public class PanelViewReservation extends javax.swing.JPanel {
         d = b[1].split(":");
         e = d[0];
         f = d[1];
-        Date dt = new Date(a);
-
-        String x = c1 + "/" + c2 + "/" + c3 + " " + e + ":" + f + ":00";
-        VariableStatic.setDateTimeReservation(x);
+        String x = c3 + "-" + c2 + "-" + c1 + " " + e + ":" + f + ":00";
+        Timestamp ts = Timestamp.valueOf(x);
+        VariableStatic.setDateTimeReservation(ts);
         VariableStatic.setIdTable(Integer.parseInt(tbListTable.getValueAt(index, 5).toString()));
         //JOptionPane.showMessageDialog(getRootPane(), Integer.parseInt(tbListTable.getValueAt(index, 5).toString()));
 
@@ -421,33 +449,70 @@ public class PanelViewReservation extends javax.swing.JPanel {
     private void txtSearchReservationKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchReservationKeyReleased
         conn = ConnectDB.conn();
         try {
+
             tbListTable.setModel(TableReservation.getListTableReservationSearch(txtSearchReservation.getText(), conn));
-            tbListTable.setRowSelectionInterval(0, 0);
-            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+            if (tbListTable.getRowCount() <= 0) {
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
 
-            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            } else {
+                tbListTable.setRowSelectionInterval(0, 0);
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            }
         } catch (Exception e) {
-            tbListTable.setModel(TableReservation.getListTableReservation(conn));
-            tbListTable.setRowSelectionInterval(0, 0);
-            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
 
-            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
         }
 
     }//GEN-LAST:event_txtSearchReservationKeyReleased
 
+    private void dtSearchPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtSearchPropertyChange
+
+    }//GEN-LAST:event_dtSearchPropertyChange
+
+    private void btnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewActionPerformed
+        conn = ConnectDB.conn();
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String datetime = formatter.format(dtSearch.getDate());
+            Timestamp ts = Timestamp.valueOf(datetime);
+            tbListTable.setModel(TableReservation.getListTableReservationSearchByDate(ts, conn));
+            if (tbListTable.getRowCount() <= 0) {
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            } else {
+                tbListTable.setRowSelectionInterval(0, 0);
+                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+
+                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            }
+
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnViewActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnView;
-    private com.toedter.calendar.JDateChooser jDateChooser1;
+    private com.toedter.calendar.JDateChooser dtSearch;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbListTable;
     private javax.swing.JTextField txtSearchReservation;

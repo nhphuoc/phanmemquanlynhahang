@@ -17,9 +17,45 @@ public class VariableStatic {
     public static int idReservation;
     public static int idCustomer;
     public static String nameCustomer;    
-    public static String dateTimeReservation; 
+    public static java.sql.Timestamp dateTimeReservation; 
     public static boolean status;
     private static int idTable_Change;
+    private static int idSystemLog;
+    private static int typeService;
+    private static String typeServiceName;
+
+    public static String getTypeServiceName() {
+        return typeServiceName;
+    }
+
+    public static void setTypeServiceName(String typeServiceName) {
+        VariableStatic.typeServiceName = typeServiceName;
+    }
+
+    public static int getTypeService() {
+        return typeService;
+    }
+
+    public static void setTypeService(int typeService) {
+        VariableStatic.typeService = typeService;
+    }
+
+    public static int getCostService() {
+        return costService;
+    }
+
+    public static void setCostService(int costService) {
+        VariableStatic.costService = costService;
+    }
+    private static int costService;
+
+    public static int getIdSystemLog() {
+        return idSystemLog;
+    }
+
+    public static void setIdSystemLog(int idSystemLog) {
+        VariableStatic.idSystemLog = idSystemLog;
+    }
 
     public static int getIdTable_Change() {
         return idTable_Change;
@@ -85,11 +121,11 @@ public class VariableStatic {
         VariableStatic.nameCustomer = nameCustomer;
     }
 
-    public static String getDateTimeReservation() {
+    public static java.sql.Timestamp getDateTimeReservation() {
         return dateTimeReservation;
     }
 
-    public static void setDateTimeReservation(String dateTimeReservation) {
+    public static void setDateTimeReservation(java.sql.Timestamp dateTimeReservation) {
         VariableStatic.dateTimeReservation = dateTimeReservation;
     }
        

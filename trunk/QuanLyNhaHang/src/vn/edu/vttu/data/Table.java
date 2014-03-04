@@ -276,6 +276,19 @@ public class Table {
         }
         return tb;
     }
+    public static TableModel loadTableByStatusSearch(String key,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                       
+            CallableStatement calState = conn.prepareCall("{CALL table_getByStatus_Search(?)}");    
+            calState.setString(1, key);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
     public static boolean insertNewTable(String name, int type, int location, int chair, Connection conn) {
         boolean flag = false;
         try {
