@@ -125,6 +125,11 @@ public class frmMain extends javax.swing.JFrame {
         jButton4.setPreferredSize(new java.awt.Dimension(77, 75));
         jButton4.setVerifyInputWhenFocusTarget(false);
         jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton4);
 
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/staff.png"))); // NOI18N
@@ -219,6 +224,14 @@ public class frmMain extends javax.swing.JFrame {
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_btnServiceActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+         main.removeAll();
+        PanelCustomer panelcustomer= new PanelCustomer();
+        main.add(panelcustomer);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments

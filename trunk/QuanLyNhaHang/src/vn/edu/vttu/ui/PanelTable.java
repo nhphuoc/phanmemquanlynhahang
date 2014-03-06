@@ -183,7 +183,7 @@ public class PanelTable extends javax.swing.JPanel {
         Timer timer = new Timer();
         timer.schedule(taskreservation, new Date(), 2000);
         TimerTask taskwarninguser = new TaskWarningUser();
-        timer.schedule(taskwarninguser, new Date(), 30000);
+        timer.schedule(taskwarninguser, new Date(), 300000);
         try {
             popup = new JPopupMenu();
             BufferedImage bImg1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/useTable.png"));
@@ -657,7 +657,6 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void popupTableService() {
         try {
-
             popupMenu = new JPopupMenu();
             BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/back-icon.png"));
             Image imageCalService = bImgCalService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
@@ -666,15 +665,23 @@ public class PanelTable extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     conn = ConnectDB.conn();
                     String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);
-                    if (TableService.getServiceByIdService_ByIdReservation(idService, idTableReservation, conn)) {
-                        if (TableService.insert(idTableReservation, idService, Integer.parseInt(number), cost, conn)) {
-                            loadTableInvoice();
-                            totalPay();
+                    if (number != null && !number.trim().equals("")) {
+                        if (testNumber(number)) {
+                            if (TableService.getServiceByIdService_ByIdReservation(idService, idTableReservation, conn)) {
+                                if (TableService.insert(idTableReservation, idService, Integer.parseInt(number), cost, conn)) {
+                                    loadTableInvoice();
+                                    totalPay();
+                                }
+                            } else {
+                                if (TableService.update(idTableReservation, idService, Integer.parseInt(number), conn)) {
+                                    loadTableInvoice();
+                                }
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(getRootPane(), "Chỉ được nhập số");
                         }
                     } else {
-                        if (TableService.update(idTableReservation, idService, Integer.parseInt(number), conn)) {
-                            loadTableInvoice();
-                        }
+                        JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
                     }
                 }
             }));
@@ -725,50 +732,68 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void popupTableInvoice() {
         try {
-            conn = ConnectDB.conn();
+            //conn = ConnectDB.conn();
             popupMenuTableInvoice = new JPopupMenu();
             BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/move-icon.png"));
             Image imageCalService = bImgCalService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
             popupMenuTableInvoice.add(new JMenuItem(new AbstractAction("Cập Nhật Số Lượng", new ImageIcon(imageCalService)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    conn = ConnectDB.conn();
+
                     String num = JOptionPane.showInputDialog(tb_invoice, "Nhập số lượng", numberOfServiceInvoice);
-                    if (TableService.update(idTableService, Integer.parseInt(num), conn)) {
-                        loadTableInvoice();
-                        totalPay();
+                    if (num != null && !num.trim().equals("")) {
+                        if (num.length() <= 10 && testNumber(num)) {
+                            conn = ConnectDB.conn();
+                            if (TableService.update(idTableService, Integer.parseInt(num), conn)) {
+                                loadTableInvoice();
+                                totalPay();
+                            } else {
+                                JOptionPane.showMessageDialog(getRootPane(), "Lỗi, Vui lòng thực hiện lại");
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(tb_invoice, "Số quá lớn hoặc bạn nhập không phải là số");
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Lỗi, Vui lòng thực hiện lại");
+                        JOptionPane.showMessageDialog(tb_invoice, "Bạn chưa nhập số lượng");
                     }
                     conn = null;
                 }
-            }));
+            }
+            ));
             BufferedImage bImgDel = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/delete-icon.png"));
             Image imageDel = bImgDel.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popupMenuTableInvoice.add(new JMenuItem(new AbstractAction("Xóa Dịch Vụ", new ImageIcon(imageDel)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    conn = ConnectDB.conn();
-                    if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn hủy dịch vụ này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                        if (TableService.delete(idTableService, conn)) {
-                            loadTableInvoice();
-                            totalPay();
-                        } else {
-                            JOptionPane.showMessageDialog(tb_invoice, "Đã xảy ra lỗi. Vui lòng thực hiên lại");
+
+            popupMenuTableInvoice.add(
+                    new JMenuItem(new AbstractAction("Xóa Dịch Vụ", new ImageIcon(imageDel)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            conn = ConnectDB.conn();
+                            if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn hủy dịch vụ này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                if (TableService.delete(idTableService, conn)) {
+                                    loadTableInvoice();
+                                    totalPay();
+                                } else {
+                                    JOptionPane.showMessageDialog(tb_invoice, "Đã xảy ra lỗi. Vui lòng thực hiên lại");
+                                }
+                            }
                         }
                     }
-                }
-            }));
+                    ));
             popupMenuTableInvoice.addSeparator();
             BufferedImage bImgReload = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Refresh-icon.png"));
             Image imageReload = bImgReload.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popupMenuTableInvoice.add(new JMenuItem(new AbstractAction("Cập Nhật", new ImageIcon(imageReload)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    loadTableInvoice();
-                    totalPay();
-                }
-            }));
+
+            popupMenuTableInvoice.add(
+                    new JMenuItem(new AbstractAction("Cập Nhật", new ImageIcon(imageReload)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            loadTableInvoice();
+                            totalPay();
+                        }
+                    }
+                    ));
             tb_invoice.setComponentPopupMenu(popupMenuTableInvoice);
             conn = null;
         } catch (Exception e) {
@@ -1804,7 +1829,7 @@ public class PanelTable extends javax.swing.JPanel {
             int index = tbService.getSelectedRow();
             rowTableService_selectEdit = index;
             idService = (int) tbService.getValueAt(index, 0);
-            cost = (int) tbService.getValueAt(index, 2);
+            cost = Integer.parseInt(String.valueOf(tbService.getValueAt(index, 2)).replaceAll(",", ""));
             sv_name = String.valueOf(tbService.getValueAt(index, 1));
         } catch (Exception e) {
         }

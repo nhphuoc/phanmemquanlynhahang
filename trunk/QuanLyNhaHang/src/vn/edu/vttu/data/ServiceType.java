@@ -87,5 +87,24 @@ public class ServiceType {
         }
         return result;
     }
+    public static boolean insert(String name,Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL service_type_add(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);                       
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }    
     
 }
