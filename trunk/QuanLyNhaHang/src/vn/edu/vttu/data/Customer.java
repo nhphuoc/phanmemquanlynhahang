@@ -181,5 +181,48 @@ public class Customer {
 
         return flag;
     }
+    public static boolean countCustomerUsing(int id,Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL customer_count_using_table(?)";
+            CallableStatement callstate = conn.prepareCall(sql);      
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            int n=0;
+            while(rs.next()){
+                n=rs.getInt("n");
+            }
+            if(n>0){
+                flag=false;
+            }else{
+                flag=true;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }   
+    public static boolean delete(int idCustomer, Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL customer_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setInt(1, idCustomer);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }  
+     
 
 }

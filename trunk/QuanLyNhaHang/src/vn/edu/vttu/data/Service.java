@@ -92,6 +92,7 @@ public class Service {
                 return sv;
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -223,6 +224,68 @@ public class Service {
             callstate.setString(7, img);                  
             int x = callstate.executeUpdate();
             if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    } 
+    public static boolean delete(int idService, Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL service_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setInt(1, idService);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }    
+    public static boolean countServiceUsing(int id,Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL service_count_using(?)";
+            CallableStatement callstate = conn.prepareCall(sql);      
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            int n=0;
+            while(rs.next()){
+                n=rs.getInt("n");
+            }
+            if(n>0){
+                flag=false;
+            }else{
+                flag=true;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }   
+    public static boolean updateStore(int id, int num, Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL service_update_store(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            callstate.setInt(2, num);            
+            int x = callstate.executeUpdate();
+            if (x >=0) {
                 flag = true;
             } else {
                 flag = false;

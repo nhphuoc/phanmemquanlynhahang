@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Vector;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
@@ -347,6 +348,19 @@ public class Table {
             e.printStackTrace();
         }
         return flag;
+    }
+    public static TableModel getByDateNotReservation(Timestamp dt,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                       
+            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?)}");  
+            calState.setTimestamp(1, dt);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
     }
 
 }

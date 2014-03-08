@@ -8,7 +8,10 @@ package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -110,6 +113,18 @@ public class Invoice {
         }
         return flag;
     }
+    public static TableModel getAll(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL Invoice_get_all()}");            
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }   
     
     
     

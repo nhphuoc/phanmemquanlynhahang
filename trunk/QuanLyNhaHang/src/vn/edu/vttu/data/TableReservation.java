@@ -11,6 +11,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -26,45 +27,67 @@ public class TableReservation {
     private Timestamp beginDate;
     private Timestamp endDate;
     private boolean STATUS;
-    
+    private boolean PARTY;
+
     private static String DateReservation;// use reservation
+
     public static String getDateReservation() {
         return DateReservation;
     }
+
     public static void setDateReservation(String DateReservation) {
         TableReservation.DateReservation = DateReservation;
     }
+
     public int getID() {
         return ID;
     }
+
     public int getCUSTOMER() {
         return CUSTOMER;
     }
+
     public String getCUSTOMER_NAME() {
         return CUSTOMER_NAME;
     }
+
     public Timestamp getBeginDate() {
         return beginDate;
     }
+
     public Timestamp getEndDate() {
         return endDate;
     }
+
     public boolean isSTATUS() {
         return STATUS;
     }
 
-    
+    public boolean isPARTY() {
+        return PARTY;
+    }
+
+    public void setPARTY(boolean PARTY) {
+        this.PARTY = PARTY;
+    }
+
     public TableReservation(int id) {
         this.ID = id;
     }
-    public TableReservation(int id, int customer_id, String customer_name, Timestamp beginDate) {
-        this.ID=id;
-        this.CUSTOMER=customer_id;
-        this.CUSTOMER_NAME=customer_name;
-        this.beginDate=beginDate;
+
+    public TableReservation(boolean party) {
+        this.PARTY = party;
     }
+
+    public TableReservation(int id, int customer_id, String customer_name, Timestamp beginDate) {
+        this.ID = id;
+        this.CUSTOMER = customer_id;
+        this.CUSTOMER_NAME = customer_name;
+        this.beginDate = beginDate;
+    }
+
     public static TableReservation getMaxID(Connection conn) {
-        try {            
+        try {
             Statement state = conn.createStatement();
             String sql = "call table_reservation_getMaxID()";
             CallableStatement callstate = conn.prepareCall(sql);
@@ -78,11 +101,12 @@ public class TableReservation {
         }
         return null;
     }
+
     public static TableReservation getMaxIDReservation(int idTable, Connection conn) {
-        try {            
+        try {
             String sql = "call table_reservation_getmaxid_by_Reservation(?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1,idTable);
+            callstate.setInt(1, idTable);
             ResultSet rs = callstate.executeQuery();
             TableReservation table_reservation;
             while (rs.next()) {
@@ -93,28 +117,30 @@ public class TableReservation {
         }
         return null;
     }
+
     public static TableReservation getByTableByStatus(int idTable, Connection conn) {
-       TableReservation table_reservation;
-        try {            
+        TableReservation table_reservation;
+        try {
             String sql = "call table_reservation_getby_IdTable(?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idTable);            
+            callstate.setInt(1, idTable);
             ResultSet rs = callstate.executeQuery();
-            
+
             while (rs.next()) {
-                table_reservation = new TableReservation(rs.getInt("id"),rs.getInt("id_customer_id"),rs.getString("name"),rs.getTimestamp("beginDate"));
+                table_reservation = new TableReservation(rs.getInt("id"), rs.getInt("id_customer_id"), rs.getString("name"), rs.getTimestamp("beginDate"));
                 return table_reservation;
             }
         } catch (Exception e) {
         }
-        table_reservation = new TableReservation(-1,-1,"Chọn khách hàng",null);
+        table_reservation = new TableReservation(-1, -1, "Chọn khách hàng", null);
         return table_reservation;
-    }    
+    }
+
     public static boolean insert(boolean status, Connection conn) {
         boolean flag = false;
-        try {            
+        try {
             Statement state = conn.createStatement();
-            String sql = "CALL table_reservation_insert(?)";            
+            String sql = "CALL table_reservation_insert(?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setBoolean(1, status);
             int x = callstate.executeUpdate();
@@ -130,14 +156,16 @@ public class TableReservation {
 
         return flag;
     }
-    public static boolean insert(boolean status, int idCustomer, Timestamp dt, Connection conn) {
+
+    public static boolean insert(boolean status, int idCustomer, Timestamp dt, boolean party, Connection conn) {
         boolean flag = false;
-        try {            
-            String sql = "CALL table_reservation_insert_customerid(?,?,?)";
+        try {
+            String sql = "CALL table_reservation_insert_customerid(?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setBoolean(1, status);
             callstate.setInt(2, idCustomer);
             callstate.setTimestamp(3, dt);
+            callstate.setBoolean(4, party);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -150,10 +178,11 @@ public class TableReservation {
         }
 
         return flag;
-    }     
+    }
+
     public static boolean updateCustomer(int idCustomer, int idReservation, Connection conn) {
         boolean flag = false;
-        try {            
+        try {
             String sql = "CALL table_reservation_update_customer(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idCustomer);
@@ -170,67 +199,13 @@ public class TableReservation {
         }
         return flag;
     }
+
     public static boolean updateStatus(int idReservation, Connection conn) {
         boolean flag = false;
-        try {            
+        try {
             String sql = "CALL table_reservation_update_status(?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idReservation);            
-            int x = callstate.executeUpdate();
-            if (x >=0) {
-                flag = true;
-            } else {
-                flag = false;
-            }
-        } catch (Exception e) {
-            flag = false;
-            e.printStackTrace();
-        }
-        return flag;
-    }
-    public static boolean updateEndDate(int idReservation, Connection conn) {
-        boolean flag = false;
-        try {            
-            String sql = "CALL table_reservation_update_enddate(?)";
-            CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idReservation);            
-            int x = callstate.executeUpdate();
-            if (x >=0) {
-                flag = true;
-            } else {
-                flag = false;
-            }
-        } catch (Exception e) {
-            flag = false;
-            e.printStackTrace();
-        }
-        return flag;
-    }
-    public static boolean updateBeginDate(int idReservation, Connection conn) {
-        boolean flag = false;
-        try {            
-            String sql = "CALL table_reservation_update_begindate(?)";
-            CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idReservation);            
-            int x = callstate.executeUpdate();
-            if (x >=0) {
-                flag = true;
-            } else {
-                flag = false;
-            }
-        } catch (Exception e) {
-            flag = false;
-            e.printStackTrace();
-        }
-        return flag;
-    }
-    public static boolean updateBeginDate(int idReservation,Timestamp dt, Connection conn) {
-        boolean flag = false;
-        try {            
-            String sql = "CALL table_reservation_update_begindate_date(?,?)";
-            CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idReservation);            
-            callstate.setTimestamp(2, dt);            
+            callstate.setInt(1, idReservation);
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;
@@ -243,82 +218,20 @@ public class TableReservation {
         }
         return flag;
     }
-    public static int countidTableReservation(int idTable, Connection conn) {
-        int count=0;
-        ResultSet rs;
-        try {                        
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_select_list_table_reservation(?)}");            
-            calState.setInt(1, idTable);
-            rs = calState.executeQuery();            
-            while(rs.next()){
-                count=count+1;
-            }            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
-    public static int countidTableUsing(int idTable, Connection conn) {
-        int count=0;
-        ResultSet rs;
-        try {                        
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_count_table_using(?)}");            
-            calState.setInt(1, idTable);
-            rs = calState.executeQuery();            
-            while(rs.next()){
-                count=count+1;
-            }            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
-    public static TableModel getListTableReservation(Connection conn) {
-        TableModel tb = null;
-        ResultSet rs;
-        try {                    
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list()}");                        
-            rs = calState.executeQuery();
-            tb = DbUtils.resultSetToTableModel(rs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tb;
-    }    
-    public static TableModel getListTableReservationSearch(String key,Connection conn) {
-        TableModel tb = null;
-        ResultSet rs;
-        try {                    
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list_search(?)}");                        
-            calState.setString(1, key);
-            rs = calState.executeQuery();
-            tb = DbUtils.resultSetToTableModel(rs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tb;
-    }
-    public static TableModel getListTableReservationSearchByDate(Timestamp key,Connection conn) {
-        TableModel tb = null;
-        ResultSet rs;
-        try {                    
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list_search_by_date(?)}");                        
-            calState.setTimestamp(1, key);
-            rs = calState.executeQuery();
-            tb = DbUtils.resultSetToTableModel(rs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tb;
-    }
-    public static boolean reservationCancel(int idReservation, Connection conn) {
+
+    public static boolean updateEndDate(int idReservation, Connection conn) {
         boolean flag = false;
-        try {            
-            String sql = "CALL table_reservation_cancel(?)";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        java.util.Date dt = new java.util.Date();
+        String datetime = formatter.format(dt);
+        Timestamp ts = Timestamp.valueOf(datetime);
+        try {
+            String sql = "CALL table_reservation_update_enddate(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idReservation);            
+            callstate.setInt(1, idReservation);
+            callstate.setTimestamp(2, ts);
             int x = callstate.executeUpdate();
-            if (x == 1) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -328,15 +241,167 @@ public class TableReservation {
             e.printStackTrace();
         }
         return flag;
-    }    
-    public static TableModel getByTable_DateTime(int idTable,Timestamp ts, Connection conn) {
+    }
+
+    public static boolean updateBeginDate(int idReservation, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_reservation_update_begindate(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idReservation);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static boolean updateBeginDate(int idReservation, Timestamp dt, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_reservation_update_begindate_date(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idReservation);
+            callstate.setTimestamp(2, dt);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static int countidTableReservation(int idTable, Connection conn) {
+        int count = 0;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_select_list_table_reservation(?)}");
+            calState.setInt(1, idTable);
+            rs = calState.executeQuery();
+            while (rs.next()) {
+                count = count + 1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public static int countidTableUsing(int idTable, Connection conn) {
+        int count = 0;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_count_table_using(?)}");
+            calState.setInt(1, idTable);
+            rs = calState.executeQuery();
+            while (rs.next()) {
+                count = count + 1;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public static TableModel getListTableReservation(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {                    
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list()}");
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+
+    public static TableModel getListTableReservationSearch(String key, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list_search(?)}");
+            calState.setString(1, key);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+
+    public static TableModel getListTableReservationSearchByDate(Timestamp key, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_view_list_search_by_date(?)}");
+            calState.setTimestamp(1, key);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+
+    public static boolean reservationCancel(int idReservation, int idTable, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_reservation_detail_set_active_false(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idReservation);
+            callstate.setInt(2, idTable);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static boolean reservationCancel(int idReservation, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_reservation_cancel(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idReservation);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    public static TableModel getByTable_DateTime(int idTable, Timestamp ts, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
             String sql = "call table_reservation_test_by_date_time(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, idTable);            
-            callstate.setTimestamp(2, ts);   
+            callstate.setInt(1, idTable);
+            callstate.setTimestamp(2, ts);
             rs = callstate.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -344,18 +409,53 @@ public class TableReservation {
         }
         return tb;
     }
+
     public static TableModel getByTable_DateTime(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {                    
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_warning()}");                        
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_warning()}");
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tb;
-    }    
-    
+    }
+
+    public static boolean getStatusParty(int idTable, Timestamp ts, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean bl = false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_status_party(?,?)}");
+            calState.setInt(1, idTable);
+            calState.setTimestamp(2, ts);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if (tb.getRowCount() <= 0) {
+                bl = false;
+            } else {
+                bl = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bl;
+    }
+
+    public static TableModel getListTableByIdReservation(int id, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_table_by_id_reservation(?)}");
+            calState.setInt(1, id);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
 
 }

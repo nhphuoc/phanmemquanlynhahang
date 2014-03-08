@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.table.TableModel;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
@@ -117,19 +118,39 @@ public class PanelViewReservation extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         conn = ConnectDB.conn();
-                        conn.setAutoCommit(false);
 
                         if (statusTable == 1) {
                             JOptionPane.showMessageDialog(getRootPane(), "Bàn đang được sử dụng vui lòng chọn bàn khác");
                         } else {
-                            if (Table.updateStatus(tableName, 1, conn)) {
+                            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String datetime = formatter.format(new Date());
+                            Timestamp ts = Timestamp.valueOf(datetime);
+                            if (TableReservation.getStatusParty(idTable, ts, conn)) {
+                                conn.setAutoCommit(false);
+                                TableModel tb = TableReservation.getListTableByIdReservation(idreservation, conn);
                                 if (TableReservation.updateBeginDate(idreservation, conn)) {
                                     if (TableReservation.updateStatus(idreservation, conn)) {
+                                        for (int i = 0; i < tb.getRowCount(); i++) {
+                                            Table.updateStatus(Integer.parseInt(String.valueOf(tb.getValueAt(i, 0))), 1, conn);
+                                        }
                                         conn.commit();
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã nhận bàn thành công");
                                         loadListTable();
                                     }
 
+                                }
+
+                            } else {
+                                conn.setAutoCommit(false);
+                                if (Table.updateStatus(tableName, 1, conn)) {
+                                    if (TableReservation.updateBeginDate(idreservation, conn)) {
+                                        if (TableReservation.updateStatus(idreservation, conn)) {
+                                            conn.commit();
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã nhận bàn thành công");
+                                            loadListTable();
+                                        }
+
+                                    }
                                 }
                             }
                         }
@@ -151,41 +172,120 @@ public class PanelViewReservation extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     conn = ConnectDB.conn();
                     try {
-                        conn.setAutoCommit(false);
+                        Timestamp date = VariableStatic.getDateTimeReservation();
                         if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn muốn hủy đơn đặt bàn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            if (TableReservation.reservationCancel(idreservation, conn)) {
-                                if (TableReservation.countidTableReservation(idTable, conn) > 0) {
-                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                        if (Table.updateStatus(idTable, 1, conn)) {
-                                            conn.commit();
-                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                            loadListTable();
-                                        }
-                                    } else {
-                                        if (Table.updateStatus(idTable, 2, conn)) {
-                                            conn.commit();
-                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                            loadListTable();
+                            if (TableReservation.getStatusParty(idTable, date, conn)) {
+                                Object[] choices = {"Chỉ Bàn này", "Các Bàn Trong Hóa Đơn","Không"};
+                                Object defaultChoice = choices[0];
+                                int x = JOptionPane.showOptionDialog(getRootPane(),
+                                        "Chọn hành động",
+                                        "Hỏi",
+                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        null,
+                                        choices,
+                                        defaultChoice);
+                                if (x == JOptionPane.YES_OPTION) {
+                                    //chỉ bàn này
+                                    conn.setAutoCommit(false);
+                                    if (TableReservation.reservationCancel(idreservation, idTable, conn)) {
+                                        if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                                            if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                                if (Table.updateStatus(idTable, 1, conn)) {
+                                                    conn.commit();
+                                                    JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                    loadListTable();
+                                                }
+                                            } else {
+                                                if (Table.updateStatus(idTable, 2, conn)) {
+                                                    conn.commit();
+                                                    JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                    loadListTable();
+                                                }
+                                            }
+                                        } else {
+                                            if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                                if (Table.updateStatus(idTable, 1, conn)) {
+                                                    conn.commit();
+                                                    JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                    loadListTable();
+                                                }
+                                            } else {
+                                                if (Table.updateStatus(idTable, 0, conn)) {
+                                                    conn.commit();
+                                                    JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                    loadListTable();
+                                                }
+                                            }
                                         }
                                     }
-                                } else {
-                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                        if (Table.updateStatus(idTable, 1, conn)) {
-                                            conn.commit();
-                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                            loadListTable();
+                                } else if (x == JOptionPane.NO_OPTION) {
+                                    //các bàn trong hóa đơn
+                                    conn.setAutoCommit(false);
+                                    TableModel tb = TableReservation.getListTableByIdReservation(idreservation, conn);
+                                    if (TableReservation.reservationCancel(idreservation, conn)) {
+                                        TableReservation.updateEndDate(idreservation, conn);
+                                        for (int i = 0; i < tb.getRowCount(); i++) {
+                                            int idtb = Integer.parseInt(String.valueOf(tb.getValueAt(i, 0)));
+                                            if (TableReservation.countidTableReservation(idtb, conn) > 0) {
+                                                if (TableReservation.countidTableUsing(idtb, conn) > 0) {
+                                                    Table.updateStatus(idtb, 1, conn);
+                                                } else {
+                                                    Table.updateStatus(idtb, 2, conn);
+                                                }
+                                            } else {
+                                                if (TableReservation.countidTableUsing(idtb, conn) > 0) {
+                                                    Table.updateStatus(idtb, 1, conn);
+
+                                                } else {
+                                                    Table.updateStatus(idtb, 0, conn);
+                                                }
+                                            }
+                                        }// end for
+                                        conn.commit();
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                        loadListTable();
+                                    }
+                                }
+
+                            } else { //get party=false
+                                conn.setAutoCommit(false);
+                                if (TableReservation.reservationCancel(idreservation, conn)) {
+                                    TableReservation.updateEndDate(idreservation, conn);
+                                    if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                                        if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                            if (Table.updateStatus(idTable, 1, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                loadListTable();
+                                            }
+                                        } else {
+                                            if (Table.updateStatus(idTable, 2, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                loadListTable();
+                                            }
                                         }
                                     } else {
-                                        if (Table.updateStatus(idTable, 0, conn)) {
-                                            conn.commit();
-                                            JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
-                                            loadListTable();
+                                        if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                            if (Table.updateStatus(idTable, 1, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                loadListTable();
+                                            }
+                                        } else {
+                                            if (Table.updateStatus(idTable, 0, conn)) {
+                                                conn.commit();
+                                                JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
+                                                loadListTable();
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                         try {
                             conn.rollback();
                         } catch (SQLException ex1) {
@@ -195,93 +295,102 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
                     conn = null;
                 }
-            }));
+            }
+            ));
             BufferedImage bImgUpdate = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
             Image imageUpdate = bImgUpdate.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popupmenu.add(new JMenuItem(new AbstractAction("Cập Nhật Thông Tin Đặt Bàn", new ImageIcon(imageUpdate)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    int result = JOptionPane.showConfirmDialog(null, new PanelChangeReservation(),
-                            "Cập nhật thông tin đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                    if (result == JOptionPane.OK_OPTION) {
-                        int id = VariableStatic.getIdTable();
-                        Timestamp date = VariableStatic.getDateTimeReservation();
-                        JOptionPane.showMessageDialog(getRootPane(), "Mã Bàn:" + id + "\nMã Reservation:" + idreservation
-                                + "\nMã Chi tiết:" + idreservation_detail + "\nNgày Đặt: " + date);
-                        try {
-                            conn = ConnectDB.conn();
-                            conn.setAutoCommit(false);
-                            if (TableReservation.updateBeginDate(idreservation, date, conn)) {
-                                if (TableReservationDetail.updateTable(idreservation_detail, id, conn)) {
-                                    if (TableReservation.countidTableUsing(id, conn) > 0) {
-                                        if (Table.updateStatus(id, 1, conn)) {
-                                            conn.commit();
-                                            loadListTable();
-                                        }
-                                    } else {
-                                        if (TableReservation.countidTableReservation(id, conn) > 0) {
-                                            if (Table.updateStatus(id, 2, conn)) {
-                                                conn.commit();
-                                                loadListTable();
-                                            }
-                                        } else {
-                                            if (Table.updateStatus(id, 0, conn)) {
-                                                conn.commit();
-                                                loadListTable();
-                                            }
-                                        }
-                                    }
 
+            popupmenu.add(
+                    new JMenuItem(new AbstractAction("Cập Nhật Thông Tin Đặt Bàn", new ImageIcon(imageUpdate)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            int result = JOptionPane.showConfirmDialog(null, new PanelChangeReservation(),
+                                    "Cập nhật thông tin đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                            if (result == JOptionPane.OK_OPTION) {
+                                int id = VariableStatic.getIdTable();
+                                Timestamp date = VariableStatic.getDateTimeReservation();
+                                JOptionPane.showMessageDialog(getRootPane(), "Mã Bàn:" + id + "\nMã Reservation:" + idreservation
+                                        + "\nMã Chi tiết:" + idreservation_detail + "\nNgày Đặt: " + date);
+                                try {
+                                    conn = ConnectDB.conn();
                                     conn.setAutoCommit(false);
-                                    if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                        if (Table.updateStatus(idTable, 1, conn)) {
-                                            conn.commit();
-                                            JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
-                                            loadListTable();
-                                        }
-                                    } else {
-                                        if (TableReservation.countidTableReservation(idTable, conn) > 0) {
-                                            if (Table.updateStatus(idTable, 2, conn)) {
-                                                conn.commit();
-                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
-                                                loadListTable();
+                                    if (TableReservation.updateBeginDate(idreservation, date, conn)) {
+                                        if (TableReservationDetail.updateTable(idreservation_detail, id, conn)) {
+                                            if (TableReservation.countidTableUsing(id, conn) > 0) {
+                                                if (Table.updateStatus(id, 1, conn)) {
+                                                    conn.commit();
+                                                    loadListTable();
+                                                }
+                                            } else {
+                                                if (TableReservation.countidTableReservation(id, conn) > 0) {
+                                                    if (Table.updateStatus(id, 2, conn)) {
+                                                        conn.commit();
+                                                        loadListTable();
+                                                    }
+                                                } else {
+                                                    if (Table.updateStatus(id, 0, conn)) {
+                                                        conn.commit();
+                                                        loadListTable();
+                                                    }
+                                                }
+                                            }
+
+                                            conn.setAutoCommit(false);
+                                            if (TableReservation.countidTableUsing(idTable, conn) > 0) {
+                                                if (Table.updateStatus(idTable, 1, conn)) {
+                                                    conn.commit();
+                                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                                    loadListTable();
+                                                }
+                                            } else {
+                                                if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                                                    if (Table.updateStatus(idTable, 2, conn)) {
+                                                        conn.commit();
+                                                        JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                                        loadListTable();
+                                                    }
+                                                } else {
+                                                    if (Table.updateStatus(idTable, 0, conn)) {
+                                                        conn.commit();
+                                                        JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
+                                                        loadListTable();
+                                                    }
+                                                }
                                             }
                                         } else {
-                                            if (Table.updateStatus(idTable, 0, conn)) {
-                                                conn.commit();
-                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin thành công");
-                                                loadListTable();
-                                            }
+                                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
                                         }
+                                    } else {
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
                                     }
-                                } else {
-                                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                                } catch (SQLException ex) {
+                                    try {
+                                        conn.rollback();
+                                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                                    } catch (SQLException ex1) {
+                                        Logger.getLogger(PanelViewReservation.class.getName()).log(Level.SEVERE, null, ex1);
+                                    }
                                 }
-                            } else {
-                                JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+
                             }
-                        } catch (SQLException ex) {
-                            try {
-                                conn.rollback();
-                                JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
-                            } catch (SQLException ex1) {
-                                Logger.getLogger(PanelViewReservation.class.getName()).log(Level.SEVERE, null, ex1);
-                            }
+
                         }
-
                     }
-
-                }
-            }));
+                    ));
             popupmenu.addSeparator();
             BufferedImage bImgReload = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Refresh-icon.png"));
             Image imageReload = bImgReload.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popupmenu.add(new JMenuItem(new AbstractAction("Reload", new ImageIcon(imageReload)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    loadListTable();
-                }
-            }));
+
+            popupmenu.add(
+                    new JMenuItem(new AbstractAction("Reload", new ImageIcon(imageReload)) {
+                        @Override
+                        public void actionPerformed(ActionEvent e
+                        ) {
+                            loadListTable();
+                        }
+                    }
+                    ));
             tbListTable.setComponentPopupMenu(popupmenu);
         } catch (Exception e) {
             e.printStackTrace();

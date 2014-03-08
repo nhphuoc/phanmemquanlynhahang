@@ -147,10 +147,15 @@ public class PanelCustomer extends javax.swing.JPanel {
         txtEmail = new javax.swing.JTextField();
         jToolBar1 = new javax.swing.JToolBar();
         btnAdd = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         btnEdit = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
         btnDel = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         btnSave = new javax.swing.JButton();
+        jSeparator4 = new javax.swing.JToolBar.Separator();
         btnReload = new javax.swing.JButton();
+        jSeparator5 = new javax.swing.JToolBar.Separator();
         btnPrint = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbCustomer = new javax.swing.JTable();
@@ -187,6 +192,11 @@ public class PanelCustomer extends javax.swing.JPanel {
         jLabel5.setText("Điện Thoại:");
 
         txtPhone.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        txtPhone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPhoneKeyTyped(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(51, 153, 0));
@@ -220,6 +230,7 @@ public class PanelCustomer extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnAdd);
+        jToolBar1.add(jSeparator1);
 
         btnEdit.setBackground(new java.awt.Color(153, 204, 255));
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/edit-icon-24x24.png"))); // NOI18N
@@ -232,13 +243,20 @@ public class PanelCustomer extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnEdit);
+        jToolBar1.add(jSeparator2);
 
         btnDel.setBackground(new java.awt.Color(153, 204, 255));
         btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/delete-icon-24x24.png"))); // NOI18N
         btnDel.setText("Xóa");
         btnDel.setMaximumSize(new java.awt.Dimension(80, 31));
         btnDel.setMinimumSize(new java.awt.Dimension(80, 31));
+        btnDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDel);
+        jToolBar1.add(jSeparator3);
 
         btnSave.setBackground(new java.awt.Color(153, 204, 255));
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon-24x24.png"))); // NOI18N
@@ -251,6 +269,7 @@ public class PanelCustomer extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnSave);
+        jToolBar1.add(jSeparator4);
 
         btnReload.setBackground(new java.awt.Color(153, 204, 255));
         btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Refresh-icon-24x24.png"))); // NOI18N
@@ -263,6 +282,7 @@ public class PanelCustomer extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnReload);
+        jToolBar1.add(jSeparator5);
 
         btnPrint.setBackground(new java.awt.Color(153, 204, 255));
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/print-icon-24x24.png"))); // NOI18N
@@ -345,7 +365,7 @@ public class PanelCustomer extends javax.swing.JPanel {
                 return false;   //Disallow the editing of any cell
             }
         };
-        tbCustomer.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        tbCustomer.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         tbCustomer.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -357,12 +377,23 @@ public class PanelCustomer extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbCustomer.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tbCustomer.setFocusTraversalPolicyProvider(true);
         tbCustomer.setGridColor(new java.awt.Color(204, 204, 204));
         tbCustomer.setRowHeight(25);
         tbCustomer.setSelectionBackground(new java.awt.Color(255, 153, 0));
+        tbCustomer.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tbCustomer.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbCustomerMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tbCustomerMousePressed(evt);
+            }
+        });
+        tbCustomer.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbCustomerKeyPressed(evt);
             }
         });
         jScrollPane1.setViewportView(tbCustomer);
@@ -433,8 +464,7 @@ public class PanelCustomer extends javax.swing.JPanel {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         EmailValidator validator = new EmailValidator();
         Date dt = dtBirtday.getDate();;
-        Date ds = new java.sql.Date(dt.getTime());
-        System.out.println((dt.getYear() + 1900) + "---" + (new Date().getYear() + 1900));
+        Date ds = new java.sql.Date(dt.getTime());        
         if (txtName.getText().trim().equals("") || txtName.getText().trim().length() > 50) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên khách hàng hoặc nhập sai");
             txtName.requestFocus();
@@ -505,6 +535,53 @@ public class PanelCustomer extends javax.swing.JPanel {
         conn = null;
     }//GEN-LAST:event_txtSearchKeyReleased
 
+    private void txtPhoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhoneKeyTyped
+       int key = evt.getKeyChar();
+        String st = txtPhone.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtPhoneKeyTyped
+
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+       if (txtID.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn khách hàng");
+        } else {
+            conn = ConnectDB.conn();
+            if (Customer.countCustomerUsing(Integer.parseInt(txtID.getText().trim()),conn)) {
+                if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có thật sự muốn xóa khách hàng này không?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+                    if (Customer.delete(Integer.parseInt(txtID.getText().trim()), conn)) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xóa thành công");
+                        loadTbCustomer();
+                    }
+                }                 
+            }else{
+                JOptionPane.showMessageDialog(getRootPane(), "Khách hàng đang sử dụng dịch vụ hoặc có hóa đơn đang đặt, không thể xóa");
+            }
+        }
+    }//GEN-LAST:event_btnDelActionPerformed
+
+    private void tbCustomerMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCustomerMousePressed
+        int index = tbCustomer.getSelectedRow();
+        bindingText(index);
+    }//GEN-LAST:event_tbCustomerMousePressed
+
+    private void tbCustomerKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbCustomerKeyPressed
+        int index = tbCustomer.getSelectedRow();
+        bindingText(index);
+    }//GEN-LAST:event_tbCustomerKeyPressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -525,6 +602,11 @@ public class PanelCustomer extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator5;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable tbCustomer;
     private javax.swing.JTextField txtAdress;

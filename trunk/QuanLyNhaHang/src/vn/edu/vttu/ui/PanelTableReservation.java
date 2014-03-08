@@ -189,9 +189,8 @@ public class PanelTableReservation extends javax.swing.JPanel {
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void dtTableReservationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtTableReservationPropertyChange
-
-        VariableStatic.setDateTimeReservation(getTime());
-        System.out.println(VariableStatic.getDateTimeReservation());
+        
+        VariableStatic.setDateTimeReservation(getTime());        
     }//GEN-LAST:event_dtTableReservationPropertyChange
 
 

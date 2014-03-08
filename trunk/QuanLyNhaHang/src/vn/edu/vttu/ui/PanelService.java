@@ -7,6 +7,8 @@ package vn.edu.vttu.ui;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -116,6 +118,17 @@ public class PanelService extends javax.swing.JPanel {
             return this;
         }
     }
+
+    static class MyKeyListener extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                // delete row method (when "delete" is pressed)
+                System.out.println("Key \"Delete\" Pressed");
+            }
+        }
+    }
     /**
      * Creates new form PanelService
      */
@@ -131,7 +144,7 @@ public class PanelService extends javax.swing.JPanel {
     private String img;
     private String filename;
     private String fileAddress;
-    private int indexx=0;
+    private int indexx = 0;
 
     public PanelService() {
         initComponents();
@@ -179,7 +192,7 @@ public class PanelService extends javax.swing.JPanel {
 
                 tbService.getColumnModel().getColumn(8).setMinWidth(0);
                 tbService.getColumnModel().getColumn(8).setMaxWidth(0);
-            }            
+            }
             bindingTexFeild(index);
             conn = null;
         } catch (Exception e) {
@@ -241,7 +254,6 @@ public class PanelService extends javax.swing.JPanel {
             txtNote.setText(String.valueOf(tbService.getValueAt(index, 6)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
             txtLinkImage.setText(String.valueOf(tbService.getValueAt(index, 8)));
-            System.out.println(img);
 
         } catch (Exception e) {
         }
@@ -282,7 +294,7 @@ public class PanelService extends javax.swing.JPanel {
                     int idSV = (int) Service.getMaxId(conn).getValueAt(0, 0);
                     if (ServiceCost.insert(idSV, cost, conn)) {
                         UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
-                        ftpUploader.uploadFile(img,new File(img).getName(), "/images/");
+                        ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
                         ftpUploader.disconnect();
                         conn.commit();
                         flag = true;
@@ -290,10 +302,10 @@ public class PanelService extends javax.swing.JPanel {
                 }
                 conn = null;
             } catch (Exception e) {
-                
+
                 try {
                     conn.rollback();
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi\n"+e.getMessage());
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi\n" + e.getMessage());
                     flag = false;
                 } catch (SQLException ex) {
                     Logger.getLogger(PanelService.class.getName()).log(Level.SEVERE, null, ex);
@@ -336,8 +348,17 @@ public class PanelService extends javax.swing.JPanel {
                 conn.setAutoCommit(false);
                 if (Service.update(id, name, type, unit, store, note, img, conn)) {
                     if (ServiceCost.insert(id, cost, conn)) {
-                        conn.commit();
-                        flag = true;
+                        if (!tbService.getValueAt(tbService.getSelectedRow(), 8).equals(txtLinkImage.getText().trim())) {
+                            UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
+                            ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
+                            ftpUploader.disconnect();
+                            conn.commit();
+                            flag = true;
+                        } else {
+                            conn.commit();
+                            flag = true;
+                        }
+
                     }
                     conn = null;
                 }
@@ -345,6 +366,7 @@ public class PanelService extends javax.swing.JPanel {
                 e.printStackTrace();
                 try {
                     conn.rollback();
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi\n" + e.getMessage());
                     flag = false;
                 } catch (SQLException ex) {
                     Logger.getLogger(PanelService.class.getName()).log(Level.SEVERE, null, ex);
@@ -385,11 +407,17 @@ public class PanelService extends javax.swing.JPanel {
         txtNote = new javax.swing.JTextField();
         jToolBar1 = new javax.swing.JToolBar();
         btnAdd = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         btnEdit = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
         btnDelete = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         btnSave = new javax.swing.JButton();
+        jSeparator4 = new javax.swing.JToolBar.Separator();
         btnReload = new javax.swing.JButton();
+        jSeparator5 = new javax.swing.JToolBar.Separator();
         btnPrint = new javax.swing.JButton();
+        jSeparator6 = new javax.swing.JToolBar.Separator();
         btnViewImage = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         txtLinkImage = new javax.swing.JTextField();
@@ -403,6 +431,7 @@ public class PanelService extends javax.swing.JPanel {
                 return false;   //Disallow the editing of any cell
             }
         };
+        tbService.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         tbService.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -416,7 +445,7 @@ public class PanelService extends javax.swing.JPanel {
         ));
         tbService.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tbService.setGridColor(new java.awt.Color(204, 204, 204));
-        tbService.setRowHeight(40);
+        tbService.setRowHeight(25);
         tbService.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbService.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tbService.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -523,7 +552,13 @@ public class PanelService extends javax.swing.JPanel {
                 btnAddActionPerformed(evt);
             }
         });
+        btnAdd.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                btnAddKeyPressed(evt);
+            }
+        });
         jToolBar1.add(btnAdd);
+        jToolBar1.add(jSeparator1);
 
         btnEdit.setBackground(new java.awt.Color(153, 204, 255));
         btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/edit-icon-24x24.png"))); // NOI18N
@@ -534,11 +569,18 @@ public class PanelService extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnEdit);
+        jToolBar1.add(jSeparator2);
 
         btnDelete.setBackground(new java.awt.Color(153, 204, 255));
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/delete-icon-24x24.png"))); // NOI18N
         btnDelete.setText("Xóa");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDelete);
+        jToolBar1.add(jSeparator3);
 
         btnSave.setBackground(new java.awt.Color(153, 204, 255));
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
@@ -549,6 +591,7 @@ public class PanelService extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnSave);
+        jToolBar1.add(jSeparator4);
 
         btnReload.setBackground(new java.awt.Color(153, 204, 255));
         btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Refresh-icon-24x24.png"))); // NOI18N
@@ -559,6 +602,7 @@ public class PanelService extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnReload);
+        jToolBar1.add(jSeparator5);
 
         btnPrint.setBackground(new java.awt.Color(153, 204, 255));
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/print-icon-24x24.png"))); // NOI18N
@@ -569,6 +613,7 @@ public class PanelService extends javax.swing.JPanel {
             }
         });
         jToolBar1.add(btnPrint);
+        jToolBar1.add(jSeparator6);
 
         btnViewImage.setBackground(new java.awt.Color(153, 204, 255));
         btnViewImage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Images-icon.png"))); // NOI18N
@@ -754,7 +799,7 @@ public class PanelService extends javax.swing.JPanel {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         add = false;
         enableButton(false);
-        indexx=tbService.getSelectedRow();
+        indexx = tbService.getSelectedRow();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -762,13 +807,13 @@ public class PanelService extends javax.swing.JPanel {
         if (add == true) {
             if (add()) {
                 enableButton(true);
-                loadTableService(indexx);                
+                loadTableService(indexx);
             }
         } else {
             if (update()) {
                 enableButton(true);
                 System.out.println(indexx);
-                loadTableService(indexx);                   
+                loadTableService(indexx);
             }
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -955,6 +1000,10 @@ public class PanelService extends javax.swing.JPanel {
     }//GEN-LAST:event_btnChooseImageActionPerformed
 
     private void btnViewImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewImageActionPerformed
+        /*
+         int result = JOptionPane.showOptionDialog(null, new PanelViewImageService(),
+         "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+         */
         try {
             BufferedImage bImg2 = ImageIO.read(new File(txtLinkImage.getText()));
             Image image2 = bImg2.getScaledInstance(122, 144, Image.SCALE_SMOOTH);
@@ -963,6 +1012,32 @@ public class PanelService extends javax.swing.JPanel {
         }
 
     }//GEN-LAST:event_btnViewImageActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (txtID.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn dịch vụ");
+        } else {
+            conn = ConnectDB.conn();
+            if (Service.countServiceUsing(Integer.parseInt(txtID.getText().trim()), conn)) {
+                if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có thật sự muốn xóa dịch vụ này không?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+                    if (Service.delete(Integer.parseInt(txtID.getText().trim()), conn)) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xóa thành công");
+                        loadTableService(1);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Dịch vụ đang được sử dụng, không thể xóa");
+            }
+        }
+
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnAddKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnAddKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+            System.out.println("press");
+        }
+    }//GEN-LAST:event_btnAddKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -989,6 +1064,12 @@ public class PanelService extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator5;
+    private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lbImages;
     private javax.swing.JTable tbService;

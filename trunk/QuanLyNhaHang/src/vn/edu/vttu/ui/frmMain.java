@@ -44,8 +44,9 @@ public class frmMain extends javax.swing.JFrame {
         btnWaiter = new javax.swing.JButton();
         btnService = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        btnInvoice = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnStaff = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
@@ -116,6 +117,21 @@ public class frmMain extends javax.swing.JFrame {
         jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton3);
 
+        btnInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/invoice-icon.png"))); // NOI18N
+        btnInvoice.setText("Hóa Đơn");
+        btnInvoice.setFocusable(false);
+        btnInvoice.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnInvoice.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnInvoice.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnInvoice.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnInvoice.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnInvoice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInvoiceActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnInvoice);
+
         jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/customer.png"))); // NOI18N
         jButton4.setText("Khách Hàng");
         jButton4.setFocusable(false);
@@ -132,15 +148,20 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(jButton4);
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/staff.png"))); // NOI18N
-        jButton5.setText("Nhân Viên");
-        jButton5.setFocusable(false);
-        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton5.setMaximumSize(new java.awt.Dimension(77, 75));
-        jButton5.setMinimumSize(new java.awt.Dimension(77, 75));
-        jButton5.setPreferredSize(new java.awt.Dimension(77, 75));
-        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jButton5);
+        btnStaff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/staff.png"))); // NOI18N
+        btnStaff.setText("Nhân Viên");
+        btnStaff.setFocusable(false);
+        btnStaff.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnStaff.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnStaff.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnStaff.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnStaff.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnStaff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStaffActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnStaff);
 
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/statistics.png"))); // NOI18N
         jButton6.setText("Thống Kê");
@@ -219,19 +240,35 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceActionPerformed
         main.removeAll();
-        PanelService panelservice= new PanelService();
+        PanelService panelservice = new PanelService();
         main.add(panelservice);
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_btnServiceActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-         main.removeAll();
-        PanelCustomer panelcustomer= new PanelCustomer();
+        main.removeAll();
+        PanelCustomer panelcustomer = new PanelCustomer();
         main.add(panelcustomer);
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void btnStaffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStaffActionPerformed
+        main.removeAll();
+        PanelStaff panelstaff = new PanelStaff();
+        main.add(panelstaff);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnStaffActionPerformed
+
+    private void btnInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvoiceActionPerformed
+       main.removeAll();
+        PanelInvoice panelinvoice = new PanelInvoice();
+        main.add(panelinvoice);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnInvoiceActionPerformed
 
     /**
      * @param args the command line arguments
@@ -263,18 +300,19 @@ public class frmMain extends javax.swing.JFrame {
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 Rectangle bounds = env.getMaximumWindowBounds();
                 frm.setMaximizedBounds(bounds);
-                frm.setExtendedState(frm.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+                frm.setExtendedState(frm.getExtendedState() | JFrame.MAXIMIZED_BOTH);                
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnInvoice;
     private javax.swing.JButton btnService;
+    private javax.swing.JButton btnStaff;
     private javax.swing.JButton btnSystem;
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
