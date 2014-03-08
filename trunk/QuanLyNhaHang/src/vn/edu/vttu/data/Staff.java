@@ -169,8 +169,10 @@ public class Staff {
         try {
             String sql = "CALL staff_get_all()";
             CallableStatement callstate = conn.prepareCall(sql);
-            ResultSet rs = callstate.executeQuery();
-            while (rs.next()) {
+            ResultSet rs = callstate.executeQuery();            
+            vn.edu.vttu.model.Staff tb1 = new vn.edu.vttu.model.Staff(0, "Tất Cả");
+            result.add(tb1);
+            while (rs.next()) {                
                 vn.edu.vttu.model.Staff tb = new vn.edu.vttu.model.Staff(rs.getInt(1), rs.getString(2));
                 result.add(tb);
             }

@@ -3,16 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.ui;
 
 import java.awt.Component;
+import java.io.FileWriter;
 import java.sql.Connection;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JList;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
@@ -24,6 +28,7 @@ import vn.edu.vttu.data.TableLocation;
  * @author nhphuoc
  */
 public class PanelInvoice extends javax.swing.JPanel {
+
     class ItemRendererInvoice extends BasicComboBoxRenderer {
 
         public Component getListCellRendererComponent(
@@ -46,6 +51,7 @@ public class PanelInvoice extends javax.swing.JPanel {
             return this;
         }
     }
+
     class ItemRendererStaff extends BasicComboBoxRenderer {
 
         public Component getListCellRendererComponent(
@@ -73,16 +79,18 @@ public class PanelInvoice extends javax.swing.JPanel {
      * Creates new form PanelInvoice
      */
     private Connection conn;
+
     public PanelInvoice() {
         initComponents();
         fillcobCustomer();
-        fillcobStaff();        
+        fillcobStaff();
     }
+
     private void fillcobCustomer() {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Customer> model = new Vector<vn.edu.vttu.model.Customer>();
         try {
-            model = Customer.selectCustomer(conn);
+            model = Customer.selectCustomer1(conn);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,6 +101,7 @@ public class PanelInvoice extends javax.swing.JPanel {
         cobCustomer.setRenderer(new PanelInvoice.ItemRendererInvoice());
         conn = null;
     }
+
     private void fillcobStaff() {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Staff> model = new Vector<vn.edu.vttu.model.Staff>();
@@ -108,10 +117,30 @@ public class PanelInvoice extends javax.swing.JPanel {
         cobStaff.setRenderer(new PanelInvoice.ItemRendererStaff());
         conn = null;
     }
-    private void loadInvoice(){
-        conn=ConnectDB.conn();
-        tbInvoiceList.setModel(Invoice.getAll(conn));
-        conn=null;
+
+    private void loadInvoice() {
+        conn = ConnectDB.conn();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime1 = formatter.format(dtFromDate.getDate());
+        Timestamp ts1 = Timestamp.valueOf(datetime1);
+        String datetime2 = formatter.format(dtToDate.getDate());
+        Timestamp ts2 = Timestamp.valueOf(datetime2);
+        vn.edu.vttu.model.Staff staff = (vn.edu.vttu.model.Staff) cobStaff.getSelectedItem();
+        int idStaff = staff.getId();
+        vn.edu.vttu.model.Customer customer = (vn.edu.vttu.model.Customer) cobCustomer.getSelectedItem();
+        int idCustomer = customer.getId();
+        int choise = 0;
+        if (idStaff == 0 && idCustomer == 0) {
+            choise = 0;
+        } else if (idStaff == 0 && idCustomer != 0) {
+            choise = 1;
+        } else if (idStaff != 0 && idCustomer == 0) {
+            choise = 2;
+        } else if (idStaff != 0 && idCustomer != 0) {
+            choise = 3;
+        }
+        tbInvoiceList.setModel(Invoice.getAll(ts1, ts2, idStaff, idCustomer, choise, conn));
+        conn = null;
     }
 
     /**
@@ -158,12 +187,22 @@ public class PanelInvoice extends javax.swing.JPanel {
 
         dtFromDate.setDate(new Date());
         dtFromDate.setDateFormatString("dd/MM/yyyy");
+        dtFromDate.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dtFromDatePropertyChange(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel3.setText("Đến Ngày:");
 
         dtToDate.setDate(new Date());
         dtToDate.setDateFormatString("dd/MM/yyyy");
+        dtToDate.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dtToDatePropertyChange(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setText("Nhân Viên:");
@@ -217,6 +256,11 @@ public class PanelInvoice extends javax.swing.JPanel {
         btnExportToExcel.setForeground(new java.awt.Color(255, 255, 255));
         btnExportToExcel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
         btnExportToExcel.setText("Xuất Ra Excel");
+        btnExportToExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportToExcelActionPerformed(evt);
+            }
+        });
         jToolBar2.add(btnExportToExcel);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -283,21 +327,26 @@ public class PanelInvoice extends javax.swing.JPanel {
                 .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 97, Short.MAX_VALUE))
         );
 
         tbInvoiceList.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         tbInvoiceList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Ngày Nhận Bàn", "Ngày Thanh Toán", "Bàn - Tầng", "Giảm Giá", "Thanh Toán", "Ghi Chú"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tbInvoiceList.setRowHeight(25);
         tbInvoiceList.setSelectionBackground(new java.awt.Color(255, 153, 0));
         jScrollPane1.setViewportView(tbInvoiceList);
@@ -314,13 +363,57 @@ public class PanelInvoice extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSearchInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchInvoiceActionPerformed
         loadInvoice();
+        int row = Integer.parseInt(String.valueOf(tbInvoiceList.getRowCount()));
+        lbNumberInvoice.setText(String.valueOf(row) + " Hóa Đơn");
+        int total = 0;
+        for (int i = 0; i < row; i++) {
+            int n = Integer.parseInt(String.valueOf(tbInvoiceList.getValueAt(i, 4)).replaceAll(",", ""));
+            total = total + n;
+        }
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        lbTotal.setText(df.format(total) + " VNĐ");
+
     }//GEN-LAST:event_btnSearchInvoiceActionPerformed
+
+    private void dtFromDatePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtFromDatePropertyChange
+        if (dtFromDate.getDate().compareTo(dtToDate.getDate()) > 0) {
+            dtToDate.setDate(dtFromDate.getDate());
+        }
+    }//GEN-LAST:event_dtFromDatePropertyChange
+
+    private void dtToDatePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtToDatePropertyChange
+        if (dtFromDate.getDate().compareTo(dtToDate.getDate()) > 0) {
+            dtFromDate.setDate(dtToDate.getDate());
+        }
+    }//GEN-LAST:event_dtToDatePropertyChange
+
+    private void btnExportToExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportToExcelActionPerformed
+        try {
+            TableModel model = tbInvoiceList.getModel();
+            FileWriter out = new FileWriter("thongke.xls");
+            for (int i = 0; i < model.getColumnCount(); i++) {
+                out.write(model.getColumnName(i) + "\t");
+            }
+            out.write("\n");
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                for (int j = 0; j < model.getColumnCount(); j++) {
+                    String s=new String(model.getValueAt(i, j).toString().getBytes("utf-8"),"ISO-8859-1");
+                    out.write(s + "\t");
+                }
+                out.write("\n");
+            }
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnExportToExcelActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

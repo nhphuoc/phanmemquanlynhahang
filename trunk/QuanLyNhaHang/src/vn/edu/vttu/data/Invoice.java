@@ -10,6 +10,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -113,11 +114,16 @@ public class Invoice {
         }
         return flag;
     }
-    public static TableModel getAll(Connection conn) {
+    public static TableModel getAll(Timestamp dt1,Timestamp dt2,int staff, int customer, int choise,Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {                    
-            CallableStatement calState = conn.prepareCall("{CALL Invoice_get_all()}");            
+            CallableStatement calState = conn.prepareCall("{CALL Invoice_get_between_date_staff_customer(?,?,?,?,?)}");    
+            calState.setTimestamp(1, dt1);
+            calState.setTimestamp(2, dt2);
+            calState.setInt(3, staff);
+            calState.setInt(4, customer);
+            calState.setInt(5,choise);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
