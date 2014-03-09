@@ -43,7 +43,7 @@ public class frmMain extends javax.swing.JFrame {
         btnSystem = new javax.swing.JButton();
         btnWaiter = new javax.swing.JButton();
         btnService = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnPromotion = new javax.swing.JButton();
         btnInvoice = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         btnStaff = new javax.swing.JButton();
@@ -107,15 +107,20 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnService);
 
-        jButton3.setBackground(new java.awt.Color(51, 153, 255));
-        jButton3.setText("Khuyến Mãi");
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setMaximumSize(new java.awt.Dimension(77, 75));
-        jButton3.setMinimumSize(new java.awt.Dimension(77, 75));
-        jButton3.setPreferredSize(new java.awt.Dimension(77, 75));
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jButton3);
+        btnPromotion.setBackground(new java.awt.Color(51, 153, 255));
+        btnPromotion.setText("Khuyến Mãi");
+        btnPromotion.setFocusable(false);
+        btnPromotion.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnPromotion.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnPromotion.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnPromotion.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnPromotion.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnPromotion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPromotionActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnPromotion);
 
         btnInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/invoice-icon.png"))); // NOI18N
         btnInvoice.setText("Hóa Đơn");
@@ -270,6 +275,14 @@ public class frmMain extends javax.swing.JFrame {
         main.repaint();
     }//GEN-LAST:event_btnInvoiceActionPerformed
 
+    private void btnPromotionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPromotionActionPerformed
+        main.removeAll();
+        PanelPromotion panelpromotion = new PanelPromotion();
+        main.add(panelpromotion);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnPromotionActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -307,11 +320,11 @@ public class frmMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnInvoice;
+    private javax.swing.JButton btnPromotion;
     private javax.swing.JButton btnService;
     private javax.swing.JButton btnStaff;
     private javax.swing.JButton btnSystem;
     private javax.swing.JButton btnWaiter;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;

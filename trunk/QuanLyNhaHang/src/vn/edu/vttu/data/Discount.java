@@ -10,6 +10,9 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import javax.swing.JOptionPane;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -21,8 +24,7 @@ public class Discount {
     private int type;
     private Timestamp beginDate;
     private Timestamp endDate;
-
-    
+    private int condition;   
     private int value;
     private String detail;
 
@@ -65,7 +67,13 @@ public class Discount {
     public void setEndDate(Timestamp endDate) {
         this.endDate = endDate;
     }
+    public int getCondition() {
+        return condition;
+    }
 
+    public void setCondition(int condition) {
+        this.condition = condition;
+    }
     public int getValue() {
         return value;
     }
@@ -81,12 +89,13 @@ public class Discount {
     public void setDetail(String detail) {
         this.detail = detail;
     }
-    public Discount(int id, String name, int type,Timestamp beginDate,Timestamp endDate,int value,String detail){
+    public Discount(int id, String name, int type,Timestamp beginDate,Timestamp endDate,int condition,int value,String detail){
         this.id=id;
         this.name=name;
         this.type=type;
         this.beginDate=beginDate;
         this.endDate=endDate;
+        this.condition=condition;
         this.value=value;
         this.detail=detail;
     }
@@ -97,12 +106,51 @@ public class Discount {
             CallableStatement callstate = conn.prepareCall(sql);            
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                discount = new Discount(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getTimestamp("beginDate"),rs.getTimestamp("endDate"), rs.getInt("value"), rs.getString("detail"));
+                discount = new Discount(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getTimestamp("beginDate"),rs.getTimestamp("endDate"),rs.getInt("condition"),rs.getInt("value"), rs.getString("detail"));
                 return discount;
             }
         } catch (Exception e) {
         }
-        return new Discount(0, "Không có khuyến mãi",2,null,null, 0, null);
+        return new Discount(0, "Không có khuyến mãi",2,null,null,0, 0, null);
     }
+    public static TableModel getListPromotion(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL discount_get_all()}");            
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }    
+    public static boolean insert(String name, int type, Timestamp beginDate, Timestamp endDate, int condition, int valueInvoice, int value, String detail,  Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL discount_add(?,?,?,?,?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);                  
+            callstate.setInt(2, type);                  
+            callstate.setTimestamp(3, beginDate);                  
+            callstate.setTimestamp(4, endDate);                  
+            callstate.setInt(5, condition);                  
+            callstate.setInt(6, valueInvoice);                  
+            callstate.setInt(7, value);                  
+            callstate.setString(8, detail);                  
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        return flag;
+    }    
     
 }
