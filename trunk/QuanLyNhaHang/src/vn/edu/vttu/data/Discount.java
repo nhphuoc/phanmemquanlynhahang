@@ -106,7 +106,7 @@ public class Discount {
             CallableStatement callstate = conn.prepareCall(sql);            
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                discount = new Discount(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getTimestamp("beginDate"),rs.getTimestamp("endDate"),rs.getInt("condition"),rs.getInt("value"), rs.getString("detail"));
+                discount = new Discount(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getTimestamp("beginDate"),rs.getTimestamp("endDate"),rs.getInt("valueInvoice"),rs.getInt("value"), rs.getString("detail"));
                 return discount;
             }
         } catch (Exception e) {
@@ -151,6 +151,25 @@ public class Discount {
         }
 
         return flag;
-    }    
+    } 
+    public static boolean testDate(Timestamp dt,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean flag=false;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL discount_test_date(?)}");    
+            calState.setTimestamp(1, dt);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(tb.getRowCount()>0){
+                flag=false;
+            }else{
+                flag=true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }   
     
 }

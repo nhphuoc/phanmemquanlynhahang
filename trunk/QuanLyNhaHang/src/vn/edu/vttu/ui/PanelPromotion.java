@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.ui;
 
 import java.sql.Connection;
@@ -25,48 +24,54 @@ public class PanelPromotion extends javax.swing.JPanel {
      * Creates new form PanelPromotion
      */
     private Connection conn;
-    private boolean add=false;
+    private boolean add = false;
+
     public PanelPromotion() {
         initComponents();
         loadData();
         binddingData(0);
         enableControl(true);
     }
-    private void loadData(){
-        conn=ConnectDB.conn();
+
+    private void loadData() {
+        conn = ConnectDB.conn();
         tbListPromotion.setModel(Discount.getListPromotion(conn));
-        conn=null;
+        conn = null;
     }
-    private void binddingData(int index){
-        txtID.setText(String.valueOf(tbListPromotion.getValueAt(index, 0)));
-        txtName.setText(String.valueOf(tbListPromotion.getValueAt(index, 1)));
-        if (String.valueOf(tbListPromotion.getValueAt(index, 2)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 2)).equals("")) {
-            Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 2)));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String datetime = formatter.format(dt);
-            Timestamp ts = Timestamp.valueOf(datetime);
-            dtBeginDate.setDate(ts);
+
+    private void binddingData(int index) {
+        if (tbListPromotion.getRowCount() > 0) {
+            txtID.setText(String.valueOf(tbListPromotion.getValueAt(index, 0)));
+            txtName.setText(String.valueOf(tbListPromotion.getValueAt(index, 1)));
+            if (String.valueOf(tbListPromotion.getValueAt(index, 2)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 2)).equals("")) {
+                Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 2)));
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String datetime = formatter.format(dt);
+                Timestamp ts = Timestamp.valueOf(datetime);
+                dtBeginDate.setDate(ts);
+            }
+            if (String.valueOf(tbListPromotion.getValueAt(index, 3)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 3)).equals("")) {
+                Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 3)));
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String datetime = formatter.format(dt);
+                Timestamp ts = Timestamp.valueOf(datetime);
+                dtEndDate.setDate(ts);
+            }
+            cobPromotion.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 4)));
+            cobCondition.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 5)));
+            txtCostInvoiceCondition.setText(String.valueOf(tbListPromotion.getValueAt(index, 6)));
+            txtCostPromotion.setText(String.valueOf(tbListPromotion.getValueAt(index, 7)));
+            txtDetail.setText(String.valueOf(tbListPromotion.getValueAt(index, 8)));
         }
-        if (String.valueOf(tbListPromotion.getValueAt(index, 3)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 3)).equals("")) {
-            Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 3)));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String datetime = formatter.format(dt);
-            Timestamp ts = Timestamp.valueOf(datetime);
-            dtEndDate.setDate(ts);
-        }
-        cobPromotion.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 4)));
-        cobCondition.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 5)));
-        txtCostInvoiceCondition.setText(String.valueOf(tbListPromotion.getValueAt(index, 6)));
-        txtCostPromotion.setText(String.valueOf(tbListPromotion.getValueAt(index, 7)));
-        txtDetail.setText(String.valueOf(tbListPromotion.getValueAt(index, 8)));        
     }
-    private void enableControl(boolean b){
+
+    private void enableControl(boolean b) {
         btnAdd.setEnabled(b);
         btnEdit.setEnabled(b);
         btnDelete.setEnabled(b);
         btnSave.setEnabled(!b);
-        tbListPromotion.setEnabled(b); 
-        
+        tbListPromotion.setEnabled(b);
+
         txtName.setEnabled(!b);
         txtCostInvoiceCondition.setEnabled(!b);
         txtCostPromotion.setEnabled(!b);
@@ -75,8 +80,7 @@ public class PanelPromotion extends javax.swing.JPanel {
         cobCondition.setEnabled(!b);
         cobPromotion.setEnabled(!b);
         txtDetail.setEnabled(!b);
-        
-        
+
     }
 
     /**
@@ -197,6 +201,7 @@ public class PanelPromotion extends javax.swing.JPanel {
         jLabel8.setText("Chi Tiết Chương Trình:");
 
         txtDetail.setColumns(20);
+        txtDetail.setLineWrap(true);
         txtDetail.setRows(5);
         jScrollPane2.setViewportView(txtDetail);
 
@@ -374,26 +379,26 @@ public class PanelPromotion extends javax.swing.JPanel {
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         enableControl(true);
-        add=false;
+        add = false;
         txtName.requestFocus();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void tbListPromotionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbListPromotionMouseClicked
-      int index=tbListPromotion.getSelectedRow();
+        int index = tbListPromotion.getSelectedRow();
         binddingData(index);
     }//GEN-LAST:event_tbListPromotionMouseClicked
 
     private void cobConditionPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobConditionPropertyChange
-        if(cobCondition.getSelectedItem().toString().equals("Tất Cả Hóa Đơn")){
+        if (cobCondition.getSelectedItem().toString().equals("Tất Cả Hóa Đơn")) {
             txtCostInvoiceCondition.setEnabled(false);
             txtCostInvoiceCondition.setText("0");
-        }else{
+        } else {
             txtCostInvoiceCondition.setEnabled(true);
         }
     }//GEN-LAST:event_cobConditionPropertyChange
 
     private void cobConditionVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_cobConditionVetoableChange
-        
+
     }//GEN-LAST:event_cobConditionVetoableChange
 
     private void txtCostPromotionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostPromotionKeyTyped
@@ -434,8 +439,8 @@ public class PanelPromotion extends javax.swing.JPanel {
         if (!txtCostPromotion.getText().trim().equals("")) {
             Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
             txtCostPromotion.setText(String.valueOf(df.format(num)));
-            if(cobPromotion.getSelectedItem().equals("Phần Trăm")){
-                if(txtCostPromotion.getText().trim().replaceAll("\\.", "").length()>3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""))>100){
+            if (cobPromotion.getSelectedItem().equals("Phần Trăm")) {
+                if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
                     txtCostPromotion.setText("0");
                 }
             }
@@ -443,12 +448,12 @@ public class PanelPromotion extends javax.swing.JPanel {
     }//GEN-LAST:event_txtCostPromotionKeyPressed
 
     private void txtCostPromotionKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostPromotionKeyReleased
-       DecimalFormat df = new DecimalFormat("#,###,###");
+        DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostPromotion.getText().trim().equals("")) {
             Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
             txtCostPromotion.setText(String.valueOf(df.format(num)));
-            if(cobPromotion.getSelectedItem().equals("Phần Trăm")){
-                if(txtCostPromotion.getText().trim().replaceAll("\\.", "").length()>3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""))>100){
+            if (cobPromotion.getSelectedItem().equals("Phần Trăm")) {
+                if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
                     txtCostPromotion.setText("0");
                 }
             }
@@ -464,7 +469,7 @@ public class PanelPromotion extends javax.swing.JPanel {
     }//GEN-LAST:event_txtCostInvoiceConditionKeyPressed
 
     private void txtCostInvoiceConditionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostInvoiceConditionKeyTyped
-       int key = evt.getKeyChar();
+        int key = evt.getKeyChar();
         String st = txtCostInvoiceCondition.getText();
         String stTest = "0123456789";
         if (key != evt.VK_BACK_SPACE
@@ -500,63 +505,63 @@ public class PanelPromotion extends javax.swing.JPanel {
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostInvoiceCondition.getText().trim().equals("")) {
             Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
-            txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));            
+            txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
         }
     }//GEN-LAST:event_txtCostInvoiceConditionKeyReleased
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-       enableControl(false);
-       add=true;
-       txtName.requestFocus();
-       txtName.setText("");
-       txtDetail.setText("");
-       txtCostInvoiceCondition.setText("");
-       txtCostPromotion.setText("");
-       
+        enableControl(false);
+        add = true;
+        txtName.requestFocus();
+        txtName.setText("");
+        txtDetail.setText("");
+        txtCostInvoiceCondition.setText("");
+        txtCostPromotion.setText("");
+
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        if(txtName.getText().trim().length()>50 || txtName.getText().trim().equals("")){
+        conn = ConnectDB.conn();
+        String name = txtName.getText().trim();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetimeBegin = formatter.format(dtBeginDate.getDate());
+        Timestamp tsBegin = Timestamp.valueOf(datetimeBegin);
+        String datetimeEnd = formatter.format(dtEndDate.getDate());
+        Timestamp tsEnd = Timestamp.valueOf(datetimeEnd);
+        if (txtName.getText().trim().length() > 50 || txtName.getText().trim().equals("")) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên chương trình hoặc tên >50 ký tự");
-        }else if(dtBeginDate.getDate().compareTo(new Date())<0){
+        } else if (dtBeginDate.getDate().compareTo(new Date()) < 0) {
             JOptionPane.showMessageDialog(getRootPane(), "Ngày bắt đầu phải lớn hơn ngày hiện tại");
-        }else if(dtEndDate.getDate().compareTo(dtBeginDate.getDate())<0){
+        } else if (dtEndDate.getDate().compareTo(dtBeginDate.getDate()) < 0) {
             JOptionPane.showMessageDialog(getRootPane(), "Ngày kết thúc phải lớn hơn ngày bắt đầy");
-        }else if(txtCostPromotion.getText().trim().equals("")){
+        } else if (txtCostPromotion.getText().trim().equals("")) {
             txtCostPromotion.setText("0");
-        }else{
-            String name=txtName.getText().trim();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String datetimeBegin = formatter.format(dtBeginDate.getDate());
-            Timestamp tsBegin = Timestamp.valueOf(datetimeBegin);
-            String datetimeEnd = formatter.format(dtEndDate.getDate());
-            Timestamp tsEnd = Timestamp.valueOf(datetimeEnd);
-            
-            int type=0;
-            int condition=0;
-            if(cobPromotion.getSelectedItem().equals("Tiền Mặt")){
-                type=1;
-            }else{
-                type=0;
+        } else if (Discount.testDate(tsBegin, conn) == false) {
+            JOptionPane.showMessageDialog(getRootPane(), "Đã có chương trình khuyến mãi khác");
+        } else {
+            int type = 0;
+            int condition = 0;
+            if (cobPromotion.getSelectedItem().equals("Tiền Mặt")) {
+                type = 1;
+            } else {
+                type = 0;
             }
-            if(cobCondition.getSelectedItem().equals("Tất Cả Hóa Đơn")){
-                condition=0;
-            }else{
-                condition=1;
+            if (cobCondition.getSelectedItem().equals("Tất Cả Hóa Đơn")) {
+                condition = 0;
+            } else {
+                condition = 1;
             }
-            int conditionvalue=Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
-            int value=Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
-            String detail=txtDetail.getText();
-            if(add==true){
-                conn=ConnectDB.conn();
-                if(Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)){
+            int conditionvalue = Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
+            int value = Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
+            String detail = txtDetail.getText();
+            if (add == true) {                
+                if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
                     JOptionPane.showMessageDialog(getRootPane(), "Thêm Thành Công");
                     loadData();
                     enableControl(true);
                 }
             }
-            
-            
+
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 

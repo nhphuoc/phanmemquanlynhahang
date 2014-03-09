@@ -56,6 +56,7 @@
             <EtchetBorder/>
           </Border>
         </Property>
+        <Property name="floatable" type="boolean" value="false"/>
         <Property name="rollover" type="boolean" value="true"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[620, 80]"/>
@@ -138,8 +139,8 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnPromotion">
           <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="99" red="33" type="rgb"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/vn/edu/vttu/image/promotion.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Khuy&#x1ebf;n M&#xe3;i"/>
             <Property name="focusable" type="boolean" value="false"/>

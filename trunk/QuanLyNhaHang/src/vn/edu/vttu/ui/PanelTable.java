@@ -181,7 +181,6 @@ public class PanelTable extends javax.swing.JPanel {
         loadTable(idLocation);
         loadTableService();
         fillkhCombo();
-        discount();
         TimerTask taskreservation = new TaskReservation();
         Timer timer = new Timer();
         timer.schedule(taskreservation, new Date(), 2000);
@@ -629,6 +628,7 @@ public class PanelTable extends javax.swing.JPanel {
 
                         statusTable = status;
                         setTextLable(idTable);
+
                         loadTableInvoice();
                         totalPay();
                         VariableStatic.setIdTable(idTable);
@@ -1129,6 +1129,7 @@ public class PanelTable extends javax.swing.JPanel {
         lbCustomerName.setText(nameCustomer);
         lbTableName.setText(Table.getByID(id, conn).getNAME() + " - " + Table.getByID(id, conn).getNAME_LOCATION());
         conn = null;
+
     }
 
     private boolean testDate(Timestamp date) {
@@ -1201,6 +1202,7 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void totalPay() {
+
         conn = ConnectDB.conn();
         DecimalFormat df = new DecimalFormat("#,###,###");
         float service_Charges = 0;
@@ -1211,25 +1213,45 @@ public class PanelTable extends javax.swing.JPanel {
         if (!txtService_Price.getText().trim().equals("") && testNumber(txtService_Price.getText())) {
             service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
         }
-        
-        if (!txtDiscountMoney.getText().trim().equals("")) {
-            discount_money = Integer.parseInt(txtDiscountMoney.getText().trim().replaceAll("\\.", ""));
+        /*
+         if (!txtDiscountMoney.getText().trim().equals("")) {
+         discount_money = Integer.parseInt(txtDiscountMoney.getText().trim().replaceAll("\\.", ""));
 
-        }
-        if (!txtDiscountPercent.getText().trim().equals("")) {
-            if (Integer.parseInt(txtDiscountPercent.getText()) < 100 && Integer.parseInt(txtDiscountPercent.getText()) >= 0) {
-                discount_percent = Integer.parseInt(txtDiscountPercent.getText().trim());
-            } else {
-                JOptionPane.showMessageDialog(txtDiscountPercent, "Nhập sai phần trăm");
-                txtDiscountPercent.setText("100");
-            }
+         }
+         if (!txtDiscountPercent.getText().trim().equals("")) {
+         if (Integer.parseInt(txtDiscountPercent.getText()) < 100 && Integer.parseInt(txtDiscountPercent.getText()) >= 0) {
+         discount_percent = Integer.parseInt(txtDiscountPercent.getText().trim());
+         } else {
+         JOptionPane.showMessageDialog(txtDiscountPercent, "Nhập sai phần trăm");
+         txtDiscountPercent.setText("100");
+         }
 
-        }
+         }
+         */
+
         if (!txtCustomerPay.getText().trim().equals("")) {
             customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
         }
 
-        float total = TableService.totalPayment(idTableReservation, conn);
+        float total = TableService.totalPayment(idTableReservation, conn);        
+        if (!Discount.getByDate(conn).getName().equals("Không có khuyến mãi")) {
+            if (total >= Discount.getByDate(conn).getCondition()) {
+                if (Discount.getByDate(conn).getType() == 0) {
+                    discount_percent = Discount.getByDate(conn).getValue();
+                    txtDiscountPercent.setText(String.valueOf(discount_percent));
+                }
+            }else{
+                txtDiscountPercent.setText("");
+            }
+            if (Discount.getByDate(conn).getType() == 1) {
+                if (total >= Discount.getByDate(conn).getCondition()) {
+                    discount_money = Discount.getByDate(conn).getValue();
+                    txtDiscountMoney.setText(df.format(discount_money));
+                }else{
+                txtDiscountMoney.setText("");
+            }
+            }                   
+        }
         //JOptionPane.showMessageDialog(getRootPane(), service_Charges);
         lbTotal.setText(String.valueOf(df.format(total)));
         float _discount = (discount_percent * total) / 100;
@@ -1342,20 +1364,24 @@ public class PanelTable extends javax.swing.JPanel {
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!Discount.getByDate(conn).getName().equals("Không có khuyến mãi")) {
             if (Discount.getByDate(conn).getType() == 0) {
-                txtDiscountPercent.setText(String.valueOf(Discount.getByDate(conn).getValue()));
-                txtDiscountPercent.setEnabled(false);
+                if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
+                    txtDiscountPercent.setText(String.valueOf(Discount.getByDate(conn).getValue()));
+                    txtDiscountPercent.setEnabled(false);
+                } else {
+                    txtDiscountPercent.setText("0");
+                    txtDiscountPercent.setEnabled(false);
+                }
             }
             if (Discount.getByDate(conn).getType() == 1) {
-                String x = df.format(Integer.parseInt(String.valueOf(Discount.getByDate(conn).getValue())));
-                txtDiscountMoney.setText(x);
-                txtDiscountMoney.setEnabled(false);
+                if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
+                    String x = df.format(Integer.parseInt(String.valueOf(Discount.getByDate(conn).getValue())));
+                    txtDiscountMoney.setText(x);
+                    txtDiscountMoney.setEnabled(false);
+                } else {
+                    txtDiscountMoney.setText("0");
+                }
             }
-            if (Discount.getByDate(conn).getType() == 2) {
-                txtDiscountMoney.setText(String.valueOf(Discount.getByDate(conn).getValue()));
-                txtDiscountPercent.setText(String.valueOf(Discount.getByDate(conn).getValue()));
-                txtDiscountMoney.setEnabled(false);
-                txtDiscountPercent.setEnabled(false);
-            }
+            totalPay();
         }
         conn = null;
 
@@ -1670,6 +1696,11 @@ public class PanelTable extends javax.swing.JPanel {
         txtDiscountPercent.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         txtDiscountPercent.setForeground(new java.awt.Color(0, 102, 255));
         txtDiscountPercent.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtDiscountPercent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDiscountPercentActionPerformed(evt);
+            }
+        });
 
         jLabel15.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(0, 102, 255));
@@ -1689,6 +1720,11 @@ public class PanelTable extends javax.swing.JPanel {
         lbTotal.setForeground(new java.awt.Color(0, 102, 255));
         lbTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbTotal.setText("0");
+        lbTotal.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                lbTotalPropertyChange(evt);
+            }
+        });
 
         jLabel19.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel19.setForeground(new java.awt.Color(0, 102, 255));
@@ -2006,11 +2042,11 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSearchKeyTyped
     private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
-            if (!txtService_Price.getText().trim().equals("")) {
-                Long num = Long.parseLong(txtService_Price.getText().trim().replaceAll("\\.", ""));
-                txtService_Price.setText(String.valueOf(df.format(num)));
-            }
-            totalPay();      
+        if (!txtService_Price.getText().trim().equals("")) {
+            Long num = Long.parseLong(txtService_Price.getText().trim().replaceAll("\\.", ""));
+            txtService_Price.setText(String.valueOf(df.format(num)));
+        }
+        totalPay();
     }//GEN-LAST:event_txtService_PriceKeyReleased
     private void btnAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCustomerActionPerformed
         conn = ConnectDB.conn();
@@ -2027,13 +2063,13 @@ public class PanelTable extends javax.swing.JPanel {
         conn = null;
     }//GEN-LAST:event_btnAddCustomerActionPerformed
     private void txtCustomerPayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomerPayKeyReleased
-                
-            DecimalFormat df = new DecimalFormat("#,###,###");
-            if (!txtCustomerPay.getText().trim().equals("")) {
-                Long num = Long.parseLong(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
-                txtCustomerPay.setText(String.valueOf(df.format(num)));
-            }
-            totalPay();       
+
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        if (!txtCustomerPay.getText().trim().equals("")) {
+            Long num = Long.parseLong(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+            txtCustomerPay.setText(String.valueOf(df.format(num)));
+        }
+        totalPay();
 
     }//GEN-LAST:event_txtCustomerPayKeyReleased
     private void txtService_PriceKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyTyped
@@ -2106,6 +2142,14 @@ public class PanelTable extends javax.swing.JPanel {
     private void btnPrintPreviewInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintPreviewInvoiceActionPerformed
         printInvoice();
     }//GEN-LAST:event_btnPrintPreviewInvoiceActionPerformed
+
+    private void lbTotalPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lbTotalPropertyChange
+
+    }//GEN-LAST:event_lbTotalPropertyChange
+
+    private void txtDiscountPercentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDiscountPercentActionPerformed
+
+    }//GEN-LAST:event_txtDiscountPercentActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

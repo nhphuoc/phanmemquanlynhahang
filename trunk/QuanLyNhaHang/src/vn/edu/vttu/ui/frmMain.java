@@ -58,6 +58,7 @@ public class frmMain extends javax.swing.JFrame {
         main.setLayout(new java.awt.GridLayout(1, 0));
 
         jToolBar1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
         jToolBar1.setMaximumSize(new java.awt.Dimension(620, 80));
         jToolBar1.setMinimumSize(new java.awt.Dimension(620, 80));
@@ -107,7 +108,7 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnService);
 
-        btnPromotion.setBackground(new java.awt.Color(51, 153, 255));
+        btnPromotion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/promotion.png"))); // NOI18N
         btnPromotion.setText("Khuyến Mãi");
         btnPromotion.setFocusable(false);
         btnPromotion.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
