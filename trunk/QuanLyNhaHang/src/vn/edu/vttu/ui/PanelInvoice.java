@@ -140,6 +140,13 @@ public class PanelInvoice extends javax.swing.JPanel {
             choise = 3;
         }
         tbInvoiceList.setModel(Invoice.getAll(ts1, ts2, idStaff, idCustomer, choise, conn));
+        if (tbInvoiceList.getRowCount() <= 0) {
+            tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
+            tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
+        }else{
+            tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
+            tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
+        }
         conn = null;
     }
 
@@ -404,7 +411,7 @@ public class PanelInvoice extends javax.swing.JPanel {
 
             for (int i = 0; i < model.getRowCount(); i++) {
                 for (int j = 0; j < model.getColumnCount(); j++) {
-                    String s=new String(model.getValueAt(i, j).toString().getBytes("utf-8"),"ISO-8859-1");
+                    String s = new String(model.getValueAt(i, j).toString().getBytes("utf-8"), "ISO-8859-1");
                     out.write(s + "\t");
                 }
                 out.write("\n");
