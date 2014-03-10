@@ -152,6 +152,54 @@ public class Discount {
 
         return flag;
     } 
+    public static boolean update(String name, int type, Timestamp beginDate, Timestamp endDate, int condition, int valueInvoice, int value, String detail,int id,  Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL discount_update(?,?,?,?,?,?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);                  
+            callstate.setInt(2, type);                  
+            callstate.setTimestamp(3, beginDate);                  
+            callstate.setTimestamp(4, endDate);                  
+            callstate.setInt(5, condition);                  
+            callstate.setInt(6, valueInvoice);                  
+            callstate.setInt(7, value);                  
+            callstate.setString(8, detail);                  
+            callstate.setInt(9, id);                  
+            int x = callstate.executeUpdate();
+            if (x >= 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        return flag;
+    } 
+    public static boolean delete(int id,Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL discount_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);                                       
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        return flag;
+    } 
     public static boolean testDate(Timestamp dt,Connection conn) {
         TableModel tb = null;
         ResultSet rs;

@@ -204,7 +204,7 @@ public class PanelService extends javax.swing.JPanel {
     private void fillcobServiceType() {
 
         conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
+        Vector<vn.edu.vttu.model.ServiceType> model = new Vector<vn.edu.vttu.model.ServiceType>();
         try {
             model = ServiceType.selectServiceType(conn);
         } catch (Exception e) {
@@ -419,6 +419,7 @@ public class PanelService extends javax.swing.JPanel {
         btnPrint = new javax.swing.JButton();
         jSeparator6 = new javax.swing.JToolBar.Separator();
         btnViewImage = new javax.swing.JButton();
+        btnCooking = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         txtLinkImage = new javax.swing.JTextField();
         btnChooseImage = new javax.swing.JButton();
@@ -542,6 +543,7 @@ public class PanelService extends javax.swing.JPanel {
         cobType.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
 
         jToolBar1.setBackground(new java.awt.Color(153, 204, 255));
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
         btnAdd.setBackground(new java.awt.Color(153, 204, 255));
@@ -625,6 +627,16 @@ public class PanelService extends javax.swing.JPanel {
         });
         jToolBar1.add(btnViewImage);
 
+        btnCooking.setBackground(new java.awt.Color(153, 204, 255));
+        btnCooking.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Cook-Book-icon.png"))); // NOI18N
+        btnCooking.setText("Chế Biến");
+        btnCooking.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCookingActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnCooking);
+
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(51, 153, 0));
         jLabel11.setText("Link Ảnh:");
@@ -681,16 +693,15 @@ public class PanelService extends javax.swing.JPanel {
                     .addComponent(jLabel11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtLinkImage, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(txtStore, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                             .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnAddType))))
+                            .addComponent(btnAddType)))
+                    .addComponent(txtLinkImage, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(67, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -826,6 +837,8 @@ public class PanelService extends javax.swing.JPanel {
     private void tbServiceMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbServiceMouseReleased
         int index = tbService.getSelectedRow();
         bindingTexFeild(index);
+        VariableStatic.setIdService(Integer.parseInt(String.valueOf(tbService.getValueAt(index, 0))));
+        VariableStatic.setNameService(String.valueOf(tbService.getValueAt(index, 1)));
     }//GEN-LAST:event_tbServiceMouseReleased
 
     private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTypeActionPerformed
@@ -850,6 +863,8 @@ public class PanelService extends javax.swing.JPanel {
     private void tbServiceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbServiceKeyReleased
         int index = tbService.getSelectedRow();
         bindingTexFeild(index);
+        VariableStatic.setIdService(Integer.parseInt(String.valueOf(tbService.getValueAt(index, 0))));
+        VariableStatic.setNameService(String.valueOf(tbService.getValueAt(index, 1)));
     }//GEN-LAST:event_tbServiceKeyReleased
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -1039,11 +1054,17 @@ public class PanelService extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnAddKeyPressed
 
+    private void btnCookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCookingActionPerformed
+        int result = JOptionPane.showOptionDialog(null, new PanelCooking(),
+                                    "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+    }//GEN-LAST:event_btnCookingActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddType;
     private javax.swing.JButton btnChooseImage;
+    private javax.swing.JButton btnCooking;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnPrint;

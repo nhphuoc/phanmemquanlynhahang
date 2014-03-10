@@ -8,8 +8,11 @@ package vn.edu.vttu.ui;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Discount;
@@ -36,6 +39,17 @@ public class PanelPromotion extends javax.swing.JPanel {
     private void loadData() {
         conn = ConnectDB.conn();
         tbListPromotion.setModel(Discount.getListPromotion(conn));
+        if (tbListPromotion.getRowCount() <= 0) {
+            tbListPromotion.getColumnModel().getColumn(9).setMinWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setMinWidth(0);
+            tbListPromotion.getColumnModel().getColumn(9).setMaxWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setMaxWidth(0);
+        } else {
+            tbListPromotion.getColumnModel().getColumn(9).setMinWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setMinWidth(0);
+            tbListPromotion.getColumnModel().getColumn(9).setMaxWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setMaxWidth(0);
+        }
         conn = null;
     }
 
@@ -44,18 +58,22 @@ public class PanelPromotion extends javax.swing.JPanel {
             txtID.setText(String.valueOf(tbListPromotion.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbListPromotion.getValueAt(index, 1)));
             if (String.valueOf(tbListPromotion.getValueAt(index, 2)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 2)).equals("")) {
-                Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 2)));
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String datetime = formatter.format(dt);
-                Timestamp ts = Timestamp.valueOf(datetime);
-                dtBeginDate.setDate(ts);
+                try {
+                    String dt = String.valueOf(tbListPromotion.getValueAt(index, 2));
+                    java.util.Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dt);
+                    dtBeginDate.setDate(date);
+                } catch (ParseException ex) {
+                    Logger.getLogger(PanelPromotion.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             if (String.valueOf(tbListPromotion.getValueAt(index, 3)) != null || !String.valueOf(tbListPromotion.getValueAt(index, 3)).equals("")) {
-                Date dt = new Date(String.valueOf(tbListPromotion.getValueAt(index, 3)));
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String datetime = formatter.format(dt);
-                Timestamp ts = Timestamp.valueOf(datetime);
-                dtEndDate.setDate(ts);
+                try {
+                    String dt = String.valueOf(tbListPromotion.getValueAt(index, 3));
+                    java.util.Date date = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dt);
+                    dtEndDate.setDate(date);
+                } catch (ParseException ex) {
+                    Logger.getLogger(PanelPromotion.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             cobPromotion.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 4)));
             cobCondition.setSelectedItem(String.valueOf(tbListPromotion.getValueAt(index, 5)));
@@ -104,12 +122,12 @@ public class PanelPromotion extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         dtEndDate = new com.toedter.calendar.JDateChooser();
         jLabel7 = new javax.swing.JLabel();
-        cobCondition = new javax.swing.JComboBox();
         txtCostInvoiceCondition = new javax.swing.JTextField();
         txtCostPromotion = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtDetail = new javax.swing.JTextArea();
+        cobCondition = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbListPromotion = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
@@ -160,18 +178,6 @@ public class PanelPromotion extends javax.swing.JPanel {
         jLabel7.setForeground(new java.awt.Color(51, 153, 0));
         jLabel7.setText("Điều Kiện:");
 
-        cobCondition.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Tất Cả Hóa Đơn", "Hóa Đơn Trên" }));
-        cobCondition.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                cobConditionPropertyChange(evt);
-            }
-        });
-        cobCondition.addVetoableChangeListener(new java.beans.VetoableChangeListener() {
-            public void vetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {
-                cobConditionVetoableChange(evt);
-            }
-        });
-
         txtCostInvoiceCondition.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtCostInvoiceConditionKeyPressed(evt);
@@ -205,6 +211,8 @@ public class PanelPromotion extends javax.swing.JPanel {
         txtDetail.setRows(5);
         jScrollPane2.setViewportView(txtDetail);
 
+        cobCondition.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Tất Cả Hóa Đơn", "Hóa Đơn Trên" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -232,9 +240,9 @@ public class PanelPromotion extends javax.swing.JPanel {
                             .addComponent(jLabel7)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cobCondition, 0, 110, Short.MAX_VALUE)
-                            .addComponent(cobPromotion, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cobPromotion, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cobCondition, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtCostInvoiceCondition)
@@ -270,12 +278,12 @@ public class PanelPromotion extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
-                    .addComponent(cobCondition, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCostInvoiceCondition, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCostInvoiceCondition, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cobCondition, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE))
         );
 
         tbListPromotion.setModel(new javax.swing.table.DefaultTableModel(
@@ -333,6 +341,11 @@ public class PanelPromotion extends javax.swing.JPanel {
         btnDelete.setBackground(new java.awt.Color(153, 204, 255));
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/delete-icon-24x24.png"))); // NOI18N
         btnDelete.setText("Xóa");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDelete);
         jToolBar1.add(jSeparator3);
 
@@ -350,6 +363,11 @@ public class PanelPromotion extends javax.swing.JPanel {
         btnReload.setBackground(new java.awt.Color(153, 204, 255));
         btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Refresh-icon-24x24.png"))); // NOI18N
         btnReload.setText("Reload");
+        btnReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnReload);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -378,28 +396,16 @@ public class PanelPromotion extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        enableControl(true);
+        enableControl(false);
         add = false;
         txtName.requestFocus();
+        dtBeginDate.enable(false);
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void tbListPromotionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbListPromotionMouseClicked
         int index = tbListPromotion.getSelectedRow();
         binddingData(index);
     }//GEN-LAST:event_tbListPromotionMouseClicked
-
-    private void cobConditionPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobConditionPropertyChange
-        if (cobCondition.getSelectedItem().toString().equals("Tất Cả Hóa Đơn")) {
-            txtCostInvoiceCondition.setEnabled(false);
-            txtCostInvoiceCondition.setText("0");
-        } else {
-            txtCostInvoiceCondition.setEnabled(true);
-        }
-    }//GEN-LAST:event_cobConditionPropertyChange
-
-    private void cobConditionVetoableChange(java.beans.PropertyChangeEvent evt)throws java.beans.PropertyVetoException {//GEN-FIRST:event_cobConditionVetoableChange
-
-    }//GEN-LAST:event_cobConditionVetoableChange
 
     private void txtCostPromotionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostPromotionKeyTyped
         int key = evt.getKeyChar();
@@ -536,8 +542,6 @@ public class PanelPromotion extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Ngày kết thúc phải lớn hơn ngày bắt đầy");
         } else if (txtCostPromotion.getText().trim().equals("")) {
             txtCostPromotion.setText("0");
-        } else if (Discount.testDate(tsBegin, conn) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Đã có chương trình khuyến mãi khác");
         } else {
             int type = 0;
             int condition = 0;
@@ -554,16 +558,47 @@ public class PanelPromotion extends javax.swing.JPanel {
             int conditionvalue = Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
             int value = Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
             String detail = txtDetail.getText();
-            if (add == true) {                
-                if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Thêm Thành Công");
-                    loadData();
-                    enableControl(true);
+            if (add == true) {
+                if (Discount.testDate(tsBegin, conn) == false || Discount.testDate(tsEnd, conn) == false) {
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã có chương trình khuyến mãi khác");
+                } else {
+                    if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Thành Công");
+                        loadData();
+                        enableControl(true);
+                    }
+                }
+            } else {
+                if (txtID.getText().trim().equals("")) {
+                    JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi nào");
+                } else {
+                    int id = Integer.parseInt(txtID.getText().trim());
+                    if (Discount.update(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, id, conn)) {
+                        loadData();
+                        enableControl(true);
+                    }
                 }
             }
 
         }
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (txtID.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi");
+        } else {
+            if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa chương trình khuyến mãi này không", "hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                conn = ConnectDB.conn();
+                if (Discount.delete(Integer.parseInt(txtID.getText()), conn)) {
+                    loadData();
+                }
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
+        loadData();
+    }//GEN-LAST:event_btnReloadActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

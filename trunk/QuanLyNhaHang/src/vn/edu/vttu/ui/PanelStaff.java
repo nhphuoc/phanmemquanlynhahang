@@ -7,8 +7,11 @@ package vn.edu.vttu.ui;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -84,11 +87,15 @@ public class PanelStaff extends javax.swing.JPanel {
         cobSex.setSelectedItem(String.valueOf(tbStaff.getValueAt(index, 2)));
         txtID.setText(String.valueOf(tbStaff.getValueAt(index, 0)));
         if (String.valueOf(tbStaff.getValueAt(index, 3)) != null || !String.valueOf(tbStaff.getValueAt(index, 3)).equals("")) {
-            Date dt = new Date(String.valueOf(tbStaff.getValueAt(index, 3)));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String datetime = formatter.format(dt);
-            Timestamp ts = Timestamp.valueOf(datetime);
-            dtBirthDay.setDate(ts);
+            String dt = String.valueOf(tbStaff.getValueAt(index, 3));
+            java.util.Date date;
+            try {
+                date = new SimpleDateFormat("dd/MM/yyyy").parse(dt);
+                dtBirthDay.setDate(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(PanelStaff.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
         txtPhone.setText(String.valueOf(tbStaff.getValueAt(index, 4)));
         txtEmail.setText(String.valueOf(tbStaff.getValueAt(index, 5)));
@@ -170,6 +177,7 @@ public class PanelStaff extends javax.swing.JPanel {
         jLabel4.setForeground(new java.awt.Color(51, 153, 0));
         jLabel4.setText("Ngày Sinh:");
 
+        dtBirthDay.setDate(new Date());
         dtBirthDay.setDateFormatString("dd/MM/yyyy");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N

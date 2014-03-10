@@ -22,7 +22,25 @@ public class VariableStatic {
     private static int idTable_Change;
     private static int idSystemLog;
     private static int typeService;
-    private static String typeServiceName;
+    private static String typeServiceName;    
+    private static int idService;    
+    private static String nameService;    
+
+    public static String getNameService() {
+        return nameService;
+    }
+
+    public static void setNameService(String nameService) {
+        VariableStatic.nameService = nameService;
+    }
+
+    public static int getIdService() {
+        return idService;
+    }
+
+    public static void setIdService(int idService) {
+        VariableStatic.idService = idService;
+    }
 
     public static String getTypeServiceName() {
         return typeServiceName;

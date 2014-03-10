@@ -7,8 +7,11 @@ package vn.edu.vttu.ui;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -86,11 +89,17 @@ public class PanelCustomer extends javax.swing.JPanel {
 
     private void bindingText(int index) {
         if (String.valueOf(tbCustomer.getValueAt(index, 3)) != null || !String.valueOf(tbCustomer.getValueAt(index, 3)).equals("")) {
-            Date dt = new Date(String.valueOf(tbCustomer.getValueAt(index, 3)));
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String datetime = formatter.format(dt);
-            Timestamp ts = Timestamp.valueOf(datetime);
-            dtBirtday.setDate(ts);
+            String dt = String.valueOf(tbCustomer.getValueAt(index, 3));
+            //SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            //String datetime = formatter.format(dt);
+            try {
+                java.util.Date date = new SimpleDateFormat("dd/MM/yyyy").parse(dt);
+                dtBirtday.setDate(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(PanelCustomer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            //Date ts = new Date(datetime);
+            
         }
         txtID.setText(String.valueOf(tbCustomer.getValueAt(index, 0)));
         txtName.setText(String.valueOf(tbCustomer.getValueAt(index, 1)));
@@ -186,6 +195,9 @@ public class PanelCustomer extends javax.swing.JPanel {
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(51, 153, 0));
         jLabel4.setText("Ngày Sinh:");
+
+        dtBirtday.setDate(new Date());
+        dtBirtday.setDateFormatString("d/M/yyyy");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(51, 153, 0));
@@ -463,7 +475,7 @@ public class PanelCustomer extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         EmailValidator validator = new EmailValidator();
-        Date dt = dtBirtday.getDate();;
+        Date dt = dtBirtday.getDate();
         Date ds = new java.sql.Date(dt.getTime());        
         if (txtName.getText().trim().equals("") || txtName.getText().trim().length() > 50) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên khách hàng hoặc nhập sai");

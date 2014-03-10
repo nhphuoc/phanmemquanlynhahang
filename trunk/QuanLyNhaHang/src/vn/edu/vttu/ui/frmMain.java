@@ -43,6 +43,7 @@ public class frmMain extends javax.swing.JFrame {
         btnSystem = new javax.swing.JButton();
         btnWaiter = new javax.swing.JButton();
         btnService = new javax.swing.JButton();
+        btnStore = new javax.swing.JButton();
         btnPromotion = new javax.swing.JButton();
         btnInvoice = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
@@ -107,6 +108,21 @@ public class frmMain extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(btnService);
+
+        btnStore.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Factory-icon.png"))); // NOI18N
+        btnStore.setText("Kho Hàng");
+        btnStore.setFocusable(false);
+        btnStore.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnStore.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnStore.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnStore.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnStore.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnStore.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStoreActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnStore);
 
         btnPromotion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/promotion.png"))); // NOI18N
         btnPromotion.setText("Khuyến Mãi");
@@ -284,6 +300,14 @@ public class frmMain extends javax.swing.JFrame {
         main.repaint();
     }//GEN-LAST:event_btnPromotionActionPerformed
 
+    private void btnStoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStoreActionPerformed
+        main.removeAll();
+        PanelStore panelstore = new PanelStore();
+        main.add(panelstore);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnStoreActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -324,6 +348,7 @@ public class frmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnPromotion;
     private javax.swing.JButton btnService;
     private javax.swing.JButton btnStaff;
+    private javax.swing.JButton btnStore;
     private javax.swing.JButton btnSystem;
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton4;
