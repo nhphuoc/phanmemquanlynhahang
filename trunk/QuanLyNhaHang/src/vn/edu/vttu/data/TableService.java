@@ -8,6 +8,7 @@ package vn.edu.vttu.data;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
@@ -131,9 +132,8 @@ public class TableService {
         return flag;
     }
 
-    public static boolean update(int idTableService, int num, Connection conn) {
-        boolean flag = false;
-        try {            
+    public static boolean update(int idTableService, int num, Connection conn) throws SQLException {
+        boolean flag = false;               
             String sql = "CALL table_service_update_number_byidTableService(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTableService);
@@ -143,11 +143,7 @@ public class TableService {
                 flag = true;
             } else {
                 flag = false;
-            }
-        } catch (Exception e) {
-            flag = false;
-            e.printStackTrace();
-        }
+            }        
 
         return flag;
     }

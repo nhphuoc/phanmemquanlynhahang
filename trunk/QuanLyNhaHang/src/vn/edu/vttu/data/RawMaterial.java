@@ -169,5 +169,37 @@ public class RawMaterial {
         }
         return flag;
     }
+    public static boolean updateNumber(int id,float number, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL raw_material_update_number(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            callstate.setFloat(2, number);            
+            int x = callstate.executeUpdate();
+            if (x ==1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static TableModel getNumber(int id,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL raw_material_get_number(?)}");
+            calState.setInt(1, id);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
 
 }

@@ -247,6 +247,7 @@ public class PanelStore extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbStore.setGridColor(new java.awt.Color(204, 204, 204));
         tbStore.setRowHeight(25);
         tbStore.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbStore.addMouseListener(new java.awt.event.MouseAdapter() {
