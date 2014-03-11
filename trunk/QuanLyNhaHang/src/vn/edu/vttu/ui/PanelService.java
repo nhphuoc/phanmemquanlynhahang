@@ -46,6 +46,7 @@ import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.ServiceType;
+import vn.edu.vttu.data.Unit;
 import vn.edu.vttu.data.UploadFile;
 import vn.edu.vttu.data.VariableStatic;
 
@@ -72,6 +73,33 @@ public class PanelService extends javax.swing.JPanel {
 
                 if (index == -1) {
                     vn.edu.vttu.model.ServiceType item = (vn.edu.vttu.model.ServiceType) value;
+                    setText("" + item.getName());
+                }
+
+            } catch (Exception e) {
+            }
+
+            return this;
+        }
+    }
+
+    class ItemRendererUnit extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            try {
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+
+                if (value != null) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                    // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                    setText(item.getName().toUpperCase());
+                }
+
+                if (index == -1) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
                     setText("" + item.getName());
                 }
 
@@ -138,7 +166,7 @@ public class PanelService extends javax.swing.JPanel {
     private int type = -1;
     private String name;
     private int id;
-    private String unit;
+    private int unit;
     private int store = 0;
     private String note;
     private String img;
@@ -151,6 +179,7 @@ public class PanelService extends javax.swing.JPanel {
         loadTableService(indexx);
         enableButton(true);
         fillcobServiceType();
+        fillcobUnit();
 
     }
 
@@ -158,41 +187,19 @@ public class PanelService extends javax.swing.JPanel {
         try {
             conn = ConnectDB.conn();
             DecimalFormat df = new DecimalFormat("#,###,###");
-            Service sv[] = Service.getAll(conn);
-            final Object[] columnNames = new String[]{"ID", "Tên Dịch Vụ", "Loại", "ĐVT", "Đơn Giá", "Tồn Kho", "Chi Tiết", "MaLoai", "urlAnh"};
-            DefaultTableModel dtm = new DefaultTableModel(columnNames, 0);
-            for (int i = 0; i < sv.length; i++) {
-                JButton bt = new JButton();
-                dtm.addRow(new Vector());
-                dtm.setValueAt(sv[i].getID(), i, 0);
-                dtm.setValueAt(sv[i].getNAME(), i, 1);
-                dtm.setValueAt(sv[i].getTYPE_NAME(), i, 2);
-                dtm.setValueAt(sv[i].getUNIT(), i, 3);
-                dtm.setValueAt(df.format(sv[i].getCOST()), i, 4);
-                dtm.setValueAt(sv[i].getSTORE(), i, 5);
-                dtm.setValueAt(sv[i].getDETAIL(), i, 6);
-                dtm.setValueAt(sv[i].getTYPE(), i, 7);
-                dtm.setValueAt(sv[i].getIMAGES(), i, 8);
-                bt.updateUI();
-                bt.repaint();
-            }
-            tbService.setModel(dtm);
-            tbService.getColumnModel().getColumn(7).setCellRenderer(new ButtonRenderer());
 
+            tbService.setModel(Service.serviceGetAll(conn));
             if (tbService.getRowCount() > 0) {
                 tbService.setRowSelectionInterval(index, 0);
-                tbService.getColumnModel().getColumn(7).setMinWidth(0);
-                tbService.getColumnModel().getColumn(7).setMaxWidth(0);
-
-                tbService.getColumnModel().getColumn(8).setMinWidth(0);
-                tbService.getColumnModel().getColumn(8).setMaxWidth(0);
-            } else {
-                tbService.getColumnModel().getColumn(7).setMinWidth(0);
-                tbService.getColumnModel().getColumn(7).setMaxWidth(0);
-
-                tbService.getColumnModel().getColumn(8).setMinWidth(0);
-                tbService.getColumnModel().getColumn(8).setMaxWidth(0);
             }
+            tbService.getColumnModel().getColumn(6).setMinWidth(0);
+            tbService.getColumnModel().getColumn(6).setMaxWidth(0);
+
+            tbService.getColumnModel().getColumn(7).setMinWidth(0);
+            tbService.getColumnModel().getColumn(7).setMaxWidth(0);
+
+            tbService.getColumnModel().getColumn(8).setMinWidth(0);
+            tbService.getColumnModel().getColumn(8).setMaxWidth(0);
             bindingTexFeild(index);
             conn = null;
         } catch (Exception e) {
@@ -219,10 +226,38 @@ public class PanelService extends javax.swing.JPanel {
 
     }
 
+    private void fillcobUnit() {
+
+        conn = ConnectDB.conn();
+        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
+        try {
+            model = Unit.selectUnit(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobUnit.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobUnit.setModel(defaultComboBoxModel);
+        cobUnit.setRenderer(new PanelService.ItemRendererUnit());
+        conn = null;
+
+    }
+
     public static void setSelectedValue(JComboBox comboBox, int value) {
         vn.edu.vttu.model.ServiceType item;
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             item = (vn.edu.vttu.model.ServiceType) comboBox.getItemAt(i);
+            if (item.getId() == value) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+    public static void setSelectedValueUnit(JComboBox comboBox, int value) {
+        vn.edu.vttu.model.Unit item;
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            item = (vn.edu.vttu.model.Unit) comboBox.getItemAt(i);
             if (item.getId() == value) {
                 comboBox.setSelectedIndex(i);
                 break;
@@ -236,9 +271,7 @@ public class PanelService extends javax.swing.JPanel {
         btnDelete.setEnabled(b);
         btnSave.setEnabled(!b);
         btnChooseImage.setEnabled(!b);
-        txtName.setEnabled(!b);
-        txtUnit.setEnabled(!b);
-        txtStore.setEnabled(!b);
+        txtName.setEnabled(!b);        
         txtCost.setEnabled(!b);
         txtNote.setEnabled(!b);
         tbService.setEnabled(b);
@@ -248,14 +281,14 @@ public class PanelService extends javax.swing.JPanel {
         try {
             txtID.setText(String.valueOf(tbService.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbService.getValueAt(index, 1)));
-            txtUnit.setText(String.valueOf(tbService.getValueAt(index, 3)));
-            txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));
-            txtStore.setText(String.valueOf(tbService.getValueAt(index, 5)));
-            txtNote.setText(String.valueOf(tbService.getValueAt(index, 6)));
+            txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));            
+            txtNote.setText(String.valueOf(tbService.getValueAt(index, 5)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
-            txtLinkImage.setText(String.valueOf(tbService.getValueAt(index, 8)));
+            setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
+            txtLinkImage.setText(String.valueOf(tbService.getValueAt(index, 6)));
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
@@ -275,22 +308,19 @@ public class PanelService extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn giá");
             flag = false;
             txtCost.requestFocus();
-        } else if (txtStore.getText().trim().equals("")) {
-            txtStore.setText("0");
-            flag = false;
-        } else {
+        }else {
             name = txtName.getText();
             vn.edu.vttu.model.ServiceType svType = (vn.edu.vttu.model.ServiceType) cobType.getSelectedItem();
             type = svType.getId();
-            unit = txtUnit.getText();
-            cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));
-            store = Integer.parseInt(txtStore.getText().trim().replaceAll("\\.", ""));
+            vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
+            unit = _unit.getId();
+            cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));            
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (Service.insert(name, type, unit, store, note, img, conn)) {
+                if (Service.insert(name, type, unit, note, img, conn)) {
                     int idSV = (int) Service.getMaxId(conn).getValueAt(0, 0);
                     if (ServiceCost.insert(idSV, cost, conn)) {
                         UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
@@ -330,25 +360,23 @@ public class PanelService extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn giá");
             flag = false;
             txtCost.requestFocus();
-        } else if (txtStore.getText().trim().equals("")) {
-            txtStore.setText("0");
-            flag = false;
         } else {
             id = Integer.parseInt(txtID.getText());
             name = txtName.getText();
             vn.edu.vttu.model.ServiceType svType = (vn.edu.vttu.model.ServiceType) cobType.getSelectedItem();
             type = svType.getId();
-            unit = txtUnit.getText();
-            cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));
-            store = Integer.parseInt(txtStore.getText().trim().replaceAll("\\.", ""));
+            vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
+            unit = _unit.getId();
+            cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));            
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (Service.update(id, name, type, unit, store, note, img, conn)) {
+                if (Service.update(id, name, type, unit, note, img, conn)) {
+                    
                     if (ServiceCost.insert(id, cost, conn)) {
-                        if (!tbService.getValueAt(tbService.getSelectedRow(), 8).equals(txtLinkImage.getText().trim())) {
+                        if (!tbService.getValueAt(tbService.getSelectedRow(), 6).equals(txtLinkImage.getText().trim())) {
                             UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
                             ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
                             ftpUploader.disconnect();
@@ -358,7 +386,6 @@ public class PanelService extends javax.swing.JPanel {
                             conn.commit();
                             flag = true;
                         }
-
                     }
                     conn = null;
                 }
@@ -366,7 +393,7 @@ public class PanelService extends javax.swing.JPanel {
                 e.printStackTrace();
                 try {
                     conn.rollback();
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi\n" + e.getMessage());
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
                     flag = false;
                 } catch (SQLException ex) {
                     Logger.getLogger(PanelService.class.getName()).log(Level.SEVERE, null, ex);
@@ -395,9 +422,6 @@ public class PanelService extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         btnAddType = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        txtUnit = new javax.swing.JTextField();
-        txtStore = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -423,6 +447,8 @@ public class PanelService extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         txtLinkImage = new javax.swing.JTextField();
         btnChooseImage = new javax.swing.JButton();
+        cobUnit = new javax.swing.JComboBox();
+        btnAddUnit = new javax.swing.JButton();
         txtSearch = new javax.swing.JTextField();
         lbImages = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -491,22 +517,6 @@ public class PanelService extends javax.swing.JPanel {
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(51, 153, 0));
         jLabel4.setText("Đơn Vị Tính:");
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 153, 0));
-        jLabel5.setText("Tồn Kho:");
-
-        txtUnit.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-
-        txtStore.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        txtStore.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtStoreKeyReleased(evt);
-            }
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtStoreKeyTyped(evt);
-            }
-        });
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(51, 153, 0));
@@ -650,6 +660,15 @@ public class PanelService extends javax.swing.JPanel {
             }
         });
 
+        cobUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        btnAddUnit.setText("+");
+        btnAddUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddUnitActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -668,12 +687,22 @@ public class PanelService extends javax.swing.JPanel {
                             .addComponent(jLabel4)
                             .addComponent(jLabel6))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtNote, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(51, 51, 51)
+                        .addComponent(jLabel11)
+                        .addGap(25, 25, 25)
+                        .addComponent(txtLinkImage, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtID, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                            .addComponent(cobUnit, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAddUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
@@ -682,26 +711,15 @@ public class PanelService extends javax.swing.JPanel {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel8)
                                 .addGap(29, 29, 29)
-                                .addComponent(txtCost, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(txtNote))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel11))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txtStore, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                            .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnAddType)))
-                    .addComponent(txtLinkImage, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnChooseImage, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtCost, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAddType)))
                 .addContainerGap(67, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -719,12 +737,11 @@ public class PanelService extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtCost, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
                     .addComponent(jButton1)
-                    .addComponent(txtStore, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
+                    .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddUnit))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
@@ -778,11 +795,11 @@ public class PanelService extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(lbImages, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lbImages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10))
@@ -797,9 +814,7 @@ public class PanelService extends javax.swing.JPanel {
         fillcobServiceType();
         txtName.setText("");
         txtID.setText("");
-        txtNote.setText("");
-        txtStore.setText("0");
-        txtUnit.setText("");
+        txtNote.setText("");        
         txtCost.setText("");
         txtLinkImage.setText("");
         txtName.requestFocus();
@@ -810,7 +825,7 @@ public class PanelService extends javax.swing.JPanel {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         add = false;
         enableButton(false);
-        indexx = tbService.getSelectedRow();
+        indexx = tbService.getSelectedRow();        
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -932,32 +947,6 @@ public class PanelService extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtCostKeyReleased
 
-    private void txtStoreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStoreKeyTyped
-        int key = evt.getKeyChar();
-        String st = txtCost.getText();
-        String stTest = "0123456789";
-        if (key != evt.VK_BACK_SPACE
-                && key != evt.VK_DELETE
-                && key != evt.VK_ENTER) {
-            int flag = 0;
-            if (stTest.indexOf(evt.getKeyChar()) == -1) {
-                flag++;
-            }
-            if (flag > 0) {
-
-                evt.consume();
-            }
-        }
-    }//GEN-LAST:event_txtStoreKeyTyped
-
-    private void txtStoreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStoreKeyReleased
-        DecimalFormat df = new DecimalFormat("#,###,###");
-        if (!txtStore.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtStore.getText().trim().replaceAll("\\.", ""));
-            txtStore.setText(String.valueOf(df.format(num)));
-        }
-    }//GEN-LAST:event_txtStoreKeyReleased
-
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
         try {
             conn = ConnectDB.conn();
@@ -1056,13 +1045,22 @@ public class PanelService extends javax.swing.JPanel {
 
     private void btnCookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCookingActionPerformed
         int result = JOptionPane.showOptionDialog(null, new PanelCooking(),
-                                    "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+                "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }//GEN-LAST:event_btnCookingActionPerformed
+
+    private void btnAddUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitActionPerformed
+        int result = JOptionPane.showConfirmDialog(null, new PanelUnit(),
+                "Thêm Đơn Vị Tính", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            fillcobUnit();
+        }
+    }//GEN-LAST:event_btnAddUnitActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddType;
+    private javax.swing.JButton btnAddUnit;
     private javax.swing.JButton btnChooseImage;
     private javax.swing.JButton btnCooking;
     private javax.swing.JButton btnDelete;
@@ -1072,6 +1070,7 @@ public class PanelService extends javax.swing.JPanel {
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnViewImage;
     private javax.swing.JComboBox cobType;
+    private javax.swing.JComboBox cobUnit;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1079,7 +1078,6 @@ public class PanelService extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -1100,7 +1098,5 @@ public class PanelService extends javax.swing.JPanel {
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtNote;
     private javax.swing.JTextField txtSearch;
-    private javax.swing.JTextField txtStore;
-    private javax.swing.JTextField txtUnit;
     // End of variables declaration//GEN-END:variables
 }

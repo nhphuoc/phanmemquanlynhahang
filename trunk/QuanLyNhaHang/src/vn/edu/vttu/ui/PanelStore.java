@@ -422,7 +422,7 @@ public class PanelStore extends javax.swing.JPanel {
         int result = JOptionPane.showConfirmDialog(null, new PanelUnit(),
                 "Đặt bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            loadData();
+            fillcobUnit();
         }
     }//GEN-LAST:event_btnAddUnitActionPerformed
 
