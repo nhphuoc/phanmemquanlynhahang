@@ -164,6 +164,11 @@ public class PanelAddTable extends javax.swing.JPanel {
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
         btnSave.setText("Lưu Lại");
+        btnSave.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnSaveMouseClicked(evt);
+            }
+        });
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -248,34 +253,6 @@ public class PanelAddTable extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        conn = ConnectDB.conn();
-        vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
-        int idLocation = tbLocation.getId();
-        vn.edu.vttu.model.TableType tbType = (vn.edu.vttu.model.TableType) cobTableType.getSelectedItem();
-        int idType = tbType.getId();
-        int numberPeople = 1;
-        if (txtTableName.getText().equals("") || txtTableName.getText().length() > 30) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên bàn hoặc tên bàn lớn hơn 30 ký tự");
-        } else if (!txtNumberPeople.getText().equals("")) {
-            if (Integer.parseInt(txtNumberPeople.getText()) > 0) {
-                numberPeople = Integer.parseInt(txtNumberPeople.getText());
-            }else{
-                txtNumberPeople.setText("1");
-            }
-        } else {
-            if (Table.testTableName(txtTableName.getText(), conn)) {
-                if (Table.insertNewTable(txtTableName.getText(), idType, idLocation, numberPeople, conn)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Thêm Bàn Thành Công");
-                    txtTableName.setText("");
-                    txtTableName.requestFocus();
-                    txtNumberPeople.setText(String.valueOf(numberPeople));
-                } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
-                }
-            } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có, xin chọn tên bàn khác");
-            }
-        }
 
         conn = null;
 
@@ -305,9 +282,13 @@ public class PanelAddTable extends javax.swing.JPanel {
     private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTypeActionPerformed
         conn = ConnectDB.conn();
         String location = JOptionPane.showInputDialog(getRootPane(), "Nhập Vị Trí");
-        if (TableLocation.insert(location, null, conn)) {
-            JOptionPane.showMessageDialog(getRootPane(), "Thêm mới vị trí thành công");
-            fillcobTableLocation();
+        if (location != null) {
+            if (TableLocation.insert(location, null, conn)) {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm mới vị trí thành công");
+                fillcobTableLocation();
+            }
+        } else {
+            JOptionPane.showMessageDialog(getRootPane(), "");
         }
         conn = null;
 
@@ -322,6 +303,39 @@ public class PanelAddTable extends javax.swing.JPanel {
         }
         conn = null;
     }//GEN-LAST:event_btnAddLocationActionPerformed
+
+    private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
+        conn = ConnectDB.conn();
+        try {
+            vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
+            int idLocation = tbLocation.getId();
+            vn.edu.vttu.model.TableType tbType = (vn.edu.vttu.model.TableType) cobTableType.getSelectedItem();
+            int idType = tbType.getId();
+            int numberPeople = 1;
+            if (txtTableName.getText().equals("") || txtTableName.getText().length() > 30) {
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên bàn hoặc tên bàn lớn hơn 30 ký tự");
+            } else if (txtNumberPeople.getText().equals("")) {
+                txtNumberPeople.setText("1");
+                numberPeople = 1;
+            } else {
+                if (Table.testTableName(txtTableName.getText(), conn)) {
+                    if (Table.insertNewTable(txtTableName.getText(), idType, idLocation, numberPeople, conn)) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Bàn Thành Công");
+                        txtTableName.setText("");
+                        txtTableName.requestFocus();
+                        txtNumberPeople.setText(String.valueOf(numberPeople));
+                    } else {
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có, xin chọn tên bàn khác");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }//GEN-LAST:event_btnSaveMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -22,8 +22,7 @@ public class Service {
     private String NAME;
     private int TYPE;
     private String TYPE_NAME;
-    private String UNIT;   
-    private int STORE;
+    private String UNIT;       
     private int COST;   
     private String DETAIL;
     private String IMAGES;
@@ -57,10 +56,7 @@ public class Service {
 
     public void setUNIT(String UNIT) {
         this.UNIT = UNIT;
-    }
-    public int getSTORE() {
-        return STORE;
-    }
+    }    
 
     public String getDETAIL() {
         return DETAIL;
@@ -69,12 +65,11 @@ public class Service {
     public String getIMAGES() {
         return IMAGES;
     }
-    public Service(int id, String name, String type_name,int type, String unit, int store,String detail,String images,int cost){
+    public Service(int id, String name, String type_name,int type, String unit,String detail,String images,int cost){
         this.ID=id;
         this.NAME=name;
         this.TYPE_NAME=type_name;
-        this.TYPE=type;
-        this.STORE=store;
+        this.TYPE=type;        
         this.DETAIL=detail;
         this.IMAGES=images;
         this.UNIT=unit;
@@ -88,7 +83,7 @@ public class Service {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                sv = new Service(rs.getInt("id"),rs.getString("name"),rs.getString("type_name"),rs.getInt("idType"),rs.getString("unit"),rs.getInt("store"),rs.getString("detail"),rs.getString("image"),rs.getInt("dongia"));
+                sv = new Service(rs.getInt("id"),rs.getString("name"),rs.getString("type_name"),rs.getInt("idType"),rs.getString("unit"),rs.getString("detail"),rs.getString("image"),rs.getInt("dongia"));
                 return sv;
             }
         } catch (Exception e) {

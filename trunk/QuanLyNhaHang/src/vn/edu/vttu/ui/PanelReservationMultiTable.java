@@ -67,7 +67,6 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         String datetime = formatter.format(dtDateReservation.getDate());
         Timestamp ts = Timestamp.valueOf(datetime);
         loadTable(ts);
-        
 
     }
 
@@ -118,7 +117,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (TableReservation.insert(false, idCustomer, ts,true, conn)) {
+                if (TableReservation.insert(false, idCustomer, ts, true, conn)) {
                     int maxid_reservation = TableReservation.getMaxID(conn).getID();
                     for (int i = 0; i < tbListTableReservation.getRowCount(); i++) {
                         int idtb = Integer.parseInt(String.valueOf(tbListTableReservation.getValueAt(i, 0)));
@@ -195,10 +194,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         };
         tbListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "Mã Bàn", "Tên Bàn"
@@ -219,6 +215,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbListTable.setGridColor(new java.awt.Color(204, 204, 204));
         tbListTable.setRowHeight(23);
         tbListTable.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbListTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -247,6 +244,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbListTableReservation.setGridColor(new java.awt.Color(204, 204, 204));
         tbListTableReservation.setRowHeight(23);
         tbListTableReservation.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbListTableReservation.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -291,15 +289,11 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         jLabel2.setForeground(new java.awt.Color(102, 153, 0));
         jLabel2.setText("Khách Hàng");
 
-        cobCustomer.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jButton1.setText("+");
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(102, 153, 0));
         jLabel3.setText("Vị Trí");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -369,7 +363,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSave)
-                .addGap(116, 116, 116))
+                .addGap(99, 99, 99))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -407,10 +401,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 String datetime = formatter.format(dtDateReservation.getDate());
                 Timestamp ts = Timestamp.valueOf(datetime);
                 if (reservationTable(ts, idCustomer)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");
-                    listTable = null;
-                    System.out.println(listTable);
-
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");                   
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công");
                 }
