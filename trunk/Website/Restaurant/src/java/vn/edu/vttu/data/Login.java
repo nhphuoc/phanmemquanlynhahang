@@ -3,35 +3,41 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.data;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  *
  * @author nhphuoc
  */
 public class Login {
-    public static Connection conn() {
-        Connection cn = null;
-        //readInfo read = new readInfo();
-        //Server sv = new Server();
-        try {
-            String db = "vttu_restaurant?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";
-            String usr = "root";
-            String pass = "";
-            String ip = "localhost";
-            int port = 3306;
-            Class.forName("com.mysql.jdbc.Driver");
-            String database = "jdbc:mysql://" + ip + ":" + port + "/" + db;
-            cn = DriverManager.getConnection(database, usr, pass);
 
+    public boolean  checklogin(String user, String pass) {
+        boolean flag=false;
+        try {
+            
+            Connection conn;
+            conn=(Connection) new ConnectDB();
+            String sql = "select * from usr where username=" + user + " and pass=" + pass;
+            PreparedStatement stm = conn.prepareStatement(sql);            
+            ResultSet rs = stm.executeQuery();
+            int i=0;
+            while(rs.next()){
+                i++;
+            }
+            if(i==1){
+                flag=true;
+            }else{
+                flag=false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return cn;
+        return flag;
+
     }
-    
+
 }

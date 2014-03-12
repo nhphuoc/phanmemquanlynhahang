@@ -51,6 +51,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
+import org.apache.commons.lang3.time.DateUtils;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.Service;
@@ -126,12 +127,12 @@ public class PanelTable extends javax.swing.JPanel {
                         int idtb = Integer.parseInt(String.valueOf(tb.getValueAt(i, 3)));
                         if (TableReservation.countidTableUsing(idtb, conn) > 0) {
                             if (TableReservation.countidTableReservation(idtb, conn) > 0) {
-                                Table.updateStatus(idtb, 4, conn);
+                                Table.updateStatus(idtb, 5, conn);
                             } else {
-                                Table.updateStatus(idtb, 1, conn);
+                                Table.updateStatus(idtb, 2, conn);
                             }
                         } else {
-                            Table.updateStatus(idtb, 3, conn);
+                            Table.updateStatus(idtb, 4, conn);
                         }
                     }
                     conn.commit();
@@ -237,7 +238,7 @@ public class PanelTable extends javax.swing.JPanel {
                         public void actionPerformed(ActionEvent e
                         ) {
                             int result = JOptionPane.showOptionDialog(null, new PanelReservationMultiTable(),
-                                    "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+                                    "Đặt nhiều bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
                             loadTable(idLocation);
                         }
                     }));
@@ -467,25 +468,25 @@ public class PanelTable extends javax.swing.JPanel {
             for (int i = 0; i < numberTable; i++) {
                 bt[i] = new JLabel(table[i].getNAME());
                 //bt[i].setFont(new Font("Serif", Font.BOLD, 18));
-                if (table[i].getSTATUS() == 1) {// đang có khách 
+                if (table[i].getSTATUS() == 2) {// đang có khách 
                     BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/table_icon_thue.png"));
                     Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                     ImageIcon icon = new ImageIcon(image);
                     bt[i].setIcon(icon);
                     bt[i].setPreferredSize(new Dimension(50, 50));
-                } else if (table[i].getSTATUS() == 2) {// đặt bàn trước
+                } else if (table[i].getSTATUS() == 3) {// đặt bàn trước
                     BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/table_icon_datban.png"));
                     Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                     ImageIcon icon = new ImageIcon(image);
                     bt[i].setIcon(icon);
                     bt[i].setPreferredSize(new Dimension(50, 50));
-                } else if (table[i].getSTATUS() == 3) {
+                } else if (table[i].getSTATUS() == 4) {
                     BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/warningTable.png"));
                     Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                     ImageIcon icon = new ImageIcon(image);
                     bt[i].setIcon(icon);
                     bt[i].setPreferredSize(new Dimension(50, 50));
-                } else if (table[i].getSTATUS() == 4) {
+                } else if (table[i].getSTATUS() == 5) {
                     BufferedImage bImg = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/warningtb.png"));
                     Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                     ImageIcon icon = new ImageIcon(image);
@@ -508,9 +509,9 @@ public class PanelTable extends javax.swing.JPanel {
                 Image image = bImg.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
                 ImageIcon icon = new ImageIcon(image);
                 String tooltip = "";
-                if (statusTable == 1) {
+                if (statusTable == 2) {
                     tooltip = "Bàn đang được thuê";
-                } else if (statusTable == 2) {
+                } else if (statusTable == 3) {
                     tooltip = "Bàn đang được đặt trước";
                 } else {
                     tooltip = "Bàn đang trống";
@@ -547,7 +548,7 @@ public class PanelTable extends javax.swing.JPanel {
                             popup.getComponent(16).setEnabled(false);// Xóa Bàn  
                             //line
                             popup.getComponent(18).setEnabled(false);// Quản lý khu vực      
-                            if (status == 1) { // bàn đang được sử dụng
+                            if (status == 2) { // bàn đang được sử dụng
                                 popup.getComponent(0).setEnabled(false);// Sử dụng
                                 //line
                                 popup.getComponent(2).setEnabled(true); //Đặt Bàn
@@ -567,7 +568,7 @@ public class PanelTable extends javax.swing.JPanel {
                                 popup.getComponent(16).setEnabled(false);// Xóa Bàn  
                                 //line
                                 popup.getComponent(18).setEnabled(true);// Quản lý khu vực               
-                            } else if (status == 2) { // bàn được đặt
+                            } else if (status == 3) { // bàn được đặt
                                 popup.getComponent(0).setEnabled(true);// Sử dụng
                                 //line
                                 popup.getComponent(2).setEnabled(true); //Đặt Bàn
@@ -610,11 +611,12 @@ public class PanelTable extends javax.swing.JPanel {
                             }
                         }
                         //if (SwingUtilities.isLeftMouseButton(e)) {
-                        if (status == 1) {
+                        if (status == 2) {
                             enableButton(true);
-                        } else if (status == 2) {
+                        } else if (status == 3) {
                             enableButton(false);
                             btnAddCustomer.setEnabled(true);
+                            popupMenu.getComponent(0).setEnabled(true);
                         } else {
                             enableButton(false);
                         }
@@ -669,7 +671,7 @@ public class PanelTable extends javax.swing.JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     conn = ConnectDB.conn();
-                    String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);                    
+                    String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);
                     if (number != null && !number.trim().equals("")) {
                         if (testNumber(number)) {
                             if (updateStore(idService, Integer.parseInt(number), testStore(idService), conn)) {
@@ -886,7 +888,7 @@ public class PanelTable extends javax.swing.JPanel {
                     if (TableReservation.insert(true, conn)) {
                         int maxid_reservation = TableReservation.getMaxID(conn).getID();
                         if (TableReservationDetail.insert(idTable, maxid_reservation, conn)) {
-                            if (Table.updateStatus(idTable, 1, conn)) {
+                            if (Table.updateStatus(idTable, 2, conn)) {
                                 conn.commit();
                                 loadTable(idLocation);
                             } else {
@@ -936,7 +938,7 @@ public class PanelTable extends javax.swing.JPanel {
                             if (TableReservation.reservationCancel(idTableReservation, idTable, conn)) {
                                 if (TableReservation.countidTableReservation(idTable, conn) > 0) {
                                     if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                        if (Table.updateStatus(idTable, 1, conn)) {
+                                        if (Table.updateStatus(idTable, 2, conn)) {
                                             conn.commit();
                                             JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
                                             loadTable(idLocation);
@@ -944,7 +946,7 @@ public class PanelTable extends javax.swing.JPanel {
                                             throw new Exception();
                                         }
                                     } else {
-                                        if (Table.updateStatus(idTable, 2, conn)) {
+                                        if (Table.updateStatus(idTable, 3, conn)) {
                                             conn.commit();
                                             JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
                                             loadTable(idLocation);
@@ -952,13 +954,13 @@ public class PanelTable extends javax.swing.JPanel {
                                     }
                                 } else {
                                     if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                        if (Table.updateStatus(idTable, 1, conn)) {
+                                        if (Table.updateStatus(idTable, 2, conn)) {
                                             conn.commit();
                                             JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
                                             loadTable(idLocation);
                                         }
                                     } else {
-                                        if (Table.updateStatus(idTable, 0, conn)) {
+                                        if (Table.updateStatus(idTable, 1, conn)) {
                                             conn.commit();
                                             JOptionPane.showMessageDialog(getRootPane(), "Đã hủy đặt bàn thành công");
                                             loadTable(idLocation);
@@ -979,16 +981,16 @@ public class PanelTable extends javax.swing.JPanel {
                                     int idtb = Integer.parseInt(String.valueOf(tb.getValueAt(i, 0)));
                                     if (TableReservation.countidTableReservation(idtb, conn) > 0) {
                                         if (TableReservation.countidTableUsing(idtb, conn) > 0) {
-                                            Table.updateStatus(idtb, 1, conn);
-                                        } else {
                                             Table.updateStatus(idtb, 2, conn);
+                                        } else {
+                                            Table.updateStatus(idtb, 3, conn);
                                         }
                                     } else {
                                         if (TableReservation.countidTableUsing(idtb, conn) > 0) {
-                                            Table.updateStatus(idtb, 1, conn);
+                                            Table.updateStatus(idtb, 2, conn);
 
                                         } else {
-                                            Table.updateStatus(idtb, 0, conn);
+                                            Table.updateStatus(idtb, 1, conn);
                                         }
                                     }
                                 }// end for
@@ -1006,13 +1008,13 @@ public class PanelTable extends javax.swing.JPanel {
                             TableReservation.updateEndDate(idTableReservation, conn);
                             if (TableReservation.countidTableReservation(idTable, conn) > 0) {
                                 if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                    if (Table.updateStatus(idTable, 1, conn)) {
+                                    if (Table.updateStatus(idTable, 2, conn)) {
                                         conn.commit();
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã hủy sử dụng thành công");
                                         loadTable(idLocation);
                                     }
                                 } else {
-                                    if (Table.updateStatus(idTable, 2, conn)) {
+                                    if (Table.updateStatus(idTable, 3, conn)) {
                                         conn.commit();
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã hủy sử dụng thành công");
                                         loadTable(idLocation);
@@ -1020,13 +1022,13 @@ public class PanelTable extends javax.swing.JPanel {
                                 }
                             } else {
                                 if (TableReservation.countidTableUsing(idTable, conn) > 0) {
-                                    if (Table.updateStatus(idTable, 1, conn)) {
+                                    if (Table.updateStatus(idTable, 2, conn)) {
                                         conn.commit();
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã hủy sử dụng thành công");
                                         loadTable(idLocation);
                                     }
                                 } else {
-                                    if (Table.updateStatus(idTable, 0, conn)) {
+                                    if (Table.updateStatus(idTable, 1, conn)) {
                                         conn.commit();
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã hủy sử dụng thành công");
                                         loadTable(idLocation);
@@ -1054,99 +1056,100 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void changeTable() {
 
-            
-            int result = JOptionPane.showConfirmDialog(null, new PanelChangeTable(),
-                    "Chuyển Bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-            if (result == JOptionPane.OK_OPTION) {
-                int idTableChange = VariableStatic.getIdTable_Change();
-                if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn có thật sự muốn chuyển " + Table.getByID(idTable, conn).getNAME() + " "
-                        + "Sang bàn " + Table.getByID(idTableChange, conn).getNAME(), "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                    
-                    try {
-                        conn = ConnectDB.conn();
-            conn.setAutoCommit(false);
-                        if (TableReservation.countidTableReservation(idTable, conn) > 0) {
-                        if (Table.updateStatus(idTable, 2, conn)) {
+        int result = JOptionPane.showConfirmDialog(null, new PanelChangeTable(),
+                "Chuyển Bàn", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            int idTableChange = VariableStatic.getIdTable_Change();
+            if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn có thật sự muốn chuyển " + Table.getByID(idTable, conn).getNAME() + " "
+                    + "Sang bàn " + Table.getByID(idTableChange, conn).getNAME(), "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+                try {
+                    conn = ConnectDB.conn();
+                    conn.setAutoCommit(false);
+                    if (TableReservation.countidTableReservation(idTable, conn) > 0) {
+                        if (Table.updateStatus(idTable, 3, conn)) {
                             if (Table.updateStatus(idTableChange, 1, conn)) {
                                 if (TableReservationDetail.updateTable(idTableReservation, idTable, idTableChange, conn)) {
                                     conn.commit();
                                     loadTable(idLocation);
-                                }else{
+                                } else {
                                     throw new Exception();
                                 }
 
                             }
-                        }else{
+                        } else {
                             throw new Exception();
                         }
-                    } else {                        
-                        if (Table.updateStatus(idTable, 0, conn)) {
-                            if (Table.updateStatus(idTableChange, 1, conn)) {
+                    } else {
+                        if (Table.updateStatus(idTable, 1, conn)) {
+                            if (Table.updateStatus(idTableChange, 2, conn)) {
                                 if (TableReservationDetail.updateTable(idTableReservation, idTable, idTableChange, conn)) {
                                     conn.commit();
                                     loadTable(idLocation);
-                                }else{
+                                } else {
                                     throw new Exception();
                                 }
                             }
-                        }else{
+                        } else {
                             throw new Exception();
                         }
                     }
-                    } catch (Exception e) {
-                        try {
-                            conn.rollback();
-                            JOptionPane.showMessageDialog(getRootPane(), "Da xay ra loi");
-                        } catch (SQLException ex) {
-                            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                } catch (Exception e) {
+                    try {
+                        conn.rollback();
+                        JOptionPane.showMessageDialog(getRootPane(), "Da xay ra loi");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                //JOptionPane.showMessageDialog(getRootPane(), idTable + "--" + VariableStatic.getIdTable_Change());
             }
+            //JOptionPane.showMessageDialog(getRootPane(), idTable + "--" + VariableStatic.getIdTable_Change());
+        }
 
-        
         conn = null;
     }
 
     private void reservationTable() {
         conn = ConnectDB.conn();
         if (testDate(VariableStatic.getDateTimeReservation()) == false) {
-            TableModel tb = TableReservation.getByTable_DateTime(idTable, VariableStatic.getDateTimeReservation(), conn);
+            TableModel tb = TableReservation.getByTable_DateTime(idTable, VariableStatic.getDateTimeReservation(), ConnectDB.conn());
+            System.out.println(tb.getColumnCount());
             Timestamp ts = VariableStatic.getDateTimeReservation();
             if (tb.getRowCount() <= 0) {
                 JOptionPane.showMessageDialog(getRootPane(), "Ngày đặt phải lớn hơn ngày hiện tại");
             } else {
-                if (TableReservation.getStatusParty(idTable, ts, conn)) {
+                if (TableReservation.getStatusParty(idTable, ts, ConnectDB.conn())) {
                     JOptionPane.showMessageDialog(getRootPane(), "Ngày này bàn đã được đặt tiệc nên không đặt tiếp được");
-                } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "<html>Bạn không thể đặt bàn <b><font color='green'>" + Table.getByID(idTable, conn).getNAME() + "</font></b> trong thời gian này"
-                            + "vì đã có khách hàng đang sử dụng hoặc sẽ nhận bàn vào lúc <font color='blue'><b>" + ts.getHours() + " giờ, ngày " + ts.getDate() + "/" + (ts.getMonth() + 1) + "/" + (ts.getYear() + 1900) + " </b></font>"
-                            + "<br>Xin vui lòng chọn thời gian khác hoặc bàn khác!</html>");
+                } else {                                                                                    
+                        JOptionPane.showMessageDialog(getRootPane(), "<html>Bạn không thể đặt bàn <b><font color='green'>" 
+                            + Table.getByID(idTable, ConnectDB.conn()).getNAME() + "</font></b> trong thời gian này"
+                            + "vì đã có khách hàng đang sử dụng hoặc sẽ nhận bàn vào lúc <font color='blue'><b>" 
+                            + ts.getHours() + " giờ, ngày " + ts.getDate() + "/" + (ts.getMonth() + 1) + "/" + (ts.getYear() + 1900) + " </b></font>"
+                            + "<br>Xin vui lòng chọn thời gian khác hoặc bàn khác!</html>");                                        
                 }
             }
         } else {
             try {
-                conn=ConnectDB.conn();
+                conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (TableReservation.insert(false, VariableStatic.getIdCustomer(), VariableStatic.getDateTimeReservation(), false, conn)) {
+                if (TableReservation.insert(false, VariableStatic.getIdCustomer(), VariableStatic.getDateTimeReservation(), false,VariableStatic.getPrePay(), conn)) {
                     int maxid_reservation = TableReservation.getMaxID(conn).getID();
                     if (TableReservationDetail.insert(idTable, maxid_reservation, conn)) {
                         int stt;
-                        if (statusTable == 1) {
-                            stt = 1;
-                        } else {
+                        if (statusTable == 2) {
                             stt = 2;
+                        } else {
+                            stt = 3;
                         }
                         if (Table.updateStatus(idTable, stt, conn)) {
                             conn.commit();
                             JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");
                             loadTable(idLocation);
 
-                        }else{
+                        } else {
                             throw new Exception();
                         }
-                    }else{
+                    } else {
                         throw new Exception();
                     }
                 }
@@ -1164,10 +1167,12 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void setTextLable(int id) {
         conn = ConnectDB.conn();
+        DecimalFormat df = new DecimalFormat("#,###,###");
         TableReservation tbReser = TableReservation.getByTableByStatus(id, conn);
         beginDate = tbReser.getBeginDate();
         idCustomer = tbReser.getCUSTOMER();
         nameCustomer = tbReser.getCUSTOMER_NAME();
+        txtPrepay.setText(df.format(tbReser.getPrepay()));
         idTableReservation = tbReser.getID();
         // setText lable 
         if (beginDate == null) {
@@ -1190,15 +1195,14 @@ public class PanelTable extends javax.swing.JPanel {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String datetime = formatter.format(new Date());
         Timestamp ts = Timestamp.valueOf(datetime);
-        TableModel tb = TableReservation.getByTable_DateTime(idTable, date, conn);
+        TableModel tb = TableReservation.getByTable_DateTime(idTable, date, ConnectDB.conn());        
         Date dt = new Date();
+        Date incrementedDate = DateUtils.addHours(dt, 2);
         if (statusTable == 1) {
-            int ss = date.getDate() + (date.getMonth() + 1) * 31 + (date.getYear() + 1900) * 12 * 31;
-            int dd = dt.getDate() + (dt.getMonth() + 1) * 31 + (dt.getYear() + 1900) * 12 * 31;
-            if (ss <= dd && (date.getHours() <= dt.getHours())) {
-                flag = false;
-            } else {
-                flag = true;
+            if(dt.compareTo(date)<0){                
+                flag=true;
+            }else{
+                flag=false;
             }
         } else {
 
@@ -1233,6 +1237,7 @@ public class PanelTable extends javax.swing.JPanel {
             tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
             tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
         }
+        totalPay();
         conn = null;
     }
 
@@ -1262,6 +1267,7 @@ public class PanelTable extends javax.swing.JPanel {
         int discount_money = 0;
         int discount_percent = 0;
         int customer_pay = 0;
+        int prepay =0;
         double x;
         if (!txtService_Price.getText().trim().equals("") && testNumber(txtService_Price.getText())) {
             service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
@@ -1284,6 +1290,9 @@ public class PanelTable extends javax.swing.JPanel {
 
         if (!txtCustomerPay.getText().trim().equals("")) {
             customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+        }
+        if (!txtPrepay.getText().trim().equals("")) {
+            prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
         }
 
         float total = TableService.totalPayment(idTableReservation, conn);
@@ -1314,7 +1323,7 @@ public class PanelTable extends javax.swing.JPanel {
             totalPay = (int) ((total + service_Charges) - (discount_money + _discount));
         }
 
-        lbTotalPay.setText(String.valueOf(df.format(totalPay)));
+        lbTotalPay.setText(String.valueOf(df.format(totalPay-prepay)));
         total = TableService.totalPayment(idTableReservation, conn);
         lbTotal.setText(String.valueOf(df.format(total)));
         discount = (int) (_discount + discount_money);
@@ -1345,21 +1354,21 @@ public class PanelTable extends javax.swing.JPanel {
                         TableReservationDetail table_list[] = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
                         for (int i = 0; i < table_list.length; i++) {
                             if (TableReservation.countidTableReservation(table_list[i].getID_TABLE(), conn) > 0) {
-                                if (Table.updateStatus(table_list[i].getID_TABLE(), 2, conn)) {
+                                if (Table.updateStatus(table_list[i].getID_TABLE(), 3, conn)) {
                                     flag = true;
-                                }else{
+                                } else {
                                     throw new Exception();
                                 }
                             } else {
-                                if (Table.updateStatus(table_list[i].getID_TABLE(), 0, conn)) {
+                                if (Table.updateStatus(table_list[i].getID_TABLE(), 1, conn)) {
                                     flag = true;
-                                }else{
+                                } else {
                                     throw new Exception();
                                 }
                             }
                         }
                         conn.commit();
-                    }else{
+                    } else {
                         throw new Exception();
                     }
                 }
@@ -1544,6 +1553,9 @@ public class PanelTable extends javax.swing.JPanel {
         txtService_Price = new javax.swing.JFormattedTextField();
         txtDiscountMoney = new javax.swing.JFormattedTextField();
         txtCustomerPay = new javax.swing.JFormattedTextField();
+        jLabel18 = new javax.swing.JLabel();
+        txtPrepay = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
         btnPayment = new javax.swing.JButton();
         btnCancelTableUse = new javax.swing.JButton();
         btnPrintPreviewInvoice = new javax.swing.JButton();
@@ -1791,7 +1803,7 @@ public class PanelTable extends javax.swing.JPanel {
         jLabel13.setText("VNĐ");
 
         jLabel14.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel14.setText("Giảm Giá:");
+        jLabel14.setText("Đưa Trước:");
 
         txtDiscountPercent.setEditable(false);
         txtDiscountPercent.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -1887,6 +1899,27 @@ public class PanelTable extends javax.swing.JPanel {
             }
         });
 
+        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel18.setText("Giảm Giá:");
+
+        txtPrepay.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        txtPrepay.setForeground(new java.awt.Color(255, 102, 0));
+        txtPrepay.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtPrepay.setMinimumSize(new java.awt.Dimension(6, 23));
+        txtPrepay.setPreferredSize(new java.awt.Dimension(6, 23));
+        txtPrepay.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtPrepayKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPrepayKeyTyped(evt);
+            }
+        });
+
+        jLabel21.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(0, 102, 255));
+        jLabel21.setText("VNĐ");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1895,28 +1928,40 @@ public class PanelTable extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtDiscountPercent, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
-                            .addComponent(txtCustomerPay))
-                        .addGap(5, 5, 5))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
-                            .addComponent(jLabel14))
+                            .addComponent(jLabel18))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDiscountMoney)
-                            .addComponent(txtService_Price, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtService_Price, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(txtDiscountPercent, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel15)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDiscountMoney))))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                            .addComponent(jLabel14)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtPrepay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(jLabel16)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtCustomerPay, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel15)
-                    .addComponent(jLabel17)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel11)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING)))
-                .addGap(126, 126, 126)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel17)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel11)
+                                .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING)))
+                        .addGap(126, 126, 126))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel21)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel12)
@@ -1956,11 +2001,15 @@ public class PanelTable extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel13)
-                            .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtDiscountMoney, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDiscountPercent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel15)
-                            .addComponent(txtDiscountPercent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel18))
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel14)
+                            .addComponent(txtPrepay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel16)
@@ -1974,8 +2023,7 @@ public class PanelTable extends javax.swing.JPanel {
                             .addComponent(lbTotalPay)
                             .addComponent(jLabel27)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addGap(20, 20, 20)
+                        .addGap(37, 37, 37)
                         .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1984,7 +2032,7 @@ public class PanelTable extends javax.swing.JPanel {
                             .addComponent(jLabel25))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         btnPayment.setBackground(new java.awt.Color(0, 204, 255));
@@ -2243,14 +2291,39 @@ public class PanelTable extends javax.swing.JPanel {
     private void btnPrintPreviewInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintPreviewInvoiceActionPerformed
         printInvoice();
     }//GEN-LAST:event_btnPrintPreviewInvoiceActionPerformed
-
     private void lbTotalPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lbTotalPropertyChange
 
     }//GEN-LAST:event_lbTotalPropertyChange
-
     private void txtDiscountPercentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDiscountPercentActionPerformed
 
     }//GEN-LAST:event_txtDiscountPercentActionPerformed
+
+    private void txtPrepayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrepayKeyReleased
+       DecimalFormat df = new DecimalFormat("#,###,###");
+        if (!txtPrepay.getText().trim().equals("")) {
+            Long num = Long.parseLong(txtPrepay.getText().trim().replaceAll("\\.", ""));
+            txtPrepay.setText(String.valueOf(df.format(num)));
+        }
+        totalPay();
+    }//GEN-LAST:event_txtPrepayKeyReleased
+
+    private void txtPrepayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrepayKeyTyped
+       int key = evt.getKeyChar();
+        String st = txtPrepay.getText();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtPrepayKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2270,8 +2343,10 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel27;
@@ -2307,6 +2382,7 @@ public class PanelTable extends javax.swing.JPanel {
     private javax.swing.JFormattedTextField txtDiscountMoney;
     private javax.swing.JTextField txtDiscountPercent;
     private javax.swing.JTextField txtNoteinvoice;
+    private javax.swing.JTextField txtPrepay;
     private javax.swing.JTextField txtSearch;
     private javax.swing.JFormattedTextField txtService_Price;
     // End of variables declaration//GEN-END:variables

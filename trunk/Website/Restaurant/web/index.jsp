@@ -1,6 +1,6 @@
 <%-- 
     Document   : index
-    Created on : Mar 11, 2014, 11:42:27 PM
+    Created on : Mar 12, 2014, 1:20:16 AM
     Author     : nhphuoc
 --%>
 
@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>NHÀ HÀNG RSM</title>
+        <title>JSP Page</title>
     </head>
     <body>
         <h1>Hello World!</h1>

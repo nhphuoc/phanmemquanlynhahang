@@ -149,7 +149,24 @@ public class Customer {
         }
         return result;
     }
+    public static Vector selectCustomer2(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "CALL customer_get_limit()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            vn.edu.vttu.model.Customer tb1 = new vn.edu.vttu.model.Customer(0, "Chọn Khách Hàng");
+                result.add(tb1);
+            while (rs.next()) {
+                vn.edu.vttu.model.Customer tb = new vn.edu.vttu.model.Customer(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
 
+            e.printStackTrace();
+        }
+        return result;
+    }
     public static boolean insert(String name, Boolean sex, Date birthday, String phone, String address, String email, Connection conn) {
         boolean flag = false;
         try {

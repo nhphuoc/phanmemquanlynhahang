@@ -349,18 +349,40 @@ public class Table {
         }
         return flag;
     }
-    public static TableModel getByDateNotReservation(Timestamp dt,Connection conn) {
+    
+    public static TableModel getByDateNotReservation(Timestamp dt,int num,Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {                       
-            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?)}");  
+            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?,?)}");  
             calState.setTimestamp(1, dt);
+            calState.setInt(2,num);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tb;
+    }
+    
+    public static Vector getByDateNotReservationVector(Timestamp dt, int num, Connection conn) {
+        Vector result = new Vector();
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?,?)}");  
+            calState.setTimestamp(1, dt);
+            calState.setInt(2,num);
+            ResultSet rs = calState.executeQuery();    
+            vn.edu.vttu.model.Table tb1 = new vn.edu.vttu.model.Table(0, "Chọn Bàn");
+            result.add(tb1);
+            while (rs.next()) {                
+                vn.edu.vttu.model.Table tb = new vn.edu.vttu.model.Table(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

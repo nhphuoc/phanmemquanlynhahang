@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemadesigner version="6.5">
+<source>
+<database charset="utf8" collation="utf8_unicode_ci">vttu_restaurant</database>
+</source>
+<canvas zoom="100">
+<tables>
+<table name="table" view="colnames">
+<left>226</left>
+<top>20</top>
+<width>115</width>
+<height>192</height>
+<sql_create_table>CREATE TABLE `table` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `location` int(11) DEFAULT NULL,
+  `numOfChair` tinyint(4) DEFAULT '10',
+  `status` int(4) DEFAULT '1',
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`),
+  KEY `location` (`location`),
+  KEY `status` (`status`),
+  CONSTRAINT `table_ibfk_3` FOREIGN KEY (`status`) REFERENCES `table_status` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `table_ibfk_1` FOREIGN KEY (`type`) REFERENCES `table_type` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `table_ibfk_2` FOREIGN KEY (`location`) REFERENCES `table_location` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_reservation" view="colnames">
+<left>684</left>
+<top>206</top>
+<width>133</width>
+<height>192</height>
+<sql_create_table>CREATE TABLE `table_reservation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_customer_id` int(11) DEFAULT NULL,
+  `beginDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `endDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `status` bit(1) DEFAULT b'1',
+  `party` bit(1) DEFAULT b'0',
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_customer_id` (`id_customer_id`),
+  CONSTRAINT `table_reservation_ibfk_1` FOREIGN KEY (`id_customer_id`) REFERENCES `customer` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=138 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_reservation_detail" view="colnames">
+<left>424</left>
+<top>60</top>
+<width>180</width>
+<height>141</height>
+<sql_create_table>CREATE TABLE `table_reservation_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_table_id` int(11) DEFAULT NULL,
+  `id_table_reservation_id` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_table_reservation_id` (`id_table_reservation_id`),
+  KEY `id_table_id` (`id_table_id`),
+  CONSTRAINT `table_reservation_detail_ibfk_1` FOREIGN KEY (`id_table_reservation_id`) REFERENCES `table_reservation` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `table_reservation_detail_ibfk_2` FOREIGN KEY (`id_table_id`) REFERENCES `table` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=358 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_status" view="colnames">
+<left>17</left>
+<top>325</top>
+<width>114</width>
+<height>107</height>
+<sql_create_table>CREATE TABLE `table_status` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="service" view="colnames">
+<left>1220</left>
+<top>34</top>
+<width>90</width>
+<height>192</height>
+<sql_create_table>CREATE TABLE `service` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `detail` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image` text COLLATE utf8_unicode_ci,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`),
+  KEY `service_ibfk_2` (`unit`),
+  CONSTRAINT `service_ibfk_1` FOREIGN KEY (`type`) REFERENCES `service_type` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `service_ibfk_2` FOREIGN KEY (`unit`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_service" view="colnames">
+<left>972</left>
+<top>20</top>
+<width>180</width>
+<height>209</height>
+<sql_create_table>CREATE TABLE `table_service` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_table_reservation_id` int(11) DEFAULT NULL,
+  `id_service_id` int(11) DEFAULT NULL,
+  `id_service_cost_id` int(11) DEFAULT NULL,
+  `number` tinyint(4) DEFAULT NULL,
+  `note` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `status` bit(1) DEFAULT b'1',
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_service_id` (`id_service_id`),
+  KEY `id_table_service_id` (`id_table_reservation_id`),
+  CONSTRAINT `table_service_ibfk_2` FOREIGN KEY (`id_service_id`) REFERENCES `service` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `table_service_ibfk_3` FOREIGN KEY (`id_table_reservation_id`) REFERENCES `table_reservation` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="service_cost" view="colnames">
+<left>1482</left>
+<top>8</top>
+<width>121</width>
+<height>158</height>
+<sql_create_table>CREATE TABLE `service_cost` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_service_id` int(11) DEFAULT NULL,
+  `beginDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `cost` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_service_id` (`id_service_id`),
+  CONSTRAINT `service_cost_ibfk_1` FOREIGN KEY (`id_service_id`) REFERENCES `service` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="service_type" view="colnames">
+<left>1327</left>
+<top>250</top>
+<width>112</width>
+<height>124</height>
+<sql_create_table>CREATE TABLE `service_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="invoice" view="colnames">
+<left>396</left>
+<top>248</top>
+<width>180</width>
+<height>209</height>
+<sql_create_table>CREATE TABLE `invoice` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_table_reservation_id` int(11) DEFAULT NULL,
+  `id_staff_id` int(11) DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `cost` int(11) DEFAULT NULL,
+  `discount` int(11) DEFAULT NULL,
+  `note` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_table_reservation_id` (`id_table_reservation_id`),
+  KEY `id_staff_id` (`id_staff_id`),
+  CONSTRAINT `invoice_ibfk_1` FOREIGN KEY (`id_table_reservation_id`) REFERENCES `table_reservation` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `invoice_ibfk_2` FOREIGN KEY (`id_staff_id`) REFERENCES `staff` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="discount" view="colnames">
+<left>10</left>
+<top>475</top>
+<width>119</width>
+<height>243</height>
+<sql_create_table>CREATE TABLE `discount` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` tinyint(4) DEFAULT NULL,
+  `beginDate` timestamp NULL DEFAULT NULL,
+  `endDate` timestamp NULL DEFAULT NULL,
+  `conditions` int(11) DEFAULT NULL,
+  `valueInvoice` int(11) DEFAULT NULL,
+  `value` int(11) DEFAULT NULL,
+  `detail` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="discount_detail" view="colnames">
+<left>202</left>
+<top>314</top>
+<width>127</width>
+<height>141</height>
+<sql_create_table>CREATE TABLE `discount_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_invoice_id` int(11) DEFAULT NULL,
+  `id_discount_id` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_discount_id` (`id_discount_id`),
+  KEY `id_invoice_id` (`id_invoice_id`),
+  CONSTRAINT `discount_detail_ibfk_1` FOREIGN KEY (`id_discount_id`) REFERENCES `discount` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `discount_detail_ibfk_2` FOREIGN KEY (`id_invoice_id`) REFERENCES `invoice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="unit" view="colnames">
+<left>1004</left>
+<top>328</top>
+<width>90</width>
+<height>124</height>
+<sql_create_table>CREATE TABLE `unit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="raw_material" view="colnames">
+<left>1176</left>
+<top>384</top>
+<width>112</width>
+<height>156</height>
+<sql_create_table>CREATE TABLE `raw_material` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `number` float DEFAULT NULL,
+  `unit` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `unit` (`unit`),
+  CONSTRAINT `raw_material_ibfk_1` FOREIGN KEY (`unit`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="raw_material_invoice" view="colnames">
+<left>848</left>
+<top>543</top>
+<width>170</width>
+<height>210</height>
+<sql_create_table>CREATE TABLE `raw_material_invoice` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date DEFAULT NULL,
+  `id_staff_id` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_staff_id` (`id_staff_id`),
+  CONSTRAINT `raw_material_invoice_ibfk_1` FOREIGN KEY (`id_staff_id`) REFERENCES `staff` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="raw_material_invoice_detail" view="colnames">
+<left>1333</left>
+<top>562</top>
+<width>185</width>
+<height>175</height>
+<sql_create_table>CREATE TABLE `raw_material_invoice_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_raw_material_id` int(11) DEFAULT NULL,
+  `id_raw_material_invoice` int(11) DEFAULT NULL,
+  `number` int(11) DEFAULT NULL,
+  `cost` int(11) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_raw_material_id` (`id_raw_material_id`),
+  KEY `raw_material_invoice_detail_ibfk_2` (`id_raw_material_invoice`),
+  CONSTRAINT `raw_material_invoice_detail_ibfk_1` FOREIGN KEY (`id_raw_material_id`) REFERENCES `raw_material` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `raw_material_invoice_detail_ibfk_2` FOREIGN KEY (`id_raw_material_invoice`) REFERENCES `raw_material_invoice` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="customer" view="colnames">
+<left>878</left>
+<top>256</top>
+<width>95</width>
+<height>209</height>
+<sql_create_table>CREATE TABLE `customer` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sex` bit(1) DEFAULT NULL,
+  `birthDay` date DEFAULT NULL,
+  `phone` varchar(13) COLLATE utf8_unicode_ci DEFAULT 'Chưa rõ',
+  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT 'Chưa rõ',
+  `email` varchar(100) COLLATE utf8_unicode_ci DEFAULT 'Chưa rõ',
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="account" view="colnames">
+<left>410</left>
+<top>513</top>
+<width>105</width>
+<height>175</height>
+<sql_create_table>CREATE TABLE `account` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_staff_id` int(11) DEFAULT NULL,
+  `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `password` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` tinyint(4) DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_username` (`username`),
+  KEY `id_staff_id` (`id_staff_id`),
+  CONSTRAINT `account_ibfk_1` FOREIGN KEY (`id_staff_id`) REFERENCES `staff` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="staff" view="colnames">
+<left>625</left>
+<top>456</top>
+<width>95</width>
+<height>226</height>
+<sql_create_table>CREATE TABLE `staff` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sex` bit(1) DEFAULT NULL,
+  `birthDay` date DEFAULT NULL,
+  `phone` varchar(13) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `pin` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_type" view="colnames">
+<left>20</left>
+<top>0</top>
+<width>90</width>
+<height>124</height>
+<sql_create_table>CREATE TABLE `table_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="table_location" view="colnames">
+<left>19</left>
+<top>145</top>
+<width>106</width>
+<height>141</height>
+<sql_create_table>CREATE TABLE `table_location` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `detail` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+<table name="recipes" view="colnames">
+<left>1544</left>
+<top>272</top>
+<width>155</width>
+<height>175</height>
+<sql_create_table>CREATE TABLE `recipes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_raw_material_id` int(11) DEFAULT NULL,
+  `id_service_id` int(11) DEFAULT NULL,
+  `number` float DEFAULT NULL,
+  `note` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `isActive` bit(1) DEFAULT b'1',
+  PRIMARY KEY (`id`),
+  KEY `id_raw_material_id` (`id_raw_material_id`),
+  KEY `id_service_id` (`id_service_id`),
+  CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`id_raw_material_id`) REFERENCES `raw_material` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `recipes_ibfk_2` FOREIGN KEY (`id_service_id`) REFERENCES `service` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci</sql_create_table>
+</table>
+</tables>
+</canvas>
+</schemadesigner>

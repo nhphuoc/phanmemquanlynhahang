@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import javax.swing.JOptionPane;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -28,6 +29,9 @@ public class TableReservation {
     private Timestamp endDate;
     private boolean STATUS;
     private boolean PARTY;
+    private int prepay;
+
+    
 
     private static String DateReservation;// use reservation
 
@@ -78,12 +82,19 @@ public class TableReservation {
     public TableReservation(boolean party) {
         this.PARTY = party;
     }
+    public int getPrepay() {
+        return prepay;
+    }
 
-    public TableReservation(int id, int customer_id, String customer_name, Timestamp beginDate) {
+    public void setPrepay(int prepay) {
+        this.prepay = prepay;
+    }
+    public TableReservation(int id, int customer_id, String customer_name, Timestamp beginDate, int prepay) {
         this.ID = id;
         this.CUSTOMER = customer_id;
         this.CUSTOMER_NAME = customer_name;
         this.beginDate = beginDate;
+        this.prepay=prepay;
     }
 
     public static TableReservation getMaxID(Connection conn) {
@@ -127,12 +138,12 @@ public class TableReservation {
             ResultSet rs = callstate.executeQuery();
 
             while (rs.next()) {
-                table_reservation = new TableReservation(rs.getInt("id"), rs.getInt("id_customer_id"), rs.getString("name"), rs.getTimestamp("beginDate"));
+                table_reservation = new TableReservation(rs.getInt("id"), rs.getInt("id_customer_id"), rs.getString("name"), rs.getTimestamp("beginDate"),rs.getInt("prepay"));
                 return table_reservation;
             }
         } catch (Exception e) {
         }
-        table_reservation = new TableReservation(-1, -1, "Chọn khách hàng", null);
+        table_reservation = new TableReservation(-1, -1, "Chọn khách hàng", null,0);
         return table_reservation;
     }
 
@@ -157,15 +168,16 @@ public class TableReservation {
         return flag;
     }
 
-    public static boolean insert(boolean status, int idCustomer, Timestamp dt, boolean party, Connection conn) {
+    public static boolean insert(boolean status, int idCustomer, Timestamp dt, boolean party,int prepay, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL table_reservation_insert_customerid(?,?,?,?)";
+            String sql = "CALL table_reservation_insert_customerid(?,?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setBoolean(1, status);
             callstate.setInt(2, idCustomer);
             callstate.setTimestamp(3, dt);
             callstate.setBoolean(4, party);
+            callstate.setInt(5, prepay);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -262,13 +274,15 @@ public class TableReservation {
         return flag;
     }
 
-    public static boolean updateBeginDate(int idReservation, Timestamp dt, Connection conn) {
+    public static boolean updateBeginDateCustomer(int idReservation, Timestamp dt,int idcustomer,int prepay, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL table_reservation_update_begindate_date(?,?)";
+            String sql = "CALL table_reservation_update_begindate_customer_prepay(?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idReservation);
-            callstate.setTimestamp(2, dt);
+            callstate.setTimestamp(2, dt);                       
+            callstate.setInt(3, idcustomer);                       
+            callstate.setInt(4, prepay);                       
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;
@@ -398,14 +412,18 @@ public class TableReservation {
         TableModel tb = null;
         ResultSet rs;
         try {
-            String sql = "call table_reservation_test_by_date_time(?,?)";
+            String sql = "call table_reservation_test_by_date_time(?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTable);
             callstate.setTimestamp(2, ts);
+            callstate.setInt(3,2);
+            
             rs = callstate.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
+            
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace();           
+            
         }
         return tb;
     }

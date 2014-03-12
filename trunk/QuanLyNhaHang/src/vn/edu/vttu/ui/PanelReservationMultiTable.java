@@ -72,7 +72,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
 
     private void loadTable(Timestamp ts) {
         conn = ConnectDB.conn();
-        tbListTable.setModel(Table.getByDateNotReservation(ts, conn));
+        tbListTable.setModel(Table.getByDateNotReservation(ts, 2, conn));
         try {
             tbListTable.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
@@ -117,21 +117,26 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (TableReservation.insert(false, idCustomer, ts, true, conn)) {
+                int prepay = 0;
+                if (!txtPrepay.getText().trim().equals("")) {
+                    prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
+                }
+                if (TableReservation.insert(false, idCustomer, ts, true, prepay, conn)) {
                     int maxid_reservation = TableReservation.getMaxID(conn).getID();
                     for (int i = 0; i < tbListTableReservation.getRowCount(); i++) {
                         int idtb = Integer.parseInt(String.valueOf(tbListTableReservation.getValueAt(i, 0)));
                         if (TableReservationDetail.insert(idtb, maxid_reservation, conn)) {
                             int stt;
                             if (TableReservation.countidTableUsing(idtb, conn) > 0) {
-                                stt = 1;
+                                stt = 2;
                             } else {
                                 if (TableReservation.countidTableReservation(idtb, conn) > 0) {
-                                    stt = 2;
+                                    stt = 3;
                                 } else {
-                                    stt = 0;
+                                    stt = 1;
                                 }
                             }
+                            System.out.println("Trạng thái bàn: "+stt);
                             Table.updateStatus(idtb, stt, conn);
                         }
                     }//end for
@@ -178,6 +183,8 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
+        txtPrepay = new javax.swing.JTextField();
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
         btnSave.setText("Lưu Lại");
@@ -295,13 +302,17 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         jLabel3.setForeground(new java.awt.Color(102, 153, 0));
         jLabel3.setText("Vị Trí");
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(102, 153, 0));
+        jLabel6.setText("Đưa Trước:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -309,13 +320,17 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cobCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cobCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtPrepay)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -332,7 +347,9 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtPrepay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
 
@@ -401,7 +418,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 String datetime = formatter.format(dtDateReservation.getDate());
                 Timestamp ts = Timestamp.valueOf(datetime);
                 if (reservationTable(ts, idCustomer)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");                   
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công");
                 }
@@ -474,10 +491,12 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tbListTable;
     private javax.swing.JTable tbListTableReservation;
+    private javax.swing.JTextField txtPrepay;
     // End of variables declaration//GEN-END:variables
 }
