@@ -5,6 +5,7 @@
  */
 package vn.edu.vttu.ui;
 
+import config.InfoRestaurant;
 import java.awt.Component;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -110,7 +111,7 @@ public class PanelChangeReservation extends javax.swing.JPanel {
     private void fillComboTable() {
         Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
         try {
-            model = Table.getByDateNotReservationVector(date, 2, ConnectDB.conn());
+            model = Table.getByDateNotReservationVector(date, InfoRestaurant.getHourAcceptReservationNomal(), ConnectDB.conn());
         } catch (Exception e) {
             e.printStackTrace();
         }

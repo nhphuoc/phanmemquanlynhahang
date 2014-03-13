@@ -6,6 +6,7 @@
 package vn.edu.vttu.ui;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -573,10 +574,29 @@ public class PanelPromotion extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi nào");
                 } else {
                     int id = Integer.parseInt(txtID.getText().trim());
-                    if (Discount.update(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, id, conn)) {
-                        loadData();
-                        enableControl(true);
+                    try {
+                        conn.setAutoCommit(false);
+                        if (Discount.updateStatus(id, conn)) {
+                            if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
+                                conn.commit();
+                                loadData();
+                                enableControl(true);
+                            } else {
+                                throw new Exception();
+                            }
+
+                        } else {
+                            throw new Exception();
+                        }
+                    } catch (Exception e) {
+                        try {
+                            conn.rollback();
+                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                        } catch (SQLException ex) {
+                            Logger.getLogger(PanelPromotion.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
+
                 }
             }
 

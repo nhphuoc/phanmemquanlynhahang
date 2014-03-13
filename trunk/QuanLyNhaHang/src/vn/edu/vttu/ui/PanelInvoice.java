@@ -140,6 +140,7 @@ public class PanelInvoice extends javax.swing.JPanel {
             choise = 3;
         }
         tbInvoiceList.setModel(Invoice.getAll(ts1, ts2, idStaff, idCustomer, choise, conn));
+        /*
         if (tbInvoiceList.getRowCount() <= 0) {
             tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
             tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
@@ -147,6 +148,7 @@ public class PanelInvoice extends javax.swing.JPanel {
             tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
             tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
         }
+        */
         conn = null;
     }
 
@@ -343,11 +345,11 @@ public class PanelInvoice extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Ngày Nhận Bàn", "Ngày Thanh Toán", "Bàn - Tầng", "Giảm Giá", "Thanh Toán", "Ghi Chú"
+                "Ngày Nhận Bàn", "Ngày Thanh Toán", "Bàn - Tầng", "Khuyễn Mãi", "Giảm Giá", "Thanh Toán", "Ghi Chú"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, true, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -380,7 +382,7 @@ public class PanelInvoice extends javax.swing.JPanel {
         lbNumberInvoice.setText(String.valueOf(row) + " Hóa Đơn");
         int total = 0;
         for (int i = 0; i < row; i++) {
-            int n = Integer.parseInt(String.valueOf(tbInvoiceList.getValueAt(i, 4)).replaceAll(",", ""));
+            int n = Integer.parseInt(String.valueOf(tbInvoiceList.getValueAt(i, 6)).replaceAll(",", ""));
             total = total + n;
         }
         DecimalFormat df = new DecimalFormat("#,###,###");

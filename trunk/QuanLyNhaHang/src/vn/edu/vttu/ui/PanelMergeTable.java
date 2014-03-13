@@ -46,7 +46,6 @@ public class PanelMergeTable extends javax.swing.JPanel {
     }
 
     class ItemRendererTable extends BasicComboBoxRenderer {
-
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
@@ -55,7 +54,6 @@ public class PanelMergeTable extends javax.swing.JPanel {
 
             if (value != null) {
                 vn.edu.vttu.model.Table item = (vn.edu.vttu.model.Table) value;
-                // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
                 setText(item.getNameTable());
             }
 
@@ -75,22 +73,23 @@ public class PanelMergeTable extends javax.swing.JPanel {
 
     public PanelMergeTable() {
         initComponents();
-        fillcobLocation();
-        vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
-        int idLocation = tbLocation.getId();
-        fillComboTable(idLocation);
-        vn.edu.vttu.model.Table tb = (vn.edu.vttu.model.Table) cobTable.getSelectedItem();
-        int idTable = tb.getIdTable();
-        VariableStatic.setIdTable_Change(idTable);
+        try {
+            fillcobLocation();
+            vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
+            int idLocation = tbLocation.getId();
+            fillComboTable(idLocation);            
+        } catch (Exception e) {            
+        }
+
     }
 
     private void fillcobLocation() {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
         try {
-            model = TableLocation.selectTableLocation(conn);
+            model = TableLocation.selectTableLocation(ConnectDB.conn());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Lỗi đổ dữ liệu vào combobox location "+e.toString());
         }
 
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
@@ -104,9 +103,9 @@ public class PanelMergeTable extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
         try {
-            model = Table.selectTableByLocation(idLocation,1, conn);
+            model = Table.selectTableByLocation(idLocation, 2, ConnectDB.conn());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Lỗi đổ dữ liệu vào combobox table "+e.toString());
         }
 
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);

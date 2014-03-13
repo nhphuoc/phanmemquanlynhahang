@@ -180,6 +180,26 @@ public class Discount {
 
         return flag;
     } 
+    public static boolean updateStatus(int id,  Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL discount_update_status(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);                               
+            int x = callstate.executeUpdate();
+            if (x >= 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+
+        return flag;
+    } 
     public static boolean delete(int id,Connection conn) {
         boolean flag = false;
         try {            

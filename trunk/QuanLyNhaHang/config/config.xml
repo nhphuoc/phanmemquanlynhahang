@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serverconfig>        
+    <database>localhost</database>
+    <port>3306</port>
+    <username>root</username>
+    <pass></pass>
+</serverconfig>
+
+<restaurentinfo>
+    <name>NHP</name>
+    <phone>0977941517</phone>
+    <email>it.nhphuoc@gmail.com</email>
+    <address>Hà Tiên Kiên Giang</address>
+    <logo>link</logo>
+</restaurentinfo>

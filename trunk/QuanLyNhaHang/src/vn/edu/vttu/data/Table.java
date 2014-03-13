@@ -154,8 +154,8 @@ public class Table {
     public static Table[] getByLocation(int idLocation, Connection conn) {
         Table[] tables = null;
         try {
-            String sql = "SELECT * FROM `table` WHERE `table`.`location`="+idLocation+" AND `table`.`isActive`=TRUE;";
-            CallableStatement calState = conn.prepareCall(sql);            
+            String sql = "SELECT * FROM `table` WHERE `table`.`location`=" + idLocation + " AND `table`.`isActive`=TRUE;";
+            CallableStatement calState = conn.prepareCall(sql);
             ResultSet rs = calState.executeQuery(sql);
             rs.last();
             tables = new Table[rs.getRow()];
@@ -198,7 +198,7 @@ public class Table {
             callstate.setInt(1, id);
             callstate.setInt(2, status);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -219,7 +219,7 @@ public class Table {
             callstate.setString(1, name);
             callstate.setInt(2, status);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -251,25 +251,33 @@ public class Table {
     public static Vector selectTableByLocation(int idLocation, int status, Connection conn) {
         Vector result = new Vector();
         try {
-            String sql = "SELECT * FROM `table` WHERE `table`.`location`="+idLocation+" AND `table`.status ="+status+" and `table`.`isActive`=TRUE;";
+            String sql = "SELECT * FROM `table` WHERE `table`.`location`=" + idLocation + " AND `table`.status =" + status + " and `table`.`isActive`=TRUE;";
             CallableStatement callstate = conn.prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
-            while (rs.next()) {
+            boolean b;
+            while (b=rs.next()) {
+                
                 vn.edu.vttu.model.Table tb = new vn.edu.vttu.model.Table(rs.getInt(1), rs.getString(2));
                 result.add(tb);
+                if (b == false) {
+                    vn.edu.vttu.model.Table tb1 = new vn.edu.vttu.model.Table(0, "Không Có Bàn");
+                    result.add(tb1);
+                }
+                
             }
+
         } catch (Exception e) {
 
             e.printStackTrace();
         }
         return result;
     }
-            
+
     public static TableModel loadTableByStatus(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {                       
-            CallableStatement calState = conn.prepareCall("{CALL table_getbyStatus()}");    
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_getbyStatus()}");
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -277,11 +285,12 @@ public class Table {
         }
         return tb;
     }
-    public static TableModel loadTableByStatusSearch(String key,Connection conn) {
+
+    public static TableModel loadTableByStatusSearch(String key, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {                       
-            CallableStatement calState = conn.prepareCall("{CALL table_getByStatus_Search(?)}");    
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_getByStatus_Search(?)}");
             calState.setString(1, key);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
@@ -290,6 +299,7 @@ public class Table {
         }
         return tb;
     }
+
     public static boolean insertNewTable(String name, int type, int location, int chair, Connection conn) {
         boolean flag = false;
         try {
@@ -300,7 +310,7 @@ public class Table {
             callstate.setInt(3, location);
             callstate.setInt(4, chair);
             int x = callstate.executeUpdate();
-            if (x ==1) {
+            if (x == 1) {
                 flag = true;
             } else {
                 flag = false;
@@ -311,34 +321,36 @@ public class Table {
         }
         return flag;
     }
-    public static boolean testTableName(String name,Connection conn) {
+
+    public static boolean testTableName(String name, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        boolean flag=false;
-        try {                       
-            CallableStatement calState = conn.prepareCall("call table_test_table_name(?)");    
+        boolean flag = false;
+        try {
+            CallableStatement calState = conn.prepareCall("call table_test_table_name(?)");
             calState.setString(1, name);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
-            if(tb.getRowCount()<=0){
-                flag=true;
-            }else{
-                flag=false;
+            if (tb.getRowCount() <= 0) {
+                flag = true;
+            } else {
+                flag = false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return flag;
     }
-    public static boolean updateTableName(String name, int idTable,Connection conn) {
+
+    public static boolean updateTableName(String name, int idTable, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL table_update_name(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
-            callstate.setInt(2, idTable);            
+            callstate.setInt(2, idTable);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -349,14 +361,16 @@ public class Table {
         }
         return flag;
     }
-    
-    public static TableModel getByDateNotReservation(Timestamp dt,int num,Connection conn) {
+
+    public static TableModel getByDateNotReservation(Timestamp dt, int num,int location, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        try {                       
-            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?,?)}");  
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation_1(?,?,?)}");
             calState.setTimestamp(1, dt);
-            calState.setInt(2,num);
+            calState.setInt(2, num);            
+            calState.setInt(3, location);            
+            
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -364,17 +378,17 @@ public class Table {
         }
         return tb;
     }
-    
+
     public static Vector getByDateNotReservationVector(Timestamp dt, int num, Connection conn) {
         Vector result = new Vector();
         try {
-            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?,?)}");  
+            CallableStatement calState = conn.prepareCall("{CALL table_get_by_not_reservation(?,?)}");
             calState.setTimestamp(1, dt);
-            calState.setInt(2,num);
-            ResultSet rs = calState.executeQuery();    
+            calState.setInt(2, num);
+            ResultSet rs = calState.executeQuery();
             vn.edu.vttu.model.Table tb1 = new vn.edu.vttu.model.Table(0, "Chọn Bàn");
             result.add(tb1);
-            while (rs.next()) {                
+            while (rs.next()) {
                 vn.edu.vttu.model.Table tb = new vn.edu.vttu.model.Table(rs.getInt(1), rs.getString(2));
                 result.add(tb);
             }

@@ -5,6 +5,7 @@
  */
 package vn.edu.vttu.ui;
 
+import config.InfoRestaurant;
 import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Table;
+import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
 
@@ -52,13 +54,36 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         }
     }
 
+    class ItemRendererLocation extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index,
+                    isSelected, cellHasFocus);
+
+            if (value != null) {
+                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;
+                // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                setText(item.getName());
+            }
+
+            if (index == -1) {
+                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;
+                setText("" + item.getName());
+            }
+
+            return this;
+        }
+    }
+
     /**
      * Creates new form PanelReservationMultiTable
      */
-    private Connection conn;
-    private int idLocation = -1;
+    private Connection conn;    
     private int idTable;
     private String listTable = "";
+    private int idlocation;
 
     public PanelReservationMultiTable() {
         initComponents();
@@ -66,13 +91,15 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String datetime = formatter.format(dtDateReservation.getDate());
         Timestamp ts = Timestamp.valueOf(datetime);
-        loadTable(ts);
-
+        fillkhCombo();
+        vn.edu.vttu.model.TableLocation tb = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
+         idlocation = tb.getId();
+        loadTable(ts,1);
     }
 
-    private void loadTable(Timestamp ts) {
+    private void loadTable(Timestamp ts, int location) {
         conn = ConnectDB.conn();
-        tbListTable.setModel(Table.getByDateNotReservation(ts, 2, conn));
+        tbListTable.setModel(Table.getByDateNotReservation(ts, InfoRestaurant.getHourAcceptReservationNomal(),location, conn));
         try {
             tbListTable.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
@@ -82,7 +109,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
 
     private void fillComboCustomer() {
         conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
+        Vector<vn.edu.vttu.model.Customer> model = new Vector<vn.edu.vttu.model.Customer>();
         try {
             model = Customer.selectCustomer(conn);
         } catch (Exception e) {
@@ -94,6 +121,21 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         cobCustomer.setModel(defaultComboBoxModel);
         cobCustomer.setRenderer(new PanelReservationMultiTable.ItemRendererTable());
         conn = null;
+    }
+
+    private void fillkhCombo() {
+        conn = ConnectDB.conn();
+        Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
+        try {
+            model = TableLocation.selectTableLocation(ConnectDB.conn());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobLocation.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobLocation.setModel(defaultComboBoxModel);
+        cobLocation.setRenderer(new PanelReservationMultiTable.ItemRendererLocation());
     }
 
     private boolean testDate(Timestamp date) {
@@ -135,8 +177,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                                 } else {
                                     stt = 1;
                                 }
-                            }
-                            System.out.println("Trạng thái bàn: "+stt);
+                            }                            
                             Table.updateStatus(idtb, stt, conn);
                         }
                     }//end for
@@ -180,9 +221,8 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         dtDateReservation = new com.toedter.calendar.JDateChooser();
         jLabel2 = new javax.swing.JLabel();
         cobCustomer = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        cobLocation = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
         txtPrepay = new javax.swing.JTextField();
 
@@ -296,11 +336,15 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         jLabel2.setForeground(new java.awt.Color(102, 153, 0));
         jLabel2.setText("Khách Hàng");
 
-        jButton1.setText("+");
-
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(102, 153, 0));
         jLabel3.setText("Vị Trí");
+
+        cobLocation.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                cobLocationPropertyChange(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(102, 153, 0));
@@ -324,13 +368,11 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cobLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtPrepay)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -342,15 +384,14 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                     .addComponent(dtDateReservation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel2)
-                        .addComponent(cobCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton1)))
+                        .addComponent(cobCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cobLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
                     .addComponent(txtPrepay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -405,7 +446,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                         .addComponent(btnDel)))
                 .addGap(18, 18, 18)
                 .addComponent(btnSave)
-                .addGap(0, 14, Short.MAX_VALUE))
+                .addGap(0, 17, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -419,6 +460,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 Timestamp ts = Timestamp.valueOf(datetime);
                 if (reservationTable(ts, idCustomer)) {
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");
+                    btnSave.setEnabled(false);
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công");
                 }
@@ -436,7 +478,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         }
         String datetime = formatter.format(dtDateReservation.getDate());
         Timestamp ts = Timestamp.valueOf(datetime);
-        loadTable(ts);
+        loadTable(ts,idlocation);
     }//GEN-LAST:event_dtDateReservationPropertyChange
 
     private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
@@ -477,15 +519,18 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         model.removeRow(index);
     }//GEN-LAST:event_btnDelActionPerformed
 
+    private void cobLocationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobLocationPropertyChange
+       
+    }//GEN-LAST:event_cobLocationPropertyChange
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSelect;
     private javax.swing.JComboBox cobCustomer;
+    private javax.swing.JComboBox cobLocation;
     private com.toedter.calendar.JDateChooser dtDateReservation;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -12,7 +12,7 @@ import java.io.Serializable;
  *
  * @author nhphuoc
  */
-public class Table implements Serializable{
+public class Table{
     private int idTable;
     private String nameTable;
 

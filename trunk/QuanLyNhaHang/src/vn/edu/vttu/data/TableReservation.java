@@ -7,12 +7,10 @@ package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import javax.swing.JOptionPane;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -408,7 +406,7 @@ public class TableReservation {
         return flag;
     }
 
-    public static TableModel getByTable_DateTime(int idTable, Timestamp ts, Connection conn) {
+    public static TableModel getByTable_DateTime(int idTable, Timestamp ts,int hour, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {
@@ -416,7 +414,7 @@ public class TableReservation {
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, idTable);
             callstate.setTimestamp(2, ts);
-            callstate.setInt(3,2);
+            callstate.setInt(3,hour);
             
             rs = callstate.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
@@ -428,11 +426,12 @@ public class TableReservation {
         return tb;
     }
 
-    public static TableModel getByTable_DateTime(Connection conn) {
+    public static TableModel getByTable_DateTime(int numHour,Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_warning()}");
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_warning(?)}");
+            calState.setInt(1,numHour );
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
@@ -441,14 +440,15 @@ public class TableReservation {
         return tb;
     }
 
-    public static boolean getStatusParty(int idTable, Timestamp ts, Connection conn) {
+    public static boolean getStatusParty(int idTable, Timestamp ts,int numHour, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         boolean bl = false;
         try {
-            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_status_party(?,?)}");
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_status_party(?,?,?)}");
             calState.setInt(1, idTable);
             calState.setTimestamp(2, ts);
+            calState.setInt(3, numHour);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
             if (tb.getRowCount() <= 0) {

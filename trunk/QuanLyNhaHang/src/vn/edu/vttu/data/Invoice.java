@@ -131,6 +131,24 @@ public class Invoice {
         }
         return tb;
     }   
+    public static int getMaxID(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        int id=0;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL Invoice_getMaxID()}");                
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(tb.getValueAt(0, 0)==null){
+                id=0;
+            }else{
+                id=Integer.parseInt(String.valueOf(tb.getValueAt(0, 0)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
+    }   
     
     
     

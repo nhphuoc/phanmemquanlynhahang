@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<serverconfig>        
-    <database>localhost</database>
-    <port>3306</port>
-    <username>root</username>
-    <pass></pass>
-</serverconfig>
+<system>
+    <serverconfig id="01">        
+        <IPdatabase>localhost</IPdatabase>
+        <portdatabase>3306</portdatabase>
+        <namedatabase>vttu_restaurant</namedatabase>
+        <usernamedatabase>root</usernamedatabase>
+        <passdatabase></passdatabase>
+        <IPserver></IPserver>        
+    </serverconfig>
 
-<restaurentinfo>
-    <name>NHP</name>
-    <phone>0977941517</phone>
-    <email>it.nhphuoc@gmail.com</email>
-    <address>Hà Tiên Kiên Giang</address>
-    <logo>link</logo>
-</restaurentinfo>
+    <info id="02">
+        <name>NHP</name>
+        <phone>0977941517</phone>
+        <email>it.nhphuoc@gmail.com</email>
+        <address>Hà Tiên Kiên Giang</address>
+        <logo>link</logo>
+        <hourAcceptReservationNomal>2</hourAcceptReservationNomal>
+        <hourAcceptReservationParty>2</hourAcceptReservationParty>
+        <minuteWarningCustomer>5</minuteWarningCustomer>
+    </info>
+</system>

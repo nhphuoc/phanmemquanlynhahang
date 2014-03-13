@@ -84,48 +84,41 @@ public class PanelViewReservation extends javax.swing.JPanel {
     public PanelViewReservation() {
         initComponents();
         //dtChangeDateReservation.setDate(new Date());
-        loadListTable();
+        
         popupTable();
         loadTableService();
         loadTableInvoice(idreservation);
         popupTableService();
         popupTableInvoice();
+        loadListTable();
         //btnEdit.setEnabled(true);
         //btnSave.setEnabled(false);
         tbListTable.setEnabled(true);
+        popupmenuService.getComponent(0).setEnabled(false);
 
     }
+
     private void loadListTable() {
-        try {
+        
             conn = ConnectDB.conn();
-            tbListTable.setModel(TableReservation.getListTableReservation(conn));            
+            tbListTable.setModel(TableReservation.getListTableReservation(ConnectDB.conn()));
             if (tbListTable.getRowCount() <= 0) {
                 popupmenuService.getComponent(0).setEnabled(false);
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
             }
-        } catch (Exception e) {
-        }
+            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
+
+            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);        
 
     }
+
     private void popupTable() {
         try {
             popupmenu = new JPopupMenu();
@@ -136,13 +129,14 @@ public class PanelViewReservation extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         conn = ConnectDB.conn();
+                        System.out.println("Trạng thái bàn: " + statusTable);
                         if (statusTable == 2) {
                             JOptionPane.showMessageDialog(getRootPane(), "Bàn đang được sử dụng vui lòng chọn bàn khác");
                         } else {
                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             String datetime = formatter.format(new Date());
                             Timestamp ts = Timestamp.valueOf(datetime);
-                            if (TableReservation.getStatusParty(idTable, ts, conn)) {
+                            if (TableReservation.getStatusParty(idTable, ts, 2, conn)) {
                                 conn.setAutoCommit(false);
                                 TableModel tb = TableReservation.getListTableByIdReservation(idreservation, conn);
                                 if (TableReservation.updateBeginDate(idreservation, conn)) {
@@ -158,8 +152,12 @@ public class PanelViewReservation extends javax.swing.JPanel {
                                         JOptionPane.showMessageDialog(getRootPane(), "Đã nhận bàn thành công");
                                         loadListTable();
                                         loadTableInvoice(idreservation);
+                                    } else {
+                                        throw new Exception();
                                     }
 
+                                } else {
+                                    throw new Exception();
                                 }
 
                             } else {
@@ -171,10 +169,15 @@ public class PanelViewReservation extends javax.swing.JPanel {
                                             JOptionPane.showMessageDialog(getRootPane(), "Đã nhận bàn thành công");
                                             loadListTable();
                                             loadTableInvoice(idreservation);
-                                            
+                                        } else {
+                                            throw new Exception();
                                         }
 
+                                    } else {
+                                        throw new Exception();
                                     }
+                                } else {
+                                    throw new Exception();
                                 }
                             }
                         }
@@ -198,7 +201,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                     try {
                         Timestamp date = VariableStatic.getDateTimeReservation();
                         if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn muốn hủy đơn đặt bàn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                            if (TableReservation.getStatusParty(idTable, date, conn)) {
+                            if (TableReservation.getStatusParty(idTable, date, 2, conn)) {
                                 Object[] choices = {"Chỉ Bàn này", "Các Bàn Trong Hóa Đơn", "Không"};
                                 Object defaultChoice = choices[0];
                                 int x = JOptionPane.showOptionDialog(getRootPane(),
@@ -334,14 +337,14 @@ public class PanelViewReservation extends javax.swing.JPanel {
                             if (result == JOptionPane.OK_OPTION) {
                                 int id = VariableStatic.getIdTable();
                                 Timestamp date = VariableStatic.getDateTimeReservation();
-                                int idCustomer=VariableStatic.getIdCustomer();
-                                int prepay=VariableStatic.getPrePay();
+                                int idCustomer = VariableStatic.getIdCustomer();
+                                int prepay = VariableStatic.getPrePay();
                                 JOptionPane.showMessageDialog(getRootPane(), "Mã Bàn:" + id + "\nMã Reservation:" + idreservation
                                         + "\nMã Chi tiết:" + idreservation_detail + "\nNgày Đặt: " + date);
                                 try {
                                     conn = ConnectDB.conn();
                                     conn.setAutoCommit(false);
-                                    if (TableReservation.updateBeginDateCustomer(idreservation, date,idCustomer,prepay, conn)) {
+                                    if (TableReservation.updateBeginDateCustomer(idreservation, date, idCustomer, prepay, conn)) {
                                         if (TableReservationDetail.updateTable(idreservation_detail, id, conn)) {
                                             if (TableReservation.countidTableUsing(id, conn) > 0) {
                                                 if (Table.updateStatus(id, 2, conn)) {
@@ -422,9 +425,11 @@ public class PanelViewReservation extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
+
     private void loadTableService() {
         tbService.setModel(Service.getAllLimit(ConnectDB.conn()));
     }
+
     private void loadTableInvoice(int idReservation) {
         tbInvoice.setModel(TableService.getByIdReservation(idReservation, ConnectDB.conn()));
         tbInvoice.getColumnModel().getColumn(6).setMinWidth(0);
@@ -432,6 +437,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         DecimalFormat df = new DecimalFormat("#,###,###");
         lbTotal.setText(df.format(total()));
     }
+
     private void popupTableService() {
         try {
             popupmenuService = new JPopupMenu();
@@ -472,6 +478,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         } catch (Exception e) {
         }
     }
+
     private void popupTableInvoice() {
         try {
             //conn = ConnectDB.conn();
@@ -578,6 +585,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         }
         conn = null;
     }
+
     private boolean testNumber(String num) {
         boolean test = false;
         if (num.equals("")) {
@@ -595,6 +603,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         }
         return test;
     }
+
     private boolean testStore(int id) {
         boolean flag = false;
         TableModel tb = Recipes.getRecipesByIdService(id, ConnectDB.conn());
@@ -611,6 +620,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         }
         return flag;
     }
+
     private boolean updateStore(int idService, int n, boolean flag, Connection conn) {
         boolean succ = false;
         try {
@@ -634,11 +644,12 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
         return succ;
     }
-    private int total(){
-        int total=0;
-        for(int i=0;i<tbInvoice.getRowCount();i++){
-            int n=Integer.parseInt(String.valueOf(tbInvoice.getValueAt(i, 5)).trim().replaceAll(",", ""));
-            total=total+n;
+
+    private int total() {
+        int total = 0;
+        for (int i = 0; i < tbInvoice.getRowCount(); i++) {
+            int n = Integer.parseInt(String.valueOf(tbInvoice.getValueAt(i, 5)).trim().replaceAll(",", ""));
+            total = total + n;
         }
         return total;
     }
@@ -904,12 +915,12 @@ public class PanelViewReservation extends javax.swing.JPanel {
         VariableStatic.setPrePay(Integer.parseInt(tbListTable.getValueAt(index, 8).toString().trim().replaceAll(",", "")));
         //JOptionPane.showMessageDialog(getRootPane(), Integer.parseInt(tbListTable.getValueAt(index, 5).toString()));
         loadTableInvoice(idreservation);
-        DecimalFormat df = new DecimalFormat("#,###,###");                
+        DecimalFormat df = new DecimalFormat("#,###,###");
         lbTotal.setText(df.format(total()));
         lbrepay.setText(String.valueOf(tbListTable.getValueAt(index, 8)));
-        if(tbListTable.getRowCount()<=0){
+        if (tbListTable.getRowCount() <= 0) {
             popupmenuService.getComponent(0).setEnabled(false);
-        }else{
+        } else {
             popupmenuService.getComponent(0).setEnabled(true);
         }
         conn = null;
@@ -932,28 +943,18 @@ public class PanelViewReservation extends javax.swing.JPanel {
             tbListTable.setModel(TableReservation.getListTableReservationSearch(txtSearchReservation.getText(), conn));
             if (tbListTable.getRowCount() <= 0) {
                 popupmenuService.getComponent(0).setEnabled(false);
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
-                popupmenuService.getComponent(0).setEnabled(false);
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
             }
+            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
+
+            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
         } catch (Exception e) {
 
         }
@@ -970,29 +971,22 @@ public class PanelViewReservation extends javax.swing.JPanel {
             Timestamp ts = Timestamp.valueOf(datetime);
             tbListTable.setModel(TableReservation.getListTableReservationSearchByDate(ts, conn));
             if (tbListTable.getRowCount() <= 0) {
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
+                popupmenuService.getComponent(0).setEnabled(false);
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
-                tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
-
-                tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
-                tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
             }
+            tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMinWidth(0);
+
+            tbListTable.getColumnModel().getColumn(5).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(6).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
+            tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnViewActionPerformed
     private void tbServiceMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbServiceMousePressed
