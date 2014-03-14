@@ -45,6 +45,7 @@ public class Controller extends HttpServlet {
                String p=request.getParameter("pass");
                Login lg = new Login();
                boolean check =lg.checklogin(u, p);
+               
                String url;
                if(check){
                    HttpSession session = request.getSession(true);

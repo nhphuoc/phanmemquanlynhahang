@@ -5,13 +5,23 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>NHÀ HÀNG NGUYỄN HỮU PHƯỚC</title>
         <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" />
-        <link rel="stylesheet" href="css/stylemenu.css" type="text/css" media="screen" />        
+        <link rel="stylesheet" href="css/stylemenu.css" type="text/css" media="screen" />  
+        <link rel="stylesheet" type="text/css" href="css/styleslider.css?version=new" />
+        <script type="text/javascript" src="js/jquery-1.8.2.js" ></script>
+        <script type="text/javascript" src="js/jquery-ui-1.9.0.custom.min.js" ></script>
+        <script type="text/javascript" src="js/jquery-ui-tabs-rotate.js" ></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#featured").tabs({fx: {opacity: "toggle"}}).tabs("rotate", 5000, true);
+            });
+        </script>
 
     </head>
     <body>
@@ -38,15 +48,15 @@
                     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
                     <script type="text/javascript" src="js/jquery.spasticNav.js"></script>	
                     <script type="text/javascript">
-                        $('#nav').spasticNav();
+            $('#nav').spasticNav();
                     </script>
                 </td>
             </tr>
             <tr><!--- flash-->
                 <td>
                     <div class="flash">
-                        
-                        ádjfk
+
+                        <%@include file="includes/slider.jsp" %>
                     </div>
                 </td>
             </tr>
@@ -58,7 +68,10 @@
                                 Loại Món Ăn
                             </div>
                         </div>
-                        <div class="contentright">right</div>
+                        <!-- noi dung -->
+
+                        <%@include file="includes/main.jsp" %>
+
                     </div>
                 </td>
             </tr>

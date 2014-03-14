@@ -287,6 +287,11 @@ public class PanelPromotion extends javax.swing.JPanel {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE))
         );
 
+        tbListPromotion = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbListPromotion.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 

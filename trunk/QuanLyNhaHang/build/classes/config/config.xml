@@ -6,7 +6,10 @@
         <namedatabase>vttu_restaurant</namedatabase>
         <usernamedatabase>root</usernamedatabase>
         <passdatabase></passdatabase>
-        <IPserver></IPserver>        
+        
+        <IPserver>127.0.0.1</IPserver>        
+        <usernameServer>nhphuoc</usernameServer>        
+        <passSserver>123456</passSserver>        
     </serverconfig>
 
     <info id="02">
@@ -14,7 +17,8 @@
         <phone>0977941517</phone>
         <email>it.nhphuoc@gmail.com</email>
         <address>Hà Tiên Kiên Giang</address>
-        <logo>link</logo>
+        <logo>D:\Photos Center\PHOTOS TONG HOP\33339784.jpg</logo>
+        <thank>Cám ơn quý khách đã sử dụng dịch vụ của chúng tôi</thank>
         <hourAcceptReservationNomal>2</hourAcceptReservationNomal>
         <hourAcceptReservationParty>2</hourAcceptReservationParty>
         <minuteWarningCustomer>5</minuteWarningCustomer>

@@ -5,12 +5,15 @@
  */
 package vn.edu.vttu.ui;
 
+import config.InfoRestaurant;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -246,6 +249,7 @@ public class PanelService extends javax.swing.JPanel {
             }
         }
     }
+
     public static void setSelectedValueUnit(JComboBox comboBox, int value) {
         vn.edu.vttu.model.Unit item;
         for (int i = 0; i < comboBox.getItemCount(); i++) {
@@ -263,7 +267,7 @@ public class PanelService extends javax.swing.JPanel {
         btnDelete.setEnabled(b);
         btnSave.setEnabled(!b);
         btnChooseImage.setEnabled(!b);
-        txtName.setEnabled(!b);        
+        txtName.setEnabled(!b);
         txtCost.setEnabled(!b);
         txtNote.setEnabled(!b);
         tbService.setEnabled(b);
@@ -273,7 +277,7 @@ public class PanelService extends javax.swing.JPanel {
         try {
             txtID.setText(String.valueOf(tbService.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbService.getValueAt(index, 1)));
-            txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));            
+            txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));
             txtNote.setText(String.valueOf(tbService.getValueAt(index, 5)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
             setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
@@ -300,23 +304,23 @@ public class PanelService extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn giá");
             flag = false;
             txtCost.requestFocus();
-        }else {
+        } else {
             name = txtName.getText();
             vn.edu.vttu.model.ServiceType svType = (vn.edu.vttu.model.ServiceType) cobType.getSelectedItem();
             type = svType.getId();
             vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
             unit = _unit.getId();
-            cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));            
+            cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
-                if (Service.insert(name, type, unit, note, img, conn)) {
+                if (Service.insert(name, type, unit, note, "images/" + new File(img).getName(), conn)) {
                     int idSV = (int) Service.getMaxId(conn).getValueAt(0, 0);
                     if (ServiceCost.insert(idSV, cost, conn)) {
-                        UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
-                        ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
+                        UploadFile ftpUploader = new UploadFile(InfoRestaurant.getIPserver(), InfoRestaurant.getUsernameserver(), InfoRestaurant.getPassserver());
+                        ftpUploader.uploadFile(img, new File(img).getName(), "");
                         ftpUploader.disconnect();
                         conn.commit();
                         flag = true;
@@ -359,18 +363,18 @@ public class PanelService extends javax.swing.JPanel {
             type = svType.getId();
             vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
             unit = _unit.getId();
-            cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));            
+            cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
                 if (Service.update(id, name, type, unit, note, img, conn)) {
-                    
+
                     if (ServiceCost.insert(id, cost, conn)) {
                         if (!tbService.getValueAt(tbService.getSelectedRow(), 6).equals(txtLinkImage.getText().trim())) {
-                            UploadFile ftpUploader = new UploadFile("127.0.0.1", "nhphuoc", "123456");
-                            ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
+                            UploadFile ftpUploader = new UploadFile(InfoRestaurant.getIPserver(), InfoRestaurant.getUsernameserver(), InfoRestaurant.getPassserver());
+                            ftpUploader.uploadFile(img, new File(img).getName(), "");
                             ftpUploader.disconnect();
                             conn.commit();
                             flag = true;
@@ -806,7 +810,7 @@ public class PanelService extends javax.swing.JPanel {
         fillcobServiceType();
         txtName.setText("");
         txtID.setText("");
-        txtNote.setText("");        
+        txtNote.setText("");
         txtCost.setText("");
         txtLinkImage.setText("");
         txtName.requestFocus();
@@ -817,11 +821,10 @@ public class PanelService extends javax.swing.JPanel {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         add = false;
         enableButton(false);
-        indexx = tbService.getSelectedRow();        
+        indexx = tbService.getSelectedRow();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-
         if (add == true) {
             if (add()) {
                 enableButton(true);
@@ -1000,12 +1003,23 @@ public class PanelService extends javax.swing.JPanel {
          int result = JOptionPane.showOptionDialog(null, new PanelViewImageService(),
          "Xem Danh Sách Đặt Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
          */
+        Image image = null;
         try {
-            BufferedImage bImg2 = ImageIO.read(new File(txtLinkImage.getText()));
-            Image image2 = bImg2.getScaledInstance(122, 144, Image.SCALE_SMOOTH);
-            lbImages.setIcon(new ImageIcon(image2));
-        } catch (Exception e) {
+            URL url = new URL(
+                    "http://" + InfoRestaurant.getIPserver() + "/" + txtLinkImage.getText());
+            image = ImageIO.read(url);
+            lbImages.setIcon(new ImageIcon(image));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        /*
+         try {
+         BufferedImage bImg2 = ImageIO.read(new File(txtLinkImage.getText()));
+         Image image2 = bImg2.getScaledInstance(122, 144, Image.SCALE_SMOOTH);
+         lbImages.setIcon(new ImageIcon(image2));
+         } catch (Exception e) {
+         }
+         */
 
     }//GEN-LAST:event_btnViewImageActionPerformed
 
@@ -1026,7 +1040,6 @@ public class PanelService extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(getRootPane(), "Dịch vụ đang được sử dụng, không thể xóa");
             }
         }
-
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnAddKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnAddKeyPressed

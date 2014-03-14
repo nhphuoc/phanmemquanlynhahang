@@ -26,9 +26,9 @@ ul, li {
     position: absolute;
     top: 0;
     z-index : 1;
-    background: #0b2b61;
-    background: -moz-linear-gradient(top, #0b2b61, #1153c0);
-    background: -webkit-gradient(linear, left top, left bottom, from(#0b2b61), to(#1153c0));
+    background: #09B1F2;//#0b2b61;
+    background: -moz-linear-gradient(top, #09B1F2, #1153c0);
+    background: -webkit-gradient(linear, left top, left bottom, from(#09B1F2), to(#1153c0));
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-box-shadow: 2px 3px 10px #011331;
@@ -54,8 +54,14 @@ ul, li {
     position: relative;
     z-index: 2;
     float: left;
-    font-size: 18px;
-    font-family: helvetica, arial, sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+    cursor: hand;
+    FONT-FAMILY: Tahoma, Arial;
+    FONT-WEIGHT: Bold;
+    FONT-SIZE: 15px;
+    COLOR: #fff;
+    text-shadow: 0 0 0.2em #003580;
     text-decoration: none;
     padding: 20px 30px;
 }

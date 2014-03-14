@@ -32,31 +32,41 @@ tr,td{
     min-height: 300px;    
 }
 .contentleft{
-    width: 30%;
+    width: 25%;
     min-height: 300px;
     border: 1px solid #ccc;
     float: left;
 }
 .contentright{
-    width: 69%;
+    width: 74%;
     min-height: 300px;
     border: 1px solid #ccc;
     float: right;
 }
-.headName{
-    width: 99%;
-    height: 30px;
-    border-right: 1px solid #0059ec;
-    border-left: 1px solid #0059ec;
-    position: relative;
-    top: 0;
-    z-index : 1;
-    background: #0b2b61;
-    background: -moz-linear-gradient(top, #0b2b61, #1153c0);
-    background: -webkit-gradient(linear, left top, left bottom, from(#0b2b61), to(#1153c0));
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-box-shadow: 2px 3px 10px #011331;
-    -webkit-box-shadow: 2px 3px 10px #011331;
+.headName {
+    FONT-WEIGHT: Bold;
+    FONT-SIZE: 12px;
+    COLOR: #fff;
+    text-shadow: 0 0 0.2em #003580;
+    text-transform: uppercase;
+    cursor: pointer;
+    cursor: hand;
+    FONT-FAMILY: Tahoma, Arial;
+    background: url(../img/mn1.png);
+    line-height: 20px;
+    text-align: center;
+    padding: 5px
+}
+.product{
+    width: 205px;
+    height: 250px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border:2px solid #a1a1a1;   
+    //background:#dddddd;    
+    border-radius:5px;
+    padding: 5px;
+    float:left;    
 }
 

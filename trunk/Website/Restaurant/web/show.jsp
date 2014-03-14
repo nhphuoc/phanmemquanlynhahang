@@ -4,6 +4,8 @@
     Author     : nhphuoc
 --%>
 
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -12,6 +14,14 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <%@include file="connection.jsp" %>
+        <%
+            String sql = "select * from usr";
+            Statement st = conn().createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            if (rs.next()) {
+                out.print(rs.getString(2));
+            }
+        %>
     </body>
 </html>

@@ -143,6 +143,7 @@ public class PanelStore extends javax.swing.JPanel {
         btnSave = new javax.swing.JButton();
         btnReload = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
+        btnCreateInvoice = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -325,6 +326,11 @@ public class PanelStore extends javax.swing.JPanel {
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/print-icon-24x24.png"))); // NOI18N
         btnPrint.setText("Print");
         jToolBar1.add(btnPrint);
+
+        btnCreateInvoice.setBackground(new java.awt.Color(153, 204, 255));
+        btnCreateInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/table-import-icon.png"))); // NOI18N
+        btnCreateInvoice.setText("Nhập Hàng");
+        jToolBar1.add(btnCreateInvoice);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -512,6 +518,7 @@ public class PanelStore extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddUnit;
+    private javax.swing.JButton btnCreateInvoice;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnPrint;

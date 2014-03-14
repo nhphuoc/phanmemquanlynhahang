@@ -4,9 +4,25 @@
         <servlet-name>Controller</servlet-name>
         <servlet-class>vn.edu.vttu.data.Controller</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Connection</servlet-name>
+        <servlet-class>vn.edu.vttu.data.Connect</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Connect</servlet-name>
+        <servlet-class>vn.edu.vttu.data.Connect</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Controller</servlet-name>
         <url-pattern>/Controller</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Connection</servlet-name>
+        <url-pattern>/Connection</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Connect</servlet-name>
+        <url-pattern>/Connect</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

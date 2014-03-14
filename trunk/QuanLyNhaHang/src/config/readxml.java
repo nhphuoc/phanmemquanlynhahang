@@ -37,7 +37,7 @@ public class readxml {
                 Element eElement = (Element) nNode;
                 // Địa chỉ máy chứa database
                 InfoRestaurant.setIPdatabase(eElement.getElementsByTagName("IPdatabase").item(0).getTextContent());
-                
+                // cổng database
                 InfoRestaurant.setPortdatabase(Integer.parseInt(eElement.getElementsByTagName("portdatabase").item(0).getTextContent()));
                 // Tên database
                 InfoRestaurant.setNamedatabase(eElement.getElementsByTagName("namedatabase").item(0).getTextContent());
@@ -47,8 +47,41 @@ public class readxml {
                 InfoRestaurant.setPassdatabase(eElement.getElementsByTagName("passdatabase").item(0).getTextContent());
                 // địa chỉ máy server
                 InfoRestaurant.setIPserver(eElement.getElementsByTagName("IPserver").item(0).getTextContent());
+                // tên đăng nhập server
+                InfoRestaurant.setUsernameserver(eElement.getElementsByTagName("usernameServer").item(0).getTextContent());
+                // mật khẩu đăng nhập server
+                InfoRestaurant.setPassserver(eElement.getElementsByTagName("passSserver").item(0).getTextContent());
+                
+                
 
                 //System.out.println("Staff id : " + eElement.getAttribute("id"));               
+            }
+            
+            
+            // Thông Tin Nhà Hàng
+            NodeList nListInfo = doc.getElementsByTagName("info");
+            Node nNodeInfo = nListInfo.item(0);            
+            if (nNodeInfo.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElementInfo = (Element) nNodeInfo;
+                // Tên Nhà Hàng
+                InfoRestaurant.setName(eElementInfo.getElementsByTagName("name").item(0).getTextContent());                
+                // Điện thoại
+                InfoRestaurant.setPhone(eElementInfo.getElementsByTagName("phone").item(0).getTextContent());
+                // Địa chỉ email
+                InfoRestaurant.setEmail(eElementInfo.getElementsByTagName("email").item(0).getTextContent());
+                // Địa chỉ
+                InfoRestaurant.setAddress(eElementInfo.getElementsByTagName("address").item(0).getTextContent());
+                // Link hình ảnh
+                InfoRestaurant.setLogo(eElementInfo.getElementsByTagName("logo").item(0).getTextContent());
+                // Thời gian cho phép đặt bàn
+                InfoRestaurant.setHourAcceptReservationNomal(Integer.parseInt(eElementInfo.getElementsByTagName("hourAcceptReservationNomal").item(0).getTextContent()));
+                // Thời gian cho phép đặt tiệc
+                InfoRestaurant.setHourAcceptReservationParty(Integer.parseInt(eElementInfo.getElementsByTagName("hourAcceptReservationParty").item(0).getTextContent()));
+                // Thời gian cảnh báo người dùng
+                InfoRestaurant.setMinuteWarningCustomer(Integer.parseInt(eElementInfo.getElementsByTagName("minuteWarningCustomer").item(0).getTextContent()));                        
+                
+                InfoRestaurant.setThank(eElementInfo.getElementsByTagName("thank").item(0).getTextContent());                        
+                
             }
             
         } catch (Exception e) {

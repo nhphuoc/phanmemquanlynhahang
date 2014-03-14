@@ -342,6 +342,17 @@
             <Property name="text" type="java.lang.String" value="Print"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JButton" name="btnCreateInvoice">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="cc" red="99" type="rgb"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/vn/edu/vttu/image/table-import-icon.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Nh&#x1ead;p H&#xe0;ng"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

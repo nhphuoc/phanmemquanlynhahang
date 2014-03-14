@@ -19,13 +19,18 @@ public class InfoRestaurant {
     public static String usernamedatabase;
     public static String passdatabase;
     public static String IPserver;
+    public static String usernameserver;
+    public static String passserver;
+
+    
     
     // info restaurant
     private static String name;
     public static String phone;
     public static String email;
     public static String address;
-    public static String logo;
+    public static String logo;    
+    public static String thank;        
     public static int hourAcceptReservationNomal;
     public static int hourAcceptReservationParty;
     public static int minuteWarningCustomer;
@@ -97,6 +102,13 @@ public class InfoRestaurant {
     public static void setLogo(String logo) {
         InfoRestaurant.logo = logo;
     }
+    public static String getThank() {
+        return thank;
+    }
+
+    public static void setThank(String thank) {
+        InfoRestaurant.thank = thank;
+    }
     public static int getHourAcceptReservationNomal() {
         return hourAcceptReservationNomal;
     }
@@ -114,7 +126,22 @@ public class InfoRestaurant {
     }
     public static void setMinuteWarningCustomer(int minuteWarningCustomer) {
         InfoRestaurant.minuteWarningCustomer = minuteWarningCustomer;
-    }    
+    }  
+    public static String getUsernameserver() {
+        return usernameserver;
+    }
+
+    public static void setUsernameserver(String usernameserver) {
+        InfoRestaurant.usernameserver = usernameserver;
+    }
+
+    public static String getPassserver() {
+        return passserver;
+    }
+
+    public static void setPassserver(String passserver) {
+        InfoRestaurant.passserver = passserver;
+    }
     
     
 }

@@ -48,7 +48,8 @@ public class frmMain extends javax.swing.JFrame {
         btnInvoice = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         btnStaff = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        btnDifferentMoney = new javax.swing.JButton();
+        btnStatistics = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -185,15 +186,27 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnStaff);
 
-        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/statistics.png"))); // NOI18N
-        jButton6.setText("Thống Kê");
-        jButton6.setFocusable(false);
-        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton6.setMaximumSize(new java.awt.Dimension(77, 75));
-        jButton6.setMinimumSize(new java.awt.Dimension(77, 75));
-        jButton6.setPreferredSize(new java.awt.Dimension(77, 75));
-        jButton6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jButton6);
+        btnDifferentMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Money-icon.png"))); // NOI18N
+        btnDifferentMoney.setText("Thu/Chi Khác");
+        btnDifferentMoney.setFocusable(false);
+        btnDifferentMoney.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDifferentMoney.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(btnDifferentMoney);
+
+        btnStatistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/statistics.png"))); // NOI18N
+        btnStatistics.setText("Thống Kê");
+        btnStatistics.setFocusable(false);
+        btnStatistics.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnStatistics.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnStatistics.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnStatistics.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnStatistics.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnStatistics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStatisticsActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnStatistics);
 
         jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
         jButton7.setText("Trợ Giúp");
@@ -286,7 +299,7 @@ public class frmMain extends javax.swing.JFrame {
 
     private void btnInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvoiceActionPerformed
        main.removeAll();
-        PanelInvoice panelinvoice = new PanelInvoice();
+        PanelInvoce panelinvoice = new PanelInvoce();
         main.add(panelinvoice);
         main.revalidate();
         main.repaint();
@@ -307,6 +320,14 @@ public class frmMain extends javax.swing.JFrame {
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_btnStoreActionPerformed
+
+    private void btnStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatisticsActionPerformed
+      main.removeAll();
+        PanelMenuStatistics panelmenustatitics = new PanelMenuStatistics();
+        main.add(panelmenustatitics);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnStatisticsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -344,15 +365,16 @@ public class frmMain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDifferentMoney;
     private javax.swing.JButton btnInvoice;
     private javax.swing.JButton btnPromotion;
     private javax.swing.JButton btnService;
     private javax.swing.JButton btnStaff;
+    private javax.swing.JButton btnStatistics;
     private javax.swing.JButton btnStore;
     private javax.swing.JButton btnSystem;
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

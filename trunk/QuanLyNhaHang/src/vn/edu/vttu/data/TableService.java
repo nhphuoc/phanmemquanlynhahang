@@ -63,6 +63,19 @@ public class TableService {
         }
         return tb;
     }
+    public static TableModel getByIdReservationInvoice(int id, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {            
+            CallableStatement calState = conn.prepareCall("{CALL table_service_getByIdReservation_invoice(?)}");
+            calState.setInt(1, id);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
 
     public static boolean insert(int id_reservation, int idService, int num, int cost, Connection conn) {
         boolean flag = false;

@@ -6,6 +6,7 @@
 package vn.edu.vttu.data;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -14,27 +15,20 @@ import java.sql.ResultSet;
  * @author nhphuoc
  */
 public class Login {
-
-    public boolean  checklogin(String user, String pass) {
-        boolean flag=false;
+    public boolean checklogin(String user, String pass) {
+        boolean flag = false;        
         try {
-            
-            Connection conn;
-            conn=(Connection) new ConnectDB();
-            String sql = "select * from usr where username=" + user + " and pass=" + pass;
-            PreparedStatement stm = conn.prepareStatement(sql);            
-            ResultSet rs = stm.executeQuery();
-            int i=0;
-            while(rs.next()){
-                i++;
-            }
-            if(i==1){
-                flag=true;
-            }else{
-                flag=false;
-            }
+            String db = "jsp";
+            String usr = "root";
+           
+            String ip = "localhost";
+            int port = 3306;
+            Class.forName("com.mysql.jdbc.Driver");
+            String database = "jdbc:mysql:3306//localhost/jsp";
+            Connection cn = DriverManager.getConnection(database, usr, pass);
+            flag=true;            
         } catch (Exception e) {
-            e.printStackTrace();
+            flag=false;
         }
         return flag;
 
