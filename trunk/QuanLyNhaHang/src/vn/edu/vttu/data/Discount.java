@@ -111,7 +111,7 @@ public class Discount {
             }
         } catch (Exception e) {
         }
-        return new Discount(0, "Không có khuyến mãi",2,null,null,0, 0, null);
+        return new Discount(-1, "Không có khuyến mãi",2,null,null,-1, -1, null);
     }
     public static TableModel getListPromotion(Connection conn) {
         TableModel tb = null;

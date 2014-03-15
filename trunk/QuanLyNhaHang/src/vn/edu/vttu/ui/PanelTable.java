@@ -103,11 +103,11 @@ public class PanelTable extends javax.swing.JPanel {
         public void run() {
             conn = ConnectDB.conn();
             int info1 = VariableStatic.getIdSystemLog();
-            SystemLog[] slog = SystemLog.getRowSystemLog(conn);
-            int info2 = slog.length;
+            SystemLog slog = SystemLog.getRowSystemLog(conn);
+            int info2 = slog.getId();
 
             if (info2 > info1) {
-                System.out.println(slog[0].getDate());
+                System.out.println(slog.getId());
                 loadTable(idLocation);
                 VariableStatic.setIdSystemLog(info2);
             }
@@ -187,9 +187,9 @@ public class PanelTable extends javax.swing.JPanel {
 
         TimerTask taskreservation = new TaskReservation();
         Timer timer = new Timer();
-        timer.schedule(taskreservation, new Date(), 2000);
+        timer.schedule(taskreservation, new Date(), 3000);
         TimerTask taskwarninguser = new TaskWarningUser();
-        timer.schedule(taskwarninguser, new Date(), 30000);
+        timer.schedule(taskwarninguser, new Date(), InfoRestaurant.getMinuteWarningCustomer() * 60000);
         try {
             popup = new JPopupMenu();
             BufferedImage bImg1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/useTable.png"));
@@ -1272,7 +1272,12 @@ public class PanelTable extends javax.swing.JPanel {
         int prepay = 0;
         double x;
         if (!txtService_Price.getText().trim().equals("") && testNumber(txtService_Price.getText())) {
-            service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
+            try {
+                service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll(",", ""));
+            }
+
         }
         /*
          if (!txtDiscountMoney.getText().trim().equals("")) {
@@ -1291,10 +1296,20 @@ public class PanelTable extends javax.swing.JPanel {
          */
 
         if (!txtCustomerPay.getText().trim().equals("")) {
-            customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+            try {
+                customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll(",", ""));
+            }
+
         }
         if (!txtPrepay.getText().trim().equals("")) {
-            prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
+            try {
+                prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll(",", ""));
+            }
+
         }
 
         float total = TableService.totalPayment(idTableReservation, conn);
@@ -1353,9 +1368,20 @@ public class PanelTable extends javax.swing.JPanel {
             if (TableService.updateStstus(idTableReservation, conn)) {
                 if (TableReservation.updateEndDate(idTableReservation, conn)) {
                     if (Invoice.insert(idTableReservation, 1, totalPay, discount, txtNoteinvoice.getText(), conn)) {
-                        System.out.println(Discount.getByDate(conn).getCondition());
-                        System.out.println(Integer.parseInt(lbTotal.getText().replaceAll("\\.", "")));
-                        if (Discount.getByDate(conn).getCondition() > Integer.parseInt(lbTotal.getText().replaceAll("\\.", ""))) {
+                        System.out.println("Điều kiện :" + Discount.getByDate(conn).getCondition());
+                        try {
+                            System.out.println(Integer.parseInt(lbTotal.getText().replaceAll("\\.", "")));
+                        } catch (Exception e) {
+                            System.out.println(Integer.parseInt(lbTotal.getText().replaceAll(",", "")));
+                        }
+                        int _total = 0;
+                        try {
+                            _total = Integer.parseInt(lbTotal.getText().replaceAll("\\.", ""));
+                        } catch (Exception e) {
+                            _total = Integer.parseInt(lbTotal.getText().replaceAll(",", ""));
+                        }
+                        System.out.println(_total);
+                        if (Discount.getByDate(conn).getCondition() < _total) {
                             TableReservationDetail table_list[] = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
                             for (int i = 0; i < table_list.length; i++) {
                                 if (TableReservation.countidTableReservation(table_list[i].getID_TABLE(), conn) > 0) {
@@ -1455,34 +1481,36 @@ public class PanelTable extends javax.swing.JPanel {
         jcomboTableLocation.setModel(defaultComboBoxModel);
         jcomboTableLocation.setRenderer(new PanelTable.ItemRenderer());
     }
+    /*
+     private void discount() {
+     conn = ConnectDB.conn();
+     DecimalFormat df = new DecimalFormat("#,###,###");
+     if (!Discount.getByDate(conn).getName().equals("Không có khuyến mãi")) {
+     if (Discount.getByDate(conn).getType() == 0) {
+                
+     if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
+     txtDiscountPercent.setText(String.valueOf(Discount.getByDate(conn).getValue()));
+     txtDiscountPercent.setEnabled(false);
+     } else {
+     txtDiscountPercent.setText("0");
+     txtDiscountPercent.setEnabled(false);
+     }
+     }
+     if (Discount.getByDate(conn).getType() == 1) {
+     if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
+     String x = df.format(Integer.parseInt(String.valueOf(Discount.getByDate(conn).getValue())));
+     txtDiscountMoney.setText(x);
+     txtDiscountMoney.setEnabled(false);
+     } else {
+     txtDiscountMoney.setText("0");
+     }
+     }
+     totalPay();
+     }
+     conn = null;
 
-    private void discount() {
-        conn = ConnectDB.conn();
-        DecimalFormat df = new DecimalFormat("#,###,###");
-        if (!Discount.getByDate(conn).getName().equals("Không có khuyến mãi")) {
-            if (Discount.getByDate(conn).getType() == 0) {
-                if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
-                    txtDiscountPercent.setText(String.valueOf(Discount.getByDate(conn).getValue()));
-                    txtDiscountPercent.setEnabled(false);
-                } else {
-                    txtDiscountPercent.setText("0");
-                    txtDiscountPercent.setEnabled(false);
-                }
-            }
-            if (Discount.getByDate(conn).getType() == 1) {
-                if (Integer.parseInt(lbTotal.getText().trim().replaceAll("\\.", "")) >= Discount.getByDate(conn).getCondition()) {
-                    String x = df.format(Integer.parseInt(String.valueOf(Discount.getByDate(conn).getValue())));
-                    txtDiscountMoney.setText(x);
-                    txtDiscountMoney.setEnabled(false);
-                } else {
-                    txtDiscountMoney.setText("0");
-                }
-            }
-            totalPay();
-        }
-        conn = null;
-
-    }
+     }
+     */
 
     private boolean testStore(int id) {
         boolean flag = false;
@@ -1504,7 +1532,6 @@ public class PanelTable extends javax.swing.JPanel {
     private boolean updateStore(int idService, int n, boolean flag, Connection conn) {
         boolean succ = false;
         try {
-
             TableModel tb = Recipes.getRecipesByIdService(idService, conn);
             if (flag) {
                 for (int i = 0; i < tb.getRowCount(); i++) {
@@ -2197,7 +2224,12 @@ public class PanelTable extends javax.swing.JPanel {
             int index = tbService.getSelectedRow();
             rowTableService_selectEdit = index;
             idService = (int) tbService.getValueAt(index, 0);
-            cost = Integer.parseInt(String.valueOf(tbService.getValueAt(index, 2)).replaceAll(",", ""));
+            try {
+                cost = Integer.parseInt(String.valueOf(tbService.getValueAt(index, 2)).replaceAll(",", ""));
+            } catch (Exception e) {
+                cost = Integer.parseInt(String.valueOf(tbService.getValueAt(index, 2)).replaceAll("\\.", ""));
+            }
+
             sv_name = String.valueOf(tbService.getValueAt(index, 1));
         } catch (Exception e) {
         }
@@ -2220,8 +2252,14 @@ public class PanelTable extends javax.swing.JPanel {
     private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtService_Price.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtService_Price.getText().trim().replaceAll("\\.", ""));
-            txtService_Price.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtService_Price.getText().trim().replaceAll("\\.", ""));
+                txtService_Price.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtService_Price.getText().trim().replaceAll(",", ""));
+                txtService_Price.setText(String.valueOf(df.format(num)));
+            }
+
         }
         totalPay();
     }//GEN-LAST:event_txtService_PriceKeyReleased
@@ -2243,8 +2281,13 @@ public class PanelTable extends javax.swing.JPanel {
 
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCustomerPay.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
-            txtCustomerPay.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+                txtCustomerPay.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCustomerPay.getText().trim().replaceAll(",", ""));
+                txtCustomerPay.setText(String.valueOf(df.format(num)));
+            }
         }
         totalPay();
 
@@ -2328,8 +2371,13 @@ public class PanelTable extends javax.swing.JPanel {
     private void txtPrepayKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrepayKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtPrepay.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtPrepay.getText().trim().replaceAll("\\.", ""));
-            txtPrepay.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtPrepay.getText().trim().replaceAll("\\.", ""));
+                txtPrepay.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtPrepay.getText().trim().replaceAll(",", ""));
+                txtPrepay.setText(String.valueOf(df.format(num)));
+            }
         }
         totalPay();
     }//GEN-LAST:event_txtPrepayKeyReleased

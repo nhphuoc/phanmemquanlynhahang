@@ -449,11 +449,23 @@ public class PanelPromotion extends javax.swing.JPanel {
         }
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostPromotion.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
-            txtCostPromotion.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
+                txtCostPromotion.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll(",", ""));
+                txtCostPromotion.setText(String.valueOf(df.format(num)));
+            }
+
             if (cobPromotion.getSelectedItem().equals("Phần Trăm")) {
-                if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
-                    txtCostPromotion.setText("0");
+                try {
+                    if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
+                        txtCostPromotion.setText("0");
+                    }
+                } catch (Exception e) {
+                    if (txtCostPromotion.getText().trim().replaceAll(",", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
+                        txtCostPromotion.setText("0");
+                    }
                 }
             }
         }
@@ -462,11 +474,22 @@ public class PanelPromotion extends javax.swing.JPanel {
     private void txtCostPromotionKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostPromotionKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostPromotion.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
-            txtCostPromotion.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
+                txtCostPromotion.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCostPromotion.getText().trim().replaceAll(",", ""));
+                txtCostPromotion.setText(String.valueOf(df.format(num)));
+            }
             if (cobPromotion.getSelectedItem().equals("Phần Trăm")) {
-                if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
-                    txtCostPromotion.setText("0");
+                try {
+                    if (txtCostPromotion.getText().trim().replaceAll("\\.", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
+                        txtCostPromotion.setText("0");
+                    }
+                } catch (Exception e) {
+                    if (txtCostPromotion.getText().trim().replaceAll(",", "").length() > 3 || Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", "")) > 100) {
+                        txtCostPromotion.setText("0");
+                    }
                 }
             }
         }
@@ -475,8 +498,13 @@ public class PanelPromotion extends javax.swing.JPanel {
     private void txtCostInvoiceConditionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostInvoiceConditionKeyPressed
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostInvoiceCondition.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
-            txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
+                txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll(",", ""));
+                txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            }
         }
     }//GEN-LAST:event_txtCostInvoiceConditionKeyPressed
 
@@ -516,8 +544,13 @@ public class PanelPromotion extends javax.swing.JPanel {
         }
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCostInvoiceCondition.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
-            txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
+                txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCostInvoiceCondition.getText().trim().replaceAll(",", ""));
+                txtCostInvoiceCondition.setText(String.valueOf(df.format(num)));
+            }
         }
     }//GEN-LAST:event_txtCostInvoiceConditionKeyReleased
 
@@ -561,8 +594,20 @@ public class PanelPromotion extends javax.swing.JPanel {
             } else {
                 condition = 1;
             }
-            int conditionvalue = Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
-            int value = Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
+            int conditionvalue = 0;
+            try {
+                conditionvalue = Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                conditionvalue = Integer.parseInt(txtCostInvoiceCondition.getText().trim().replaceAll(",", ""));
+            }
+
+            int value = 0;
+            try {
+                value = Integer.parseInt(txtCostPromotion.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                value = Integer.parseInt(txtCostPromotion.getText().trim().replaceAll(",", ""));
+            }
+
             String detail = txtDetail.getText();
             if (add == true) {
                 if (Discount.testDate(tsBegin, conn) == false || Discount.testDate(tsEnd, conn) == false) {

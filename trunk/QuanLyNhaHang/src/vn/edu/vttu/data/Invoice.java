@@ -148,8 +148,49 @@ public class Invoice {
             e.printStackTrace();
         }
         return id;
+    } 
+    public static TableModel getStatiticsByDate(Timestamp dtStart,Timestamp dtEnd,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL invoice_statitics_by_day(?,?)}");    
+            calState.setTimestamp(1, dtStart);
+            calState.setTimestamp(2, dtEnd);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
     }   
-    
+    public static TableModel getStatiticsByMonth(Timestamp dtStart,Timestamp dtEnd,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL invoice_statitics_by_month(?,?)}");    
+            calState.setTimestamp(1, dtStart);
+            calState.setTimestamp(2, dtEnd);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }   
+    public static TableModel getStatiticsByYear(Timestamp dtStart,Timestamp dtEnd,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {                    
+            CallableStatement calState = conn.prepareCall("{CALL invoice_statitics_by_year(?,?)}");    
+            calState.setTimestamp(1, dtStart);
+            calState.setTimestamp(2, dtEnd);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }   
     
     
     

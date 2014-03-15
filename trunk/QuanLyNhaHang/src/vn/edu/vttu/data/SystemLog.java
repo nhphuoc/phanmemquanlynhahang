@@ -19,7 +19,7 @@ import net.proteanit.sql.DbUtils;
  */
 public class SystemLog {
     private int id;
-    private int info;
+    private String info;
     private Timestamp date;
    
     public Timestamp getDate() {
@@ -38,31 +38,26 @@ public class SystemLog {
         this.id = id;
     }
 
-    public int getInfo() {
+    public String getInfo() {
         return info;
     }
 
-    public void setInfo(int info) {
+    public void setInfo(String info) {
         this.info = info;
     }
-    public SystemLog(int id, int info, Timestamp date){
+    public SystemLog(int id, String info, Timestamp date){
         this.id=id;
         this.info=info;
         this.date=date;
     }
-    public static SystemLog[] getRowSystemLog(Connection conn) {
-        SystemLog[] slog = null;
+    public static SystemLog getRowSystemLog(Connection conn) {
+        SystemLog slog=null;
         try {
-            String sql = "select * from system_log order by id desc";
+            String sql = "call system_log_get_max_id";
             CallableStatement calState = conn.prepareCall(sql);
-            ResultSet rs = calState.executeQuery(sql);
-            rs.last();
-            slog = new SystemLog[rs.getRow()];
-            rs.beforeFirst();
-            int i = 0;
+            ResultSet rs = calState.executeQuery(sql);                                                
             while (rs.next()) {
-                slog[i] = new SystemLog(rs.getInt("id"),rs.getInt("info"),rs.getTimestamp("date"));
-                i++;
+                slog = new SystemLog(rs.getInt("id"),rs.getString("info"),rs.getTimestamp("date"));                
             }
 
         } catch (Exception e) {

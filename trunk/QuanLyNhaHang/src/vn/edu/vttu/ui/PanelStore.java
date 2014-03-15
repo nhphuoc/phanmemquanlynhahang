@@ -65,6 +65,7 @@ public class PanelStore extends javax.swing.JPanel {
         initComponents();
         loadData();
         fillcobUnit();
+        enableControl(true);
     }
 
     private void loadData() {
@@ -81,6 +82,7 @@ public class PanelStore extends javax.swing.JPanel {
         btnSave.setEnabled(!b);
         txtNAme.setEnabled(!b);
         txtNumber.setEnabled(!b);
+        tbStore.setEnabled(b);
     }
 
     private void fillcobUnit() {
@@ -364,17 +366,19 @@ public class PanelStore extends javax.swing.JPanel {
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         add = true;
-        enableControl(false);        
+        enableControl(false);
         txtNAme.setText("");
         txtNumber.setText("0");
         txtNAme.requestFocus();
+        txtNumber.setEnabled(false);
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         add = false;
-        enableControl(false);        
+        enableControl(false);
         txtNAme.requestFocus();
         name = txtNAme.getText();
+        txtNumber.setEnabled(false);
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
@@ -389,9 +393,9 @@ public class PanelStore extends javax.swing.JPanel {
         } else {
             if (add == true) {
                 if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có trong CSDL");
+                    JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
                 } else {
-                    if (RawMaterial.insert(txtNAme.getText(), Float.parseFloat(txtNumber.getText().trim()), _unit, conn)) {
+                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, conn)) {
                         loadData();
                         enableControl(true);
                     } else {
@@ -404,7 +408,13 @@ public class PanelStore extends javax.swing.JPanel {
                     if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
                         JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL");
                     } else {
-                        if (RawMaterial.update(txtNAme.getText().trim(), Float.parseFloat(txtNumber.getText().trim()), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
+                        float _number = 0;
+                        try {
+                            _number = Float.parseFloat(txtNumber.getText().trim().replaceAll("\\.", ""));
+                        } catch (Exception e) {
+                            _number = Float.parseFloat(txtNumber.getText().trim().replaceAll(",", ""));
+                        }
+                        if (RawMaterial.update(txtNAme.getText().trim(), _number, _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
                             loadData();
                             enableControl(true);
                         }
@@ -483,16 +493,27 @@ public class PanelStore extends javax.swing.JPanel {
         }
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtNumber.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtNumber.getText().trim().replaceAll("\\.", ""));
-            txtNumber.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll("\\.", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll(",", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            }
+
         }
     }//GEN-LAST:event_txtNumberKeyPressed
 
     private void txtNumberKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumberKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtNumber.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtNumber.getText().trim().replaceAll("\\.", ""));
-            txtNumber.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll("\\.", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll(",", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            }
         }
     }//GEN-LAST:event_txtNumberKeyReleased
 

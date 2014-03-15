@@ -277,7 +277,11 @@ public class PanelService extends javax.swing.JPanel {
         try {
             txtID.setText(String.valueOf(tbService.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbService.getValueAt(index, 1)));
-            txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));
+            try {
+                txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));
+            } catch (Exception e) {
+                txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim());
+            }            
             txtNote.setText(String.valueOf(tbService.getValueAt(index, 5)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
             setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
@@ -310,7 +314,12 @@ public class PanelService extends javax.swing.JPanel {
             type = svType.getId();
             vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
             unit = _unit.getId();
-            cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));
+            try {
+                cost = Integer.parseInt(txtCost.getText().trim().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                cost = Integer.parseInt(txtCost.getText().trim().replaceAll(",", ""));
+            }
+            
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
@@ -320,7 +329,7 @@ public class PanelService extends javax.swing.JPanel {
                     int idSV = (int) Service.getMaxId(conn).getValueAt(0, 0);
                     if (ServiceCost.insert(idSV, cost, conn)) {
                         UploadFile ftpUploader = new UploadFile(InfoRestaurant.getIPserver(), InfoRestaurant.getUsernameserver(), InfoRestaurant.getPassserver());
-                        ftpUploader.uploadFile(img, new File(img).getName(), "");
+                        ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
                         ftpUploader.disconnect();
                         conn.commit();
                         flag = true;
@@ -363,19 +372,28 @@ public class PanelService extends javax.swing.JPanel {
             type = svType.getId();
             vn.edu.vttu.model.Unit _unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
             unit = _unit.getId();
-            cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));
+            try {
+                cost = Integer.parseInt(txtCost.getText().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                cost = Integer.parseInt(txtCost.getText().replaceAll(",", ""));
+            }
+            
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
                 conn = ConnectDB.conn();
                 conn.setAutoCommit(false);
                 if (Service.update(id, name, type, unit, note, img, conn)) {
-
                     if (ServiceCost.insert(id, cost, conn)) {
                         if (!tbService.getValueAt(tbService.getSelectedRow(), 6).equals(txtLinkImage.getText().trim())) {
-                            UploadFile ftpUploader = new UploadFile(InfoRestaurant.getIPserver(), InfoRestaurant.getUsernameserver(), InfoRestaurant.getPassserver());
-                            ftpUploader.uploadFile(img, new File(img).getName(), "");
-                            ftpUploader.disconnect();
+                            try {
+                                UploadFile ftpUploader = new UploadFile(InfoRestaurant.getIPserver(), InfoRestaurant.getUsernameserver(), InfoRestaurant.getPassserver());
+                                ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
+                                ftpUploader.disconnect();
+                            } catch (Exception e) {
+                                throw new Exception();
+                            }
+
                             conn.commit();
                             flag = true;
                         } else {
@@ -384,6 +402,8 @@ public class PanelService extends javax.swing.JPanel {
                         }
                     }
                     conn = null;
+                } else {
+                    throw new Exception();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -911,8 +931,14 @@ public class PanelService extends javax.swing.JPanel {
         }
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCost.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCost.getText().trim().replaceAll("\\.", ""));
+            try {
+                Long num = Long.parseLong(txtCost.getText().trim().replaceAll("\\.", ""));
             txtCost.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCost.getText().trim().replaceAll(",", ""));
+            txtCost.setText(String.valueOf(df.format(num)));
+            }
+            
         }
     }//GEN-LAST:event_txtCostKeyPressed
 
@@ -937,8 +963,15 @@ public class PanelService extends javax.swing.JPanel {
     private void txtCostKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostKeyReleased
         DecimalFormat df = new DecimalFormat("#,###,###");
         if (!txtCost.getText().trim().equals("")) {
-            Long num = Long.parseLong(txtCost.getText().trim().replaceAll("\\.", ""));
-            txtCost.setText(String.valueOf(df.format(num)));
+            try {
+                Long num = Long.parseLong(txtCost.getText().trim().replaceAll("\\.", ""));
+                txtCost.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtCost.getText().trim().replaceAll(",", ""));
+                txtCost.setText(String.valueOf(df.format(num)));
+            }
+            
+            
         }
     }//GEN-LAST:event_txtCostKeyReleased
 

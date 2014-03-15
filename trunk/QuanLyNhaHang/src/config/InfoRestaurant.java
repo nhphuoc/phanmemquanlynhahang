@@ -72,6 +72,7 @@ public class InfoRestaurant {
     public static void setIPserver(String IPserver) {
         InfoRestaurant.IPserver = IPserver;
     }
+    
     public static String getName() {
         return name;
     }
