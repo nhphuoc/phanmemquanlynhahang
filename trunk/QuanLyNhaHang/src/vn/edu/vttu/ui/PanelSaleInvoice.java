@@ -20,6 +20,7 @@ import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableService;
@@ -143,6 +144,8 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
         tbInvoiceList.setModel(Invoice.getAll(ts1, ts2, idStaff, idCustomer, choise, conn));
         tbInvoiceList.getColumnModel().getColumn(7).setMinWidth(0);
         tbInvoiceList.getColumnModel().getColumn(7).setMaxWidth(0);
+        tbInvoiceList.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+        tbInvoiceList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
         /*
          if (tbInvoiceList.getRowCount() <= 0) {
          tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
@@ -159,6 +162,10 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
         tbInvoiceDetail.setModel(TableService.getByIdReservationInvoice(id, ConnectDB.conn()));
         tbInvoiceDetail.getColumnModel().getColumn(0).setMinWidth(0);
         tbInvoiceDetail.getColumnModel().getColumn(0).setMaxWidth(0);
+        tbInvoiceDetail.getColumnModel().getColumn(5).setMaxWidth(0);
+        tbInvoiceDetail.getColumnModel().getColumn(5).setMinWidth(0);
+        tbInvoiceDetail.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+        tbInvoiceDetail.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
     }
 
     /**

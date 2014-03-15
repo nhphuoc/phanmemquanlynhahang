@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Discount;
+import vn.edu.vttu.data.NumberCellRenderer;
 
 /**
  *
@@ -51,6 +52,10 @@ public class PanelPromotion extends javax.swing.JPanel {
             tbListPromotion.getColumnModel().getColumn(9).setMaxWidth(0);
             tbListPromotion.getColumnModel().getColumn(10).setMaxWidth(0);
         }
+        tbListPromotion.getColumnModel().getColumn(7).setCellRenderer(new NumberCellRenderer());
+        tbListPromotion.getColumnModel().getColumn(6).setCellRenderer(new NumberCellRenderer());
+        tbListPromotion.getColumnModel().getColumn(9).setCellRenderer(new NumberCellRenderer());
+        tbListPromotion.getColumnModel().getColumn(10).setCellRenderer(new NumberCellRenderer());
         conn = null;
     }
 

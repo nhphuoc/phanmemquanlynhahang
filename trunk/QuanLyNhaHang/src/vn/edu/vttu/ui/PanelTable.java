@@ -64,6 +64,7 @@ import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Discount;
 import vn.edu.vttu.data.DiscountDetail;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.SystemLog;
@@ -658,6 +659,7 @@ public class PanelTable extends javax.swing.JPanel {
         tbService.setModel(Service.getAllLimit(conn));
         try {
             tbService.setRowSelectionInterval(0, 0);
+            tbService.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         } catch (Exception e) {
         }
 
@@ -1239,6 +1241,8 @@ public class PanelTable extends javax.swing.JPanel {
             tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
             tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
         }
+        tb_invoice.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+        tb_invoice.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
         totalPay();
         conn = null;
     }
@@ -2246,6 +2250,7 @@ public class PanelTable extends javax.swing.JPanel {
         try {
             tbService.setModel(Service.searchByName(txtSearch.getText(), conn));
             tbService.setRowSelectionInterval(0, 0);
+            tbService.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         } catch (Exception e) {
         }
     }//GEN-LAST:event_txtSearchKeyTyped

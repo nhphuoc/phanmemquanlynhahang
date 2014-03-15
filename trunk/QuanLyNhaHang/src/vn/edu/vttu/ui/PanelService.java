@@ -38,6 +38,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.ServiceType;
@@ -180,9 +181,7 @@ public class PanelService extends javax.swing.JPanel {
 
     private void loadTableService(int index) {
         try {
-            conn = ConnectDB.conn();
-            DecimalFormat df = new DecimalFormat("#,###,###");
-
+            conn = ConnectDB.conn();            
             tbService.setModel(Service.serviceGetAll(conn));
             if (tbService.getRowCount() > 0) {
                 tbService.setRowSelectionInterval(index, 0);
@@ -194,12 +193,13 @@ public class PanelService extends javax.swing.JPanel {
             tbService.getColumnModel().getColumn(7).setMaxWidth(0);
 
             tbService.getColumnModel().getColumn(8).setMinWidth(0);
-            tbService.getColumnModel().getColumn(8).setMaxWidth(0);
+            tbService.getColumnModel().getColumn(8).setMaxWidth(0);            
             bindingTexFeild(index);
             conn = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());       
 
     }
 
@@ -274,14 +274,12 @@ public class PanelService extends javax.swing.JPanel {
     }
 
     private void bindingTexFeild(int index) {
+        DecimalFormat df = new DecimalFormat("#,###,###");
         try {
             txtID.setText(String.valueOf(tbService.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbService.getValueAt(index, 1)));
-            try {
-                txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim().replaceAll(",", "\\."));
-            } catch (Exception e) {
-                txtCost.setText(String.valueOf(tbService.getValueAt(index, 4)).trim());
-            }            
+            txtCost.setText(df.format(Integer.parseInt(String.valueOf(tbService.getValueAt(index, 4)).trim())));
+                     
             txtNote.setText(String.valueOf(tbService.getValueAt(index, 5)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
             setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
@@ -991,6 +989,7 @@ public class PanelService extends javax.swing.JPanel {
                 tbService.getColumnModel().getColumn(8).setMinWidth(0);
                 tbService.getColumnModel().getColumn(8).setMaxWidth(0);
             }
+            tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());       
             int index = 0;
             bindingTexFeild(index);
             conn = null;

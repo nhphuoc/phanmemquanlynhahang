@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
+import java.sql.Timestamp;
 
 /**
  *
@@ -59,6 +60,20 @@ public class TableService {
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+    public static TableModel getStatiticsService(Timestamp dt1,Timestamp dt2, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {            
+            CallableStatement calState = conn.prepareCall("{CALL table_service_statitics(?,?)}");
+            calState.setTimestamp(1, dt1);
+            calState.setTimestamp(2, dt2);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return tb;
@@ -239,5 +254,6 @@ public class TableService {
         }
         return flag;
     }
+    
 
 }

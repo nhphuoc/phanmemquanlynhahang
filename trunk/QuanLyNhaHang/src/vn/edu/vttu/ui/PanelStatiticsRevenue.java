@@ -9,7 +9,6 @@ import java.awt.Color;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import org.apache.commons.lang3.time.DateUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,6 +16,7 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Invoice;
+import vn.edu.vttu.data.NumberCellRenderer;
 
 /**
  *
@@ -61,7 +61,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
     private void showChart(String title, String begin, String end) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        int row = tbResult.getRowCount();        
+        int row = tbResult.getRowCount();
         for (int i = 0; i < row; i++) {
             float value = 0;
             try {
@@ -71,16 +71,16 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
                     value = Float.parseFloat(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll(",", "")) / 1000;
                 }
             } catch (Exception e) {
-                value=0;
+                value = 0;
             }
             String date = String.valueOf(tbResult.getValueAt(i, 0)).trim();
 
             dataset.addValue(value, "Doanh Thu", date);
         }
 
-        JFreeChart chart = ChartFactory.createBarChart("THỐNG KÊ DOANH THU\nTỪ " + title + " " + begin + " ĐẾN " + title + " " + end, title, "Số Tiền(Đơn vị: nghìn đồng)", dataset);
+        JFreeChart chart = ChartFactory.createLineChart("THỐNG KÊ DOANH THU\nTỪ " + title + " " + begin + " ĐẾN " + title + " " + end, title, "Số Tiền(Đơn vị: nghìn đồng)", dataset);
         CategoryPlot p = chart.getCategoryPlot();
-        p.setRangeGridlinePaint(Color.black);
+        p.setRangeGridlinePaint(Color.black);        
         ChartPanel CP = new ChartPanel(chart);
         pnChart.removeAll();
         pnChart.add(CP);
@@ -310,6 +310,9 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
                 showChart("Ngày", format.format(dtFormDate.getDate()), format.format(dtToDate.getDate()));// thống kê theo ngày
                 break;
         }
+        tbResult.getColumnModel().getColumn(1).setCellRenderer(new NumberCellRenderer());
+        tbResult.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
+        tbResult.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
         int row = tbResult.getRowCount();
         int totalInvoice = 0;
         for (int i = 0; i < row; i++) {
@@ -319,9 +322,9 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         for (int i = 0; i < row; i++) {
             int value = 0;
             try {
-                totalPay = Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll("\\.", ""));
+                value= Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll("\\.", ""));
             } catch (Exception e) {
-                totalPay = Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll(",", ""));
+                value = Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll(",", ""));
             }
             totalPay = totalPay + value;
         }

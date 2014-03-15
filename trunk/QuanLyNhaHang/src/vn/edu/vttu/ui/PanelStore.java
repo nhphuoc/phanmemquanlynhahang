@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.Unit;
@@ -73,6 +74,7 @@ public class PanelStore extends javax.swing.JPanel {
         tbStore.setModel(RawMaterial.getAll(conn));
         tbStore.getColumnModel().getColumn(4).setMinWidth(0);
         tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbStore.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());        
     }
 
     private void enableControl(boolean b) {
@@ -470,6 +472,7 @@ public class PanelStore extends javax.swing.JPanel {
             tbStore.setModel(RawMaterial.search(txtSearch.getText().trim(), ConnectDB.conn()));
             tbStore.getColumnModel().getColumn(4).setMinWidth(0);
             tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+            tbStore.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());       
         } catch (Exception e) {
         }
 
