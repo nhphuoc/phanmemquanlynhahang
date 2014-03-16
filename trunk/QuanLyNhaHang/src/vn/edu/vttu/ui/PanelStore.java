@@ -334,6 +334,11 @@ public class PanelStore extends javax.swing.JPanel {
         btnCreateInvoice.setBackground(new java.awt.Color(153, 204, 255));
         btnCreateInvoice.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/table-import-icon.png"))); // NOI18N
         btnCreateInvoice.setText("Nhập Hàng");
+        btnCreateInvoice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateInvoiceActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnCreateInvoice);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -537,6 +542,11 @@ public class PanelStore extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtNumberKeyTyped
+
+    private void btnCreateInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateInvoiceActionPerformed
+        JOptionPane.showOptionDialog(null, new PanelAddStoreInvoice(),
+                "Viết Phiếu Chi", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+    }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -76,8 +76,7 @@ import vn.edu.vttu.data.TableLocation;
  */
 public class PanelTable extends javax.swing.JPanel {
 
-    class ItemRenderer extends BasicComboBoxRenderer {
-
+    class ItemRenderer extends BasicComboBoxRenderer {        
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {

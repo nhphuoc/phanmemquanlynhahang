@@ -187,10 +187,15 @@ public class frmMain extends javax.swing.JFrame {
         jToolBar1.add(btnStaff);
 
         btnDifferentMoney.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Money-icon.png"))); // NOI18N
-        btnDifferentMoney.setText("Thu/Chi Khác");
+        btnDifferentMoney.setText("Chi Khác");
         btnDifferentMoney.setFocusable(false);
         btnDifferentMoney.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnDifferentMoney.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDifferentMoney.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDifferentMoneyActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDifferentMoney);
 
         btnStatistics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/statistics.png"))); // NOI18N
@@ -328,6 +333,14 @@ public class frmMain extends javax.swing.JFrame {
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_btnStatisticsActionPerformed
+
+    private void btnDifferentMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDifferentMoneyActionPerformed
+       main.removeAll();
+        PanelPaymentInvoice panelpaymentInvoive = new PanelPaymentInvoice();
+        main.add(panelpaymentInvoive);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnDifferentMoneyActionPerformed
 
     /**
      * @param args the command line arguments
