@@ -24,6 +24,10 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
         pnThongKeDichVu.add(new PanelStatiticsService());
         pnThongKeDoanhThu.updateUI();
         pnThongKeDoanhThu.repaint();
+        
+        pnThongKeChi.add(new PanelStatiticsPaymentRawmaterialInvoice());
+        pnThongKeChi.updateUI();
+        pnThongKeChi.repaint();
     }    
 
     /**
@@ -38,7 +42,6 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         pnThongKeDoanhThu = new javax.swing.JPanel();
         pnThongKeDichVu = new javax.swing.JPanel();
-        pnThongKeNguyenLieu = new javax.swing.JPanel();
         pnThongKeChi = new javax.swing.JPanel();
         pnThongKeThuChi = new javax.swing.JPanel();
 
@@ -50,33 +53,10 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
         pnThongKeDoanhThu.setLayout(new java.awt.GridLayout(1, 0));
         jTabbedPane1.addTab("Thống Kê Doanh Thu", pnThongKeDoanhThu);
 
-        pnThongKeDichVu.setLayout(new java.awt.GridLayout());
+        pnThongKeDichVu.setLayout(new java.awt.GridLayout(1, 0));
         jTabbedPane1.addTab("Thống Kê Dịch Vụ", pnThongKeDichVu);
 
-        javax.swing.GroupLayout pnThongKeNguyenLieuLayout = new javax.swing.GroupLayout(pnThongKeNguyenLieu);
-        pnThongKeNguyenLieu.setLayout(pnThongKeNguyenLieuLayout);
-        pnThongKeNguyenLieuLayout.setHorizontalGroup(
-            pnThongKeNguyenLieuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 719, Short.MAX_VALUE)
-        );
-        pnThongKeNguyenLieuLayout.setVerticalGroup(
-            pnThongKeNguyenLieuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 271, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Thống Kê Nguyên Liệu", pnThongKeNguyenLieu);
-
-        javax.swing.GroupLayout pnThongKeChiLayout = new javax.swing.GroupLayout(pnThongKeChi);
-        pnThongKeChi.setLayout(pnThongKeChiLayout);
-        pnThongKeChiLayout.setHorizontalGroup(
-            pnThongKeChiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 719, Short.MAX_VALUE)
-        );
-        pnThongKeChiLayout.setVerticalGroup(
-            pnThongKeChiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 271, Short.MAX_VALUE)
-        );
-
+        pnThongKeChi.setLayout(new java.awt.GridLayout());
         jTabbedPane1.addTab("Thống Kê Chi", pnThongKeChi);
 
         javax.swing.GroupLayout pnThongKeThuChiLayout = new javax.swing.GroupLayout(pnThongKeThuChi);
@@ -101,7 +81,6 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
     private javax.swing.JPanel pnThongKeChi;
     private javax.swing.JPanel pnThongKeDichVu;
     private javax.swing.JPanel pnThongKeDoanhThu;
-    private javax.swing.JPanel pnThongKeNguyenLieu;
     private javax.swing.JPanel pnThongKeThuChi;
     // End of variables declaration//GEN-END:variables
 }

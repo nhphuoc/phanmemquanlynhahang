@@ -18,6 +18,18 @@ import net.proteanit.sql.DbUtils;
  * @author nhphuoc
  */
 public class RawMaterialInvoice {
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    public RawMaterialInvoice(int id){
+        this.id=id;
+    }
     public static TableModel getByDate(Timestamp fromdate, Timestamp todate,Connection conn) {
         TableModel tb = null;
         ResultSet rs;
@@ -32,5 +44,41 @@ public class RawMaterialInvoice {
         }
         return tb;
     }
+    public static boolean insert(int staff,int distributor,String note, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL raw_material_invoice_add(?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setInt(1, staff);
+            callstate.setInt(2, distributor);
+            callstate.setString(3, note);
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+    public static RawMaterialInvoice getMaxID(Connection conn) {
+        RawMaterialInvoice rawinvoice;
+        try {
+            String sql = "call raw_material_invoice_get_max_id()";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                rawinvoice = new RawMaterialInvoice(rs.getInt("id"));
+                return rawinvoice;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+    
     
 }

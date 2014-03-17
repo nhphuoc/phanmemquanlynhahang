@@ -31,5 +31,27 @@ public class RawMaterialInvoiceDetail {
         }
         return tb;
     }
+    public static boolean insert(int id_raw, int id_raw_invoice,float number,int cost, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL raw_material_invoice_detail_add(?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id_raw);            
+            callstate.setInt(2, id_raw_invoice);            
+            callstate.setFloat(3, number);            
+            callstate.setInt(4, cost);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
     
 }

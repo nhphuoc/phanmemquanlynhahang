@@ -546,6 +546,7 @@ public class PanelStore extends javax.swing.JPanel {
     private void btnCreateInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateInvoiceActionPerformed
         JOptionPane.showOptionDialog(null, new PanelAddStoreInvoice(),
                 "Viết Phiếu Chi", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+        loadData();
     }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
 

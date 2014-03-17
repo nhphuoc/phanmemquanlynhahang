@@ -8,6 +8,7 @@ package vn.edu.vttu.data;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Vector;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -174,8 +175,8 @@ public class RawMaterial {
         try {
             String sql = "CALL raw_material_update_number(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, id);
-            callstate.setFloat(2, number);            
+            callstate.setInt(2, id);
+            callstate.setFloat(1, number);            
             int x = callstate.executeUpdate();
             if (x ==1) {
                 flag = true;
@@ -200,6 +201,22 @@ public class RawMaterial {
             e.printStackTrace();
         }
         return tb;
+    }
+    public static Vector selectRawmaterial(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "call raw_material_get_all()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.StoreList tb = new vn.edu.vttu.model.StoreList(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

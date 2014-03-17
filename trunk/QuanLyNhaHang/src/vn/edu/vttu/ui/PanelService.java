@@ -37,6 +37,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
+import vn.edu.vttu.data.ColoredTableCellRenderer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Service;
@@ -193,7 +194,10 @@ public class PanelService extends javax.swing.JPanel {
             tbService.getColumnModel().getColumn(7).setMaxWidth(0);
 
             tbService.getColumnModel().getColumn(8).setMinWidth(0);
-            tbService.getColumnModel().getColumn(8).setMaxWidth(0);            
+            tbService.getColumnModel().getColumn(8).setMaxWidth(0);
+            for(int i=0;i<tbService.getColumnCount();i++){
+            tbService.getColumnModel().getColumn(i).setCellRenderer(new ColoredTableCellRenderer());
+            }
             bindingTexFeild(index);
             conn = null;
         } catch (Exception e) {
@@ -487,7 +491,7 @@ public class PanelService extends javax.swing.JPanel {
         tbService.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tbService.setGridColor(new java.awt.Color(204, 204, 204));
         tbService.setRowHeight(25);
-        tbService.setSelectionBackground(new java.awt.Color(255, 153, 0));
+        tbService.setSelectionBackground(new java.awt.Color(102, 153, 255));
         tbService.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tbService.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {

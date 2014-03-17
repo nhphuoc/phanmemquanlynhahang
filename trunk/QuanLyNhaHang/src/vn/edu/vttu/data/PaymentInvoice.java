@@ -57,5 +57,47 @@ public class PaymentInvoice {
 
         return flag;
     }
+    public static TableModel getPaymentInvoiceRawmaterialInvoiceByDay(Timestamp dtFrom, Timestamp dtTo, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL payment_invoice_raw_material_invoice_statitics_by_day(?,?)}");
+            calState.setTimestamp(1, dtFrom);
+            calState.setTimestamp(2, dtTo);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+    public static TableModel getPaymentInvoiceRawmaterialInvoiceByMonth(Timestamp dtFrom, Timestamp dtTo, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL payment_invoice_raw_material_invoice_statitics_by_month(?,?)}");
+            calState.setTimestamp(1, dtFrom);
+            calState.setTimestamp(2, dtTo);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
+    public static TableModel getPaymentInvoiceRawmaterialInvoiceByYear(Timestamp dtFrom, Timestamp dtTo, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL payment_invoice_raw_material_invoice_statitics_by_year(?,?)}");
+            calState.setTimestamp(1, dtFrom);
+            calState.setTimestamp(2, dtTo);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
     
 }
