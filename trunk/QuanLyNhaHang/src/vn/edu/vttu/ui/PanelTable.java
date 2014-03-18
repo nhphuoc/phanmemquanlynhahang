@@ -69,6 +69,7 @@ import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.SystemLog;
 import vn.edu.vttu.data.TableLocation;
+import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -120,7 +121,7 @@ public class PanelTable extends javax.swing.JPanel {
         public void run() {
             conn = ConnectDB.conn();
             try {
-                TableModel tb = TableReservation.getByTable_DateTime(InfoRestaurant.getMinuteWarningCustomer(), conn);
+                TableModel tb = TableReservation.getByTable_DateTime(tbRestaurant.getValues().getHourReservationNomal(), conn);
                 if (tb.getRowCount() > 0) {
                     conn.setAutoCommit(false);
                     for (int i = 0; i < tb.getRowCount(); i++) {
@@ -189,7 +190,7 @@ public class PanelTable extends javax.swing.JPanel {
         Timer timer = new Timer();
         timer.schedule(taskreservation, new Date(), 3000);
         TimerTask taskwarninguser = new TaskWarningUser();
-        timer.schedule(taskwarninguser, new Date(), InfoRestaurant.getMinuteWarningCustomer() * 60000);
+        timer.schedule(taskwarninguser, new Date(), tbRestaurant.getValues().getMinuteWarning() * 60000);
         try {
             popup = new JPopupMenu();
             BufferedImage bImg1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/useTable.png"));

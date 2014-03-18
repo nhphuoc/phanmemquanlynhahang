@@ -5,22 +5,29 @@
  */
 package vn.edu.vttu.ui;
 
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.VariableStatic;
 
@@ -29,6 +36,33 @@ import vn.edu.vttu.data.VariableStatic;
  * @author nhphuoc
  */
 public class PanelCooking extends javax.swing.JPanel {
+
+    class ItemRenderer extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            try {
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+
+                if (value != null) {
+                    vn.edu.vttu.model.UnitSub item = (vn.edu.vttu.model.UnitSub) value;
+                    // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                    setText(item.getName().toUpperCase());
+                }
+
+                if (index == -1) {
+                    vn.edu.vttu.model.UnitSub item = (vn.edu.vttu.model.UnitSub) value;
+                    setText("" + item.getName());
+                }
+
+            } catch (Exception e) {
+            }
+
+            return this;
+        }
+    }
 
     /**
      * Creates new form PanelCooking
@@ -52,6 +86,7 @@ public class PanelCooking extends javax.swing.JPanel {
         loadRecipes();
         popuptbCook();
         popuptbStore();
+       
     }
 
     private void loadStore() {
@@ -63,6 +98,7 @@ public class PanelCooking extends javax.swing.JPanel {
         }
         tbStore.getColumnModel().getColumn(4).setMinWidth(0);
         tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
 
     private void loadRecipes() {
@@ -72,18 +108,10 @@ public class PanelCooking extends javax.swing.JPanel {
         } else {
             tbCook.setRowSelectionInterval(0, 0);
         }
+        tbCook.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
-    /*
-     private void enableControl(boolean b) {
-     btnAdd.setEnabled(b);
-     btnEdit.setEnabled(b);
-     btnDelete.setEnabled(b);
-     btnSave.setEnabled(!b);
-     txtNumber.setEnabled(!b);
-     txtStoreName.setEnabled(!b);
 
-     }
-     */
+    
 
     private void popuptbCook() {
         try {
@@ -140,39 +168,6 @@ public class PanelCooking extends javax.swing.JPanel {
     private void popuptbStore() {
         try {
             popup = new JPopupMenu();
-            BufferedImage bImg1 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/add-icon_24x24.png"));
-            Image image1 = bImg1.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popup.add(new JMenuItem(new AbstractAction("Thêm vào nguyên liệu", new ImageIcon(image1)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String number = JOptionPane.showInputDialog(tbStore, "Số Lượng", 1).trim().replaceAll(",", ".");
-                    if (number != null && !number.trim().equals("")) {
-                        if (testNumber(number)) {
-                            if (idStore == -1) {
-                                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn nguyên liệu.\n"
-                                        + "Vui lòng click vào nguyên liệu cần chọn và thực hiện lại thao tác");
-                            } else {
-
-                                if (Recipes.countRecipesByIdService(idService, idStore, ConnectDB.conn())) {
-                                    if (Recipes.insert(idStore, idService, Float.parseFloat(number), ConnectDB.conn())) {
-                                        loadRecipes();
-                                    } else {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
-                                    }
-                                } else {
-                                    if (Recipes.update(idStore, idService, Float.parseFloat(number), ConnectDB.conn())) {
-                                        loadRecipes();
-                                    }
-                                }
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập không phải là số");
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
-                    }
-                }
-            }));
             BufferedImage bImg3 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/Refresh-icon-24x24.png"));
             Image image3 = bImg3.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
             popup.add(new JMenuItem(new AbstractAction("Cập nhật lại danh sách", new ImageIcon(image3)) {
@@ -220,6 +215,11 @@ public class PanelCooking extends javax.swing.JPanel {
         tbStore = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtNumber = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        cobUnitSub = new javax.swing.JComboBox();
+        btnAdd = new javax.swing.JButton();
 
         tbCook = new javax.swing.JTable(){
             public boolean isCellEditable(int rowIndex, int colIndex) {
@@ -241,6 +241,12 @@ public class PanelCooking extends javax.swing.JPanel {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbCookMouseClicked(evt);
             }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tbCookMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tbCookMouseReleased(evt);
+            }
         });
         jScrollPane1.setViewportView(tbCook);
 
@@ -257,7 +263,7 @@ public class PanelCooking extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID", "Tên", "ĐVT", "Tồn Kho"
+                "ID", "Tên", "Tồn Kho", "ĐVT"
             }
         ));
         tbStore.setGridColor(new java.awt.Color(204, 204, 204));
@@ -267,6 +273,9 @@ public class PanelCooking extends javax.swing.JPanel {
         tbStore.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tbStoreMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tbStoreMousePressed(evt);
             }
         });
         tbStore.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -286,6 +295,19 @@ public class PanelCooking extends javax.swing.JPanel {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setText("Số Lượng");
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel3.setText("ĐVT:");
+
+        btnAdd.setText("Thêm");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -295,11 +317,24 @@ public class PanelCooking extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
-                    .addComponent(txtSearch)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                    .addComponent(txtSearch)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAdd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,15 +342,22 @@ public class PanelCooking extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(lbServiceName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 312, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)
+                            .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnAdd))
+                        .addContainerGap())
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -326,12 +368,14 @@ public class PanelCooking extends javax.swing.JPanel {
 
     private void tbStoreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbStoreKeyReleased
         int index = tbStore.getSelectedRow();
-        idStore = Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 0)));
+        if (tbStore.getRowCount() > 0) {
+            idStore = Integer.parseInt(String.valueOf(tbStore.getValueAt(0, 0)));
+            //fillcobUnitSub(Integer.parseInt(String.valueOf(tbStore.getValueAt(0, 4))));
+        }
     }//GEN-LAST:event_tbStoreKeyReleased
 
     private void tbCookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMouseClicked
-        int index = tbCook.getSelectedRow();
-        idRecipes = Integer.parseInt(String.valueOf(tbCook.getValueAt(index, 0)));
+
     }//GEN-LAST:event_tbCookMouseClicked
 
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
@@ -340,20 +384,67 @@ public class PanelCooking extends javax.swing.JPanel {
             //tbStore.setRowSelectionInterval(0, 0);
         } else {
             tbStore.setRowSelectionInterval(0, 0);
-            idStore=Integer.parseInt(String.valueOf(tbStore.getValueAt(0, 0)));
+            idStore = Integer.parseInt(String.valueOf(tbStore.getValueAt(0, 0)));
         }
+        tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
         tbStore.getColumnModel().getColumn(4).setMinWidth(0);
         tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
     }//GEN-LAST:event_txtSearchKeyReleased
 
+    private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
+        int index = tbStore.getSelectedRow();
+        //fillcobUnitSub(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
+    }//GEN-LAST:event_tbStoreMousePressed
+
+    private void tbCookMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbCookMousePressed
+
+    private void tbCookMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMouseReleased
+        int index = tbCook.getSelectedRow();
+        idRecipes = Integer.parseInt(String.valueOf(tbCook.getValueAt(index, 0)));
+    }//GEN-LAST:event_tbCookMouseReleased
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        if (txtNumber.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
+            txtNumber.requestFocus();
+        } else {
+            vn.edu.vttu.model.UnitSub unitsub = (vn.edu.vttu.model.UnitSub) cobUnitSub.getSelectedItem();
+            int idsubunit = unitsub.getId();
+            float number = Float.parseFloat(String.valueOf(txtNumber.getText()));
+            if (idStore == -1) {
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn nguyên liệu.\n"
+                        + "Vui lòng click vào nguyên liệu cần chọn và thực hiện lại thao tác");
+            } else {
+                if (Recipes.countRecipesByIdService(idService, idStore, ConnectDB.conn())) {
+                    if (Recipes.insert(idStore, idService, number, idsubunit, ConnectDB.conn())) {
+                        loadRecipes();
+                    } else {
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                    }
+                } else {
+                    if (Recipes.update(idStore, idService, number, ConnectDB.conn())) {
+                        loadRecipes();
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_btnAddActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
+    private javax.swing.JComboBox cobUnitSub;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbServiceName;
     private javax.swing.JTable tbCook;
     private javax.swing.JTable tbStore;
+    private javax.swing.JTextField txtNumber;
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

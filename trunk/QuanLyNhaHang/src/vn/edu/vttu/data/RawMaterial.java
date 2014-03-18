@@ -20,8 +20,11 @@ public class RawMaterial {
 
     private int id;
     private String name;
-    private int number;
+    private float number;
     private int unit;
+    private String namenit;
+
+    
 
     public int getId() {
         return id;
@@ -39,11 +42,11 @@ public class RawMaterial {
         this.name = name;
     }
 
-    public int getNumber() {
+    public float getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(float number) {
         this.number = number;
     }
 
@@ -54,14 +57,35 @@ public class RawMaterial {
     public void setUnit(int unit) {
         this.unit = unit;
     }
+    public String getNamenit() {
+        return namenit;
+    }
 
-    public RawMaterial(int id, String name, int number, int unit) {
+    public void setNamenit(String namenit) {
+        this.namenit = namenit;
+    }
+    public RawMaterial(int id, String name, float number, int unit,String nameunit) {
         this.id = id;
         this.name = name;
         this.number = number;
         this.unit = unit;
+        this.namenit=nameunit;
     }
-
+    public static RawMaterial getByID(int id, Connection conn) {
+        RawMaterial raw;
+        try {
+            String sql = "call raw_material_get_by_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5),rs.getString(4));
+                return raw;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
     public static TableModel getAll(Connection conn) {
         TableModel tb = null;
         ResultSet rs;

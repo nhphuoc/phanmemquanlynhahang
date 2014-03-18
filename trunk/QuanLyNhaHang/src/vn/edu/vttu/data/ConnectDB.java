@@ -9,6 +9,7 @@ import config.InfoRestaurant;
 import config.readxml;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import vn.edu.vttu.sqlite.TbConnection;
 import vn.edu.vttu.ui.loadConnection;
 
 /**
@@ -24,23 +25,22 @@ public class ConnectDB {
     public static int port;
 
     public static Connection conn() {
-        Connection cn = null;
-        //readInfo read = new readInfo();
-        //Server sv = new Server();
-        readxml.readXMLinfo();        
+        Connection cn =null;        
         try {
-            db = InfoRestaurant.getNamedatabase() + "?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";            
-            usr = InfoRestaurant.getUsernamedatabase();            
-            pass = InfoRestaurant.getPassdatabase();
-            ipdb = InfoRestaurant.getIPdatabase();
-            port = InfoRestaurant.getPortdatabase();
+            
+            db = TbConnection.getValues().getDbname() + "?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";            
+            usr = TbConnection.getValues().getUser();
+            pass = TbConnection.getValues().getPass();
+            ipdb = TbConnection.getValues().getIp();
+            port = TbConnection.getValues().getPort();            
+            
             Class.forName("com.mysql.jdbc.Driver");
             String database = "jdbc:mysql://" + ipdb + ":" + port + "/" + db;
             // String database = "jdbc:mysql://localhost:3306/vttu_restaurant";
-            cn = DriverManager.getConnection(database, usr, pass);
+            cn = DriverManager.getConnection(database, usr, pass);            
 
         } catch (Exception e) {
-            return null;
+            e.printStackTrace();
         }
         return cn;
     }

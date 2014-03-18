@@ -81,14 +81,15 @@ public class Recipes {
         return tb;
     }
 
-    public static boolean insert(int id_raw_material, int idService, float number, Connection conn) {
+    public static boolean insert(int id_raw_material, int idService, float number, int unitsub,Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL recipes_add(?,?,?)";
+            String sql = "CALL recipes_add(?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id_raw_material);
             callstate.setInt(2, idService);
             callstate.setFloat(3, number);
+            callstate.setInt(4, unitsub);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;

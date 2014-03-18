@@ -182,7 +182,7 @@ public class PanelService extends javax.swing.JPanel {
 
     private void loadTableService(int index) {
         try {
-            conn = ConnectDB.conn();            
+            conn = ConnectDB.conn();
             tbService.setModel(Service.serviceGetAll(conn));
             if (tbService.getRowCount() > 0) {
                 tbService.setRowSelectionInterval(index, 0);
@@ -195,15 +195,15 @@ public class PanelService extends javax.swing.JPanel {
 
             tbService.getColumnModel().getColumn(8).setMinWidth(0);
             tbService.getColumnModel().getColumn(8).setMaxWidth(0);
-            for(int i=0;i<tbService.getColumnCount();i++){
-            tbService.getColumnModel().getColumn(i).setCellRenderer(new ColoredTableCellRenderer());
+            for (int i = 0; i < tbService.getColumnCount(); i++) {
+                tbService.getColumnModel().getColumn(i).setCellRenderer(new ColoredTableCellRenderer());
             }
             bindingTexFeild(index);
             conn = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());       
+        tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
 
     }
 
@@ -283,10 +283,14 @@ public class PanelService extends javax.swing.JPanel {
             txtID.setText(String.valueOf(tbService.getValueAt(index, 0)));
             txtName.setText(String.valueOf(tbService.getValueAt(index, 1)));
             txtCost.setText(df.format(Integer.parseInt(String.valueOf(tbService.getValueAt(index, 4)).trim())));
-                     
+
             txtNote.setText(String.valueOf(tbService.getValueAt(index, 5)));
             setSelectedValue(cobType, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 7))));
-            setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
+            try {
+                setSelectedValueUnit(cobUnit, Integer.parseInt(String.valueOf(tbService.getValueAt(index, 8))));
+            } catch (Exception e) {
+            }
+
             txtLinkImage.setText(String.valueOf(tbService.getValueAt(index, 6)));
 
         } catch (Exception e) {
@@ -321,7 +325,7 @@ public class PanelService extends javax.swing.JPanel {
             } catch (Exception e) {
                 cost = Integer.parseInt(txtCost.getText().trim().replaceAll(",", ""));
             }
-            
+
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
@@ -379,7 +383,7 @@ public class PanelService extends javax.swing.JPanel {
             } catch (Exception e) {
                 cost = Integer.parseInt(txtCost.getText().replaceAll(",", ""));
             }
-            
+
             note = txtNote.getText();
             img = txtLinkImage.getText();
             try {
@@ -935,12 +939,12 @@ public class PanelService extends javax.swing.JPanel {
         if (!txtCost.getText().trim().equals("")) {
             try {
                 Long num = Long.parseLong(txtCost.getText().trim().replaceAll("\\.", ""));
-            txtCost.setText(String.valueOf(df.format(num)));
+                txtCost.setText(String.valueOf(df.format(num)));
             } catch (Exception e) {
                 Long num = Long.parseLong(txtCost.getText().trim().replaceAll(",", ""));
-            txtCost.setText(String.valueOf(df.format(num)));
+                txtCost.setText(String.valueOf(df.format(num)));
             }
-            
+
         }
     }//GEN-LAST:event_txtCostKeyPressed
 
@@ -972,8 +976,7 @@ public class PanelService extends javax.swing.JPanel {
                 Long num = Long.parseLong(txtCost.getText().trim().replaceAll(",", ""));
                 txtCost.setText(String.valueOf(df.format(num)));
             }
-            
-            
+
         }
     }//GEN-LAST:event_txtCostKeyReleased
 
@@ -993,7 +996,7 @@ public class PanelService extends javax.swing.JPanel {
                 tbService.getColumnModel().getColumn(8).setMinWidth(0);
                 tbService.getColumnModel().getColumn(8).setMaxWidth(0);
             }
-            tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());       
+            tbService.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
             int index = 0;
             bindingTexFeild(index);
             conn = null;

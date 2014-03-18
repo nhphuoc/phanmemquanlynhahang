@@ -120,7 +120,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         tbList.getColumnModel().getColumn(6).setMaxWidth(0);
         tbList.getColumnModel().getColumn(6).setMinWidth(0);
         fillcobStore();
-        fillcobUnit();
+        //fillcobUnit();
         fillcobNhaCungCap();
     }
 
@@ -139,21 +139,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         cobNguyenLieu.setRenderer(new PanelAddStoreInvoice.ItemRendererStore());
 
     }
-
-    private void fillcobUnit() {
-        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
-        try {
-            model = Unit.selectUnit(ConnectDB.conn());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
-        cobUnit.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
-        cobUnit.setModel(defaultComboBoxModel);
-        cobUnit.setRenderer(new PanelAddStoreInvoice.ItemRendererUnit());
-
-    }
+    
 
     private void fillcobNhaCungCap() {
         Vector<vn.edu.vttu.model.Distributor> model = new Vector<vn.edu.vttu.model.Distributor>();
@@ -183,13 +169,11 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         cobNguyenLieu = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
-        cobUnit = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
         txtNumber = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtDonGia = new javax.swing.JTextField();
         btnThemNguyenLieu = new javax.swing.JButton();
-        btnThemDVT = new javax.swing.JButton();
         btnAddToList = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         btnDel = new javax.swing.JButton();
@@ -198,6 +182,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         btnThemNguyenLieu1 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         txtNote = new javax.swing.JTextField();
+        lbDVT = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbList = new javax.swing.JTable();
 
@@ -208,12 +193,15 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         jLabel1.setText("Nguyên Liệu:");
 
         cobNguyenLieu.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cobNguyenLieu.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                cobNguyenLieuPropertyChange(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 153, 0));
         jLabel2.setText("Đơn Vị Tính:");
-
-        cobUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(51, 153, 0));
@@ -248,13 +236,6 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
 
         btnThemNguyenLieu.setText("+");
 
-        btnThemDVT.setText("+");
-        btnThemDVT.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnThemDVTActionPerformed(evt);
-            }
-        });
-
         btnAddToList.setText("Thêm Vào Danh Sách");
         btnAddToList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -288,6 +269,9 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         jLabel6.setForeground(new java.awt.Color(51, 153, 0));
         jLabel6.setText("Ghi Chú:");
 
+        lbDVT.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lbDVT.setText("DVT");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -310,11 +294,9 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cobUnit, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtDonGia, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnThemDVT)
-                        .addGap(22, 22, 22))
+                            .addComponent(txtDonGia, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+                            .addComponent(lbDVT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(69, 69, 69))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnThemNguyenLieu1)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
@@ -352,9 +334,8 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(cobNguyenLieu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnThemNguyenLieu)
-                    .addComponent(btnThemDVT))
+                    .addComponent(lbDVT))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -424,10 +405,10 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tbList.getModel();
         vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
         int idNguyenLieu = store.getId();
+        
         String tenNguyenLieu = store.getName();
-        vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
-        int _unit = unit.getId();
-        String tenDVT = unit.getName();
+        String tenDVT=RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit();
+        int _unit=RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getUnit();
         boolean flag = false;
         int j = 0;
         if (txtNumber.getText().equals("") || txtDonGia.getText().equals("")) {
@@ -585,23 +566,26 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtDonGiaKeyTyped
 
-    private void btnThemDVTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemDVTActionPerformed
-        int result = JOptionPane.showConfirmDialog(null, new PanelUnit(),
-                "Thêm Đơn Vị Tính", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);        
-            fillcobUnit();        
-    }//GEN-LAST:event_btnThemDVTActionPerformed
+    private void cobNguyenLieuPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobNguyenLieuPropertyChange
+        //fillcobStore();
+        try {
+            vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
+        int idNguyenLieu = store.getId();
+        lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
+        } catch (Exception e) {
+        }
+        
+    }//GEN-LAST:event_cobNguyenLieuPropertyChange
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddToList;
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnThemDVT;
     private javax.swing.JButton btnThemNguyenLieu;
     private javax.swing.JButton btnThemNguyenLieu1;
     private javax.swing.JComboBox cobNguyenLieu;
     private javax.swing.JComboBox cobNhaCungCap;
-    private javax.swing.JComboBox cobUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -610,6 +594,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbDVT;
     private javax.swing.JTable tbList;
     private javax.swing.JTextField txtDonGia;
     private javax.swing.JTextField txtNote;
