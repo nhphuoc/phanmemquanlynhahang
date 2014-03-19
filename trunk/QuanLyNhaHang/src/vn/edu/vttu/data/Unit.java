@@ -22,6 +22,9 @@ public class Unit {
 
     private int id;
     private String name;
+    private int id_sub;
+    private int cast;
+    private boolean parent;
 
     public int getId() {
         return id;
@@ -37,6 +40,38 @@ public class Unit {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getId_sub() {
+        return id_sub;
+    }
+
+    public void setId_sub(int id_sub) {
+        this.id_sub = id_sub;
+    }
+
+    public int getCast() {
+        return cast;
+    }
+
+    public void setCast(int cast) {
+        this.cast = cast;
+    }
+
+    public boolean isParent() {
+        return parent;
+    }
+
+    public void setParent(boolean parent) {
+        this.parent = parent;
+    }
+
+    public Unit(int id, String name, int id_sub, int cast, boolean parent) {
+        this.id = id;
+        this.name = name;
+        this.id_sub = id_sub;
+        this.cast = cast;
+        this.parent = parent;
     }
 
     public static TableModel getAll(Connection conn) {
@@ -92,12 +127,13 @@ public class Unit {
 
         return flag;
     }
+
     public static boolean delete(int id, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL unit_del(?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setInt(1, id);            
+            callstate.setInt(1, id);
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;
@@ -111,26 +147,28 @@ public class Unit {
 
         return flag;
     }
-    public static boolean testName(String name,Connection conn) {
+
+    public static boolean testName(String name, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        boolean flag=false;
+        boolean flag = false;
         try {
             CallableStatement calState = conn.prepareCall("{CALL unit_test_name(?)}");
             calState.setString(1, name);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
-            if(tb.getRowCount()>0){
-                flag=false;
-            }else{
-                flag=true;
+            if (tb.getRowCount() > 0) {
+                flag = false;
+            } else {
+                flag = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            flag=false;
+            flag = false;
         }
         return flag;
     }
+
     public static Vector selectUnit(Connection conn) {
         Vector result = new Vector();
         try {
@@ -147,5 +185,38 @@ public class Unit {
         return result;
     }
 
+    public static Vector selectUnitByID(int id, Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "call unit_sub_get_by_unit_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.Unit tb = new vn.edu.vttu.model.Unit(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static Unit getByID(int id, Connection conn) {
+        Unit unit;
+        try {
+            String sql = "call unit_sub_get_by_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                unit = new Unit(rs.getInt("id"), rs.getString("name"), rs.getInt("id_unit_id"), rs.getInt("cast"), rs.getBoolean("isParent"));
+                return unit;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

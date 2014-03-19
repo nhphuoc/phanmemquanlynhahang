@@ -461,6 +461,25 @@ public class TableReservation {
         }
         return bl;
     }
+    public static boolean getStatusParty(int idTable, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean bl = false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_status_party_not_by_date(?)}");
+            calState.setInt(1, idTable);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if (tb.getRowCount() <= 0) {
+                bl = false;
+            } else {
+                bl = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bl;
+    }
 
     public static TableModel getListTableByIdReservation(int id, Connection conn) {
         TableModel tb = null;

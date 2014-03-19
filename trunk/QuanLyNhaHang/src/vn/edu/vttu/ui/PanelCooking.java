@@ -29,6 +29,7 @@ import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.TableReservation;
+import vn.edu.vttu.data.Unit;
 import vn.edu.vttu.data.VariableStatic;
 
 /**
@@ -47,13 +48,13 @@ public class PanelCooking extends javax.swing.JPanel {
                         isSelected, cellHasFocus);
 
                 if (value != null) {
-                    vn.edu.vttu.model.UnitSub item = (vn.edu.vttu.model.UnitSub) value;
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
                     // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
                     setText(item.getName().toUpperCase());
                 }
 
                 if (index == -1) {
-                    vn.edu.vttu.model.UnitSub item = (vn.edu.vttu.model.UnitSub) value;
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
                     setText("" + item.getName());
                 }
 
@@ -79,14 +80,30 @@ public class PanelCooking extends javax.swing.JPanel {
     public PanelCooking() {
         initComponents();
         loadStore();
-
         idService = VariableStatic.getIdService();
         nameService = VariableStatic.getNameService();
         lbServiceName.setText("Chế biến :" + nameService);
         loadRecipes();
         popuptbCook();
-        popuptbStore();
+        popuptbStore();        
        
+    }
+    private void fillcobUnit(int id) {
+
+        conn = ConnectDB.conn();
+        Vector<vn.edu.vttu.model.ServiceType> model = new Vector<vn.edu.vttu.model.ServiceType>();
+        try {
+            model = Unit.selectUnitByID(id, conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobUnitSub.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobUnitSub.setModel(defaultComboBoxModel);
+        cobUnitSub.setRenderer(new PanelCooking.ItemRenderer());
+        conn = null;
+
     }
 
     private void loadStore() {
@@ -110,9 +127,7 @@ public class PanelCooking extends javax.swing.JPanel {
         }
         tbCook.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
-
-    
-
+   
     private void popuptbCook() {
         try {
             popup = new JPopupMenu();
@@ -393,7 +408,8 @@ public class PanelCooking extends javax.swing.JPanel {
 
     private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
         int index = tbStore.getSelectedRow();
-        //fillcobUnitSub(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
+        fillcobUnit(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
+        
     }//GEN-LAST:event_tbStoreMousePressed
 
     private void tbCookMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMousePressed
@@ -410,7 +426,7 @@ public class PanelCooking extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
             txtNumber.requestFocus();
         } else {
-            vn.edu.vttu.model.UnitSub unitsub = (vn.edu.vttu.model.UnitSub) cobUnitSub.getSelectedItem();
+            vn.edu.vttu.model.Unit unitsub = (vn.edu.vttu.model.Unit) cobUnitSub.getSelectedItem();
             int idsubunit = unitsub.getId();
             float number = Float.parseFloat(String.valueOf(txtNumber.getText()));
             if (idStore == -1) {
