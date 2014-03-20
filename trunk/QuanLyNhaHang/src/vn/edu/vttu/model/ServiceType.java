@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.model;
 
 /**
@@ -11,6 +10,7 @@ package vn.edu.vttu.model;
  * @author nhphuoc
  */
 public class ServiceType {
+
     private int id;
     private String name;
 
@@ -29,9 +29,15 @@ public class ServiceType {
     public void setName(String name) {
         this.name = name;
     }
-    public ServiceType(int id, String name){
-        this.id=id;
-        this.name=name;
+
+    public ServiceType(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
-    
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }

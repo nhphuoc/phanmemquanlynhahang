@@ -33,5 +33,9 @@ public class Distributor {
         this.id=id;
         this.name=name;
     }
+    @Override
+    public String toString() {
+        return name;
+    }
     
 }

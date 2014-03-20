@@ -145,5 +145,25 @@ public class TableReservationDetail {
         }
         return table_list;
     }
+    public static boolean delete(int idReservation, int idTable,Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_reservation_detail_delete(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idTable);
+            callstate.setInt(2, idReservation);
+
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
 }

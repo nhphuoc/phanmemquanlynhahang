@@ -55,12 +55,12 @@ public class PanelChangeTable extends javax.swing.JPanel {
 
             if (value != null) {
                 vn.edu.vttu.model.Table item = (vn.edu.vttu.model.Table) value;
-                setText(item.getNameTable());
+                setText(String.valueOf(item.getNameTable()));
             }
 
             if (index == -1) {
                 vn.edu.vttu.model.Table item = (vn.edu.vttu.model.Table) value;
-                setText("" + item.getNameTable());
+                setText("" + String.valueOf(item.getNameTable()));
             }
 
             return this;
@@ -138,6 +138,7 @@ public class PanelChangeTable extends javax.swing.JPanel {
         jLabel1.setForeground(new java.awt.Color(51, 153, 0));
         jLabel1.setText("Chọn Vị Trí");
 
+        cobTableLocation.setEditable(true);
         cobTableLocation.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cobTableLocationItemStateChanged(evt);
@@ -148,6 +149,7 @@ public class PanelChangeTable extends javax.swing.JPanel {
         jLabel2.setForeground(new java.awt.Color(51, 153, 0));
         jLabel2.setText("Chọn Bàn");
 
+        cobTable.setEditable(true);
         cobTable.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cobTableItemStateChanged(evt);

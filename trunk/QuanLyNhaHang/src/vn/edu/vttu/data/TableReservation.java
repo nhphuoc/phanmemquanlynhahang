@@ -494,5 +494,18 @@ public class TableReservation {
         }
         return tb;
     }
+    public static TableModel getListTable(int id, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_reservation_get_list_table(?)}");
+            calState.setInt(1, id);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
 
 }

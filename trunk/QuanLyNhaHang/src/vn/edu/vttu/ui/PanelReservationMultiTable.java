@@ -90,7 +90,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         fillkhCombo();
         vn.edu.vttu.model.TableLocation tb = (vn.edu.vttu.model.TableLocation) cobLocation.getSelectedItem();
         idlocation = tb.getId();
-        loadTable(ts, 1);
+        loadTable(ts, idlocation);
     }
 
     private void loadTable(Timestamp ts, int location) {

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.model;
 
 import java.io.Serializable;
@@ -12,7 +11,8 @@ import java.io.Serializable;
  *
  * @author nhphuoc
  */
-public class Table{
+public class Table {
+
     private int idTable;
     private String nameTable;
 
@@ -31,10 +31,15 @@ public class Table{
     public void setNameTable(String nameTable) {
         this.nameTable = nameTable;
     }
-    
+
     public Table(int idTable, String nameTable) {
-        this.idTable=idTable;
+        this.idTable = idTable;
         this.nameTable = nameTable;
     }
-    
+
+    @Override
+    public String toString() {
+        return nameTable;
+    }
+
 }

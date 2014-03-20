@@ -21,6 +21,15 @@ import net.proteanit.sql.DbUtils;
 public class Customer {
 
     private static int ID;
+    private  int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     private String NAME;
     private boolean SEX;
     private Date BIRTHDAY;
@@ -59,7 +68,25 @@ public class Customer {
     public String getEMAIL() {
         return EMAIL;
     }
-
+    public Customer(int id,String name){
+        this.id=id;
+        this.NAME=name;
+    }
+    public static Customer getByID(int id, Connection conn) {
+        Customer cus;
+        try {
+            String sql = "call customer_get_by_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                cus = new Customer(rs.getInt(1), rs.getString(2));
+                return cus;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
     public static TableModel getLimit(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
