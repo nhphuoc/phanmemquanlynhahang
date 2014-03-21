@@ -13,7 +13,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.ConnectDB;
-import static vn.edu.vttu.data.ConnectDB.conn;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableType;
@@ -76,8 +75,12 @@ public class PanelAddTable extends javax.swing.JPanel {
 
     public PanelAddTable() {
         initComponents();
-        fillcobTableLocation();
-        fillComboTableType();
+        try {
+            fillcobTableLocation();
+            fillComboTableType();
+        } catch (Exception e) {
+        }
+
         txtTableName.requestFocus();
     }
 
@@ -99,7 +102,7 @@ public class PanelAddTable extends javax.swing.JPanel {
 
     private void fillComboTableType() {
         conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
+        Vector<vn.edu.vttu.model.TableType> model = new Vector<vn.edu.vttu.model.TableType>();
         try {
             model = TableType.selectTableType(conn);
         } catch (Exception e) {

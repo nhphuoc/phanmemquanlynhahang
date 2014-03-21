@@ -51,11 +51,9 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
-import org.apache.commons.lang3.time.DateUtils;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.Service;
-import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
@@ -69,6 +67,7 @@ import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.SystemLog;
 import vn.edu.vttu.data.TableLocation;
+import vn.edu.vttu.data.TableType;
 import vn.edu.vttu.data.Unit;
 import vn.edu.vttu.sqlite.tbRestaurant;
 
@@ -384,10 +383,20 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-                            int result = JOptionPane.showOptionDialog(null, new PanelAddTable(),
-                                    "Thêm Mới Bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
-                            loadTable(idLocation);
-                            fillkhCombo();
+                            conn=ConnectDB.conn();
+                            String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn");
+                            if (tablename != null) {
+                                if (Table.testTableName(tablename, conn)) {
+                                    if (Table.insertNewTable(tablename, TableType.getByMaxID(conn).getId(), TableLocation.getByMinID(conn).getID(), 10, conn)) {
+                                        JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn thành công");
+                                        loadTable(idLocation);                                        
+                                    }else{
+                                        JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn không thành công");
+                                    }
+                                }else{
+                                    JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có");
+                                }                                        
+                            }
                         }
                     }));
             BufferedImage bImg10 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
@@ -1472,11 +1481,11 @@ public class PanelTable extends javax.swing.JPanel {
             } catch (Exception e) {
                 prepay = Integer.parseInt(String.valueOf(txtPrepay.getText().trim().replaceAll(",", "")));
             }
-            TableReservationDetail[]tb=TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
-            String ban="";
-            for(int i=0;i<tb.length;i++){
-                int id=tb[i].getID_TABLE();
-                ban=ban+","+Table.getByID(id, conn).getNAME();
+            TableReservationDetail[] tb = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
+            String ban = "";
+            for (int i = 0; i < tb.length; i++) {
+                int id = tb[i].getID_TABLE();
+                ban = ban + "," + Table.getByID(id, conn).getNAME();
             }
             HashMap<String, Object> parameter = new HashMap<String, Object>();
             parameter.put("idReservation", idTableReservation);
@@ -1493,7 +1502,7 @@ public class PanelTable extends javax.swing.JPanel {
             parameter.put("tennhahang", tbRestaurant.getValues().getName());
             parameter.put("diachi", "Địa Chỉ: " + tbRestaurant.getValues().getAddress());
             parameter.put("dienthoai", "Điện Thoại: " + tbRestaurant.getValues().getPhone());
-            parameter.put("ban",ban);
+            parameter.put("ban", ban);
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/Invoice.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
             JasperViewer jv = new JasperViewer(jp, false);

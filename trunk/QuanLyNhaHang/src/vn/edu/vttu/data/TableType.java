@@ -38,6 +38,24 @@ public class TableType {
         this.id=id;
         this.name=name;
     }
+    public TableType(int id){
+        this.id=id;
+    }
+    public static TableType getByMaxID(Connection conn) {
+        TableType tabletype;
+        try {
+            String sql = "call table_type_get_max_id()";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                tabletype = new TableType(rs.getInt("id"));
+                return tabletype;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
+    
     public static Vector selectTableType(Connection conn) {
         Vector result = new Vector();
         try {

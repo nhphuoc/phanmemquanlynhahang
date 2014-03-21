@@ -32,6 +32,23 @@ public class TableLocation {
         this.ID=ID;
         this.NAME=NAME;
     }
+    public TableLocation(int id){
+        this.ID=id;
+    }
+    public static TableLocation getByMinID(Connection conn) {
+        TableLocation tablelocation;
+        try {
+            String sql = "call table_location_get_min_id()";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                tablelocation = new TableLocation(rs.getInt("id"));
+                return tablelocation;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
     public static TableLocation[] getAll(Connection conn) {     
         TableLocation tables_location[] = null;
         try {
