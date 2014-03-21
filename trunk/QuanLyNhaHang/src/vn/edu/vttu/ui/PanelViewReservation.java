@@ -6,15 +6,21 @@
 package vn.edu.vttu.ui;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -23,15 +29,22 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.TableModel;
-import vn.edu.vttu.data.ColoredTableCellRenderer;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
 import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.Service;
@@ -110,6 +123,11 @@ public class PanelViewReservation extends javax.swing.JPanel {
         } else {
             tbListTable.setRowSelectionInterval(0, 0);
         }
+        tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
+        tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
+        tbListTable.getColumnModel().getColumn(3).setMaxWidth(100);
+        tbListTable.getColumnModel().getColumn(4).setMaxWidth(100);
+
         tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
         tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
         tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
@@ -759,6 +777,13 @@ public class PanelViewReservation extends javax.swing.JPanel {
         conn = null;
     }
 
+    private void printListRawmetarial() {
+
+        JOptionPane.showOptionDialog(null, new PanelPrintListRawMaterial(),
+                "DANH SÁCH NGUYÊN LIỆU ĐẶT BÀN", JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -784,6 +809,9 @@ public class PanelViewReservation extends javax.swing.JPanel {
         lbTotal = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         lbrepay = new javax.swing.JLabel();
+        btnPrintInvoice = new javax.swing.JButton();
+        btnPrinNguyenLieu = new javax.swing.JButton();
+        btnPrintRaw = new javax.swing.JButton();
 
         tbListTable.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         tbListTable = new javax.swing.JTable(){
@@ -931,6 +959,27 @@ public class PanelViewReservation extends javax.swing.JPanel {
         lbrepay.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbrepay.setText("0");
 
+        btnPrintInvoice.setText("In Hóa Đơn");
+        btnPrintInvoice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintInvoiceActionPerformed(evt);
+            }
+        });
+
+        btnPrinNguyenLieu.setText("In Danh Sách Đặt Bàn");
+        btnPrinNguyenLieu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrinNguyenLieuActionPerformed(evt);
+            }
+        });
+
+        btnPrintRaw.setText("In Nguyên Liệu");
+        btnPrintRaw.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintRawActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -961,6 +1010,12 @@ public class PanelViewReservation extends javax.swing.JPanel {
                         .addComponent(dtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnView)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPrintInvoice)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPrinNguyenLieu)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPrintRaw)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -972,7 +1027,11 @@ public class PanelViewReservation extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnView)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btnView)
+                                .addComponent(btnPrintInvoice)
+                                .addComponent(btnPrinNguyenLieu)
+                                .addComponent(btnPrintRaw))
                             .addComponent(dtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1019,6 +1078,11 @@ public class PanelViewReservation extends javax.swing.JPanel {
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
             }
+            tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
+            tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(3).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(4).setMaxWidth(100);
+
             tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
@@ -1051,6 +1115,11 @@ public class PanelViewReservation extends javax.swing.JPanel {
                 tbListTable.setRowSelectionInterval(0, 0);
 
             }
+            tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
+            tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(3).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(4).setMaxWidth(100);
+
             tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(7).setMinWidth(0);
@@ -1088,8 +1157,69 @@ public class PanelViewReservation extends javax.swing.JPanel {
         idTableService = (int) tbInvoice.getValueAt(index, 0);
     }//GEN-LAST:event_tbInvoiceMousePressed
 
+    private void btnPrintInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintInvoiceActionPerformed
+
+        try {
+            int index = tbListTable.getSelectedRow();
+            conn = ConnectDB.conn();
+            DecimalFormat df = new DecimalFormat("#,###,###");
+            HashMap<String, Object> parameter = new HashMap<String, Object>();
+            parameter.put("khachhang", Customer.getByID(Integer.parseInt(tbListTable.getValueAt(index, 9).toString()), conn).getNAME());
+            parameter.put("sdt", tbListTable.getValueAt(index, 3).toString());
+            parameter.put("ban", tbListTable.getValueAt(index, 1).toString());
+            parameter.put("ngay", tbListTable.getValueAt(index, 4).toString());
+            parameter.put("duatruoc", lbrepay.getText());
+            parameter.put("tongtien", lbTotal.getText());
+            parameter.put("nhanvien", "Nguyễn Hữu Phước");
+            parameter.put("mahoadon", idreservation);
+            parameter.put("mahoadon", idreservation);
+            parameter.put("tennhahang", tbRestaurant.getValues().getName());
+            parameter.put("diachi", tbRestaurant.getValues().getAddress());
+            parameter.put("sdtnhahang", tbRestaurant.getValues().getPhone());
+            parameter.put("logo", tbRestaurant.getValues().getLogo());
+            JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/InvoiceReservation.jrxml"));
+            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
+            JasperViewer jv = new JasperViewer(jp, false);
+            Container container = jv.getContentPane();
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int width = (int) screenSize.getWidth();
+            int height = (int) screenSize.getHeight();
+            panel.setPreferredSize(new Dimension(width, height));
+            panel.add(container);
+            JOptionPane.showOptionDialog(null, panel,
+                    "Xem Hóa Đơn Đặt Bàn", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+        } catch (Exception ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_btnPrintInvoiceActionPerformed
+
+    private void btnPrinNguyenLieuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrinNguyenLieuActionPerformed
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        JTable.PrintMode mode = JTable.PrintMode.FIT_WIDTH;
+        MessageFormat header = new MessageFormat("DANH SÁCH CÁC BÀN ĐƯỢC ĐẶT");
+        MessageFormat footer = new MessageFormat("Ngày: " + formatter.format(new Date()));
+        try {
+            boolean comp = tbListTable.print(mode, header, footer, false, null, false, null);
+            if (comp) {
+                JOptionPane.showMessageDialog(getRootPane(), "Đã In");
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnPrinNguyenLieuActionPerformed
+
+    private void btnPrintRawActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintRawActionPerformed
+        printListRawmetarial();
+    }//GEN-LAST:event_btnPrintRawActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnPrinNguyenLieu;
+    private javax.swing.JButton btnPrintInvoice;
+    private javax.swing.JButton btnPrintRaw;
     private javax.swing.JButton btnView;
     private com.toedter.calendar.JDateChooser dtSearch;
     private javax.swing.JLabel jLabel1;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="421" pageHeight="595" columnWidth="381" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="85f61f54-9b65-4e1f-9176-4538b81a1758">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.771561000000001"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="idReservation" class="java.lang.Integer">
@@ -14,6 +14,11 @@
 	<parameter name="dateUse" class="java.lang.String"/>
 	<parameter name="staff" class="java.lang.String"/>
 	<parameter name="note" class="java.lang.String"/>
+	<parameter name="duatruoc" class="java.lang.String"/>
+	<parameter name="tennhahang" class="java.lang.String"/>
+	<parameter name="diachi" class="java.lang.String"/>
+	<parameter name="dienthoai" class="java.lang.String"/>
+	<parameter name="ban" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
 	table_service.id as id,
@@ -45,16 +50,30 @@ WHERE
 		<band/>
 	</background>
 	<title>
-		<band height="72">
+		<band height="83">
 			<frame>
-				<reportElement mode="Opaque" x="-20" y="-20" width="422" height="92" backcolor="#006699" uuid="1e4a487e-a61b-4614-b3d7-1894ac4d10be"/>
-				<staticText>
-					<reportElement x="20" y="20" width="234" height="43" forecolor="#FFFFFF" uuid="e2a420b0-9f6f-4571-8e0d-89c95de8b426"/>
-					<textElement>
-						<font size="34" isBold="true"/>
+				<reportElement mode="Opaque" x="-20" y="-20" width="422" height="103" backcolor="#006699" uuid="1e4a487e-a61b-4614-b3d7-1894ac4d10be"/>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="20" width="422" height="39" forecolor="#FFFFFF" uuid="75746485-e915-450e-8012-f543b85b7c28"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="20" isBold="true"/>
 					</textElement>
-					<text><![CDATA[ABC]]></text>
-				</staticText>
+					<textFieldExpression><![CDATA[$P{tennhahang}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="59" width="422" height="20" forecolor="#FFFFFF" uuid="f629a039-6f4c-4dc7-869b-abf0e78f486b"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{diachi}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="79" width="422" height="20" forecolor="#FFFFFF" uuid="e17c56f6-683f-47a9-b28a-12c65c21b9c0"/>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="12" isBold="true" isItalic="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{dienthoai}]]></textFieldExpression>
+				</textField>
 			</frame>
 		</band>
 	</title>
@@ -67,7 +86,7 @@ WHERE
 				</textElement>
 				<text><![CDATA[Khách Hàng:]]></text>
 			</staticText>
-			<textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="65" y="0" width="110" height="20" uuid="749d28ce-a456-4811-af83-4f6a0c3491a8"/>
 				<textElement>
 					<font isBold="true"/>
@@ -81,7 +100,7 @@ WHERE
 				</textElement>
 				<text><![CDATA[Ngày Nhận:]]></text>
 			</staticText>
-			<textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="65" y="21" width="110" height="20" uuid="0494214c-8132-4ba4-a4b9-565f7b1a72ec"/>
 				<textElement>
 					<font isBold="true"/>
@@ -95,7 +114,7 @@ WHERE
 				</textElement>
 				<text><![CDATA[Nhân Viên: ]]></text>
 			</staticText>
-			<textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="256" y="1" width="125" height="20" uuid="c0481b43-df29-4d16-8358-1c97dba30866"/>
 				<textElement>
 					<font isBold="true"/>
@@ -109,12 +128,26 @@ WHERE
 				</textElement>
 				<text><![CDATA[Ghi Chú: ]]></text>
 			</staticText>
-			<textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="65" y="40" width="316" height="20" uuid="6f1b8684-dc6e-4176-935e-e693ef51e6f3"/>
 				<textElement>
 					<font fontName="Tahoma" isItalic="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{note}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="191" y="21" width="65" height="20" uuid="ee9379ce-ad47-45c6-b79e-a54fe1699aa2"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Bàn:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="256" y="20" width="125" height="20" uuid="b0233bac-b365-420c-aff9-a944b0dbcead"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{ban}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -189,7 +222,7 @@ WHERE
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="90">
+		<band height="108">
 			<textField>
 				<reportElement x="254" y="0" width="122" height="20" uuid="3dff78b0-e1cc-4f30-ac64-eb6a5abe09fa"/>
 				<textElement>
@@ -212,7 +245,7 @@ WHERE
 				<textFieldExpression><![CDATA[$P{paymentDown}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement x="254" y="60" width="121" height="20" uuid="64d96395-a4e4-4e2c-b699-4451d12596ae"/>
+				<reportElement x="254" y="80" width="121" height="20" uuid="64d96395-a4e4-4e2c-b699-4451d12596ae"/>
 				<textElement>
 					<font fontName="Tahoma" isBold="true"/>
 				</textElement>
@@ -240,12 +273,26 @@ WHERE
 				<text><![CDATA[Giảm Giá(VNĐ):]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="163" y="60" width="91" height="20" uuid="1aeccc32-e8bb-41dd-8b9a-a7db7e76c243"/>
+				<reportElement x="163" y="80" width="91" height="20" uuid="1aeccc32-e8bb-41dd-8b9a-a7db7e76c243"/>
 				<textElement>
 					<font fontName="Tahoma"/>
 				</textElement>
 				<text><![CDATA[Phải Trả(VNĐ):]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="165" y="60" width="91" height="20" uuid="74a84ac9-54d1-4bc4-9973-b290c1f42e49"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<text><![CDATA[Đưa TrướcVNĐ):]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement x="256" y="60" width="119" height="20" uuid="83f7f634-a81d-4415-9d59-842890d35fb7"/>
+				<textElement>
+					<font fontName="Tahoma"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{duatruoc}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnFooter>
 	<pageFooter>

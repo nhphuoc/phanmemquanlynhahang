@@ -108,9 +108,8 @@ public class PanelChangeTable extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
         try {
-            model = Table.selectTableByLocation(idLocation, 1, ConnectDB.conn());
-        } catch (Exception e) {
-            System.out.println("Lỗi dổ dữ liệu vào combobox Table: "+e.getMessage());
+            model = Table.selectTableByLocation(idLocation,1, ConnectDB.conn());
+        } catch (Exception e) {            
         }
 
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
@@ -198,8 +197,7 @@ public class PanelChangeTable extends javax.swing.JPanel {
             vn.edu.vttu.model.TableLocation tbLocation = (vn.edu.vttu.model.TableLocation) cobTableLocation.getSelectedItem();
             int idLocation = tbLocation.getId();
             fillComboTable(idLocation);
-        } catch (Exception e) {
-            System.out.println("Lỗi dổ sự kiện thay dổi trạng thái combobox Location: "+e.getMessage());
+        } catch (Exception e) {            
         }
 
 
@@ -214,8 +212,7 @@ public class PanelChangeTable extends javax.swing.JPanel {
             vn.edu.vttu.model.Table tb = (vn.edu.vttu.model.Table) cobTable.getSelectedItem();
             int idTable = tb.getIdTable();
             VariableStatic.setIdTable_Change(idTable);
-        } catch (Exception e) {
-            System.out.println("Lỗi dổ sự kiện thay dổi trạng thái combobox table: "+e.getMessage());
+        } catch (Exception e) {            
         }
 
     }//GEN-LAST:event_cobTablePropertyChange

@@ -297,7 +297,6 @@ public class PanelTable extends javax.swing.JPanel {
                                         }
                                     } else {
                                         if (billing()) {
-
                                             loadTableInvoice();
                                             loadTable(idLocation);
                                             setTextLable(idTable);
@@ -669,72 +668,72 @@ public class PanelTable extends javax.swing.JPanel {
 
     private void popupTableService() {
         /*
-        try {
-            popupMenu = new JPopupMenu();
-            BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/back-icon.png"));
-            Image imageCalService = bImgCalService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-            popupMenu.add(new JMenuItem(new AbstractAction("Gọi dịch vụ này", new ImageIcon(imageCalService)) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    callService();
-                }
-            }
-            ));
+         try {
+         popupMenu = new JPopupMenu();
+         BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/back-icon.png"));
+         Image imageCalService = bImgCalService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+         popupMenu.add(new JMenuItem(new AbstractAction("Gọi dịch vụ này", new ImageIcon(imageCalService)) {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+         callService();
+         }
+         }
+         ));
 
-            popupMenu.addSeparator();
-            BufferedImage bImgAddService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/add-icon.png"));
-            Image imageAddService = bImgAddService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+         popupMenu.addSeparator();
+         BufferedImage bImgAddService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/add-icon.png"));
+         Image imageAddService = bImgAddService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
 
-            popupMenu.add(
-                    new JMenuItem(new AbstractAction("Thêm Dịch Vụ", new ImageIcon(imageAddService)) {
-                        @Override
-                        public void actionPerformed(ActionEvent e
-                        ) {
+         popupMenu.add(
+         new JMenuItem(new AbstractAction("Thêm Dịch Vụ", new ImageIcon(imageAddService)) {
+         @Override
+         public void actionPerformed(ActionEvent e
+         ) {
 
-                        }
-                    }));
-            BufferedImage bImgServiceChangeName = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
-            Image imageServiceChangeName = bImgServiceChangeName.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+         }
+         }));
+         BufferedImage bImgServiceChangeName = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
+         Image imageServiceChangeName = bImgServiceChangeName.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
 
-            popupMenu.add(
-                    new JMenuItem(new AbstractAction("Đổi Tên", new ImageIcon(imageServiceChangeName)) {
-                        @Override
-                        public void actionPerformed(ActionEvent e
-                        ) {
+         popupMenu.add(
+         new JMenuItem(new AbstractAction("Đổi Tên", new ImageIcon(imageServiceChangeName)) {
+         @Override
+         public void actionPerformed(ActionEvent e
+         ) {
 
-                            String name = JOptionPane.showInputDialog(tbService, "Nhập tên dịch vụ", sv_name);
-                            if (name != null) {
-                                if (Service.updateName(name, idService, conn)) {
-                                    loadTableService();
-                                }
-                            }
-                        }
-                    }
-                    ));
-            BufferedImage bImgServiceCost = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/dollar-icon.png"));
-            Image imageServiceCost = bImgServiceCost.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
+         String name = JOptionPane.showInputDialog(tbService, "Nhập tên dịch vụ", sv_name);
+         if (name != null) {
+         if (Service.updateName(name, idService, conn)) {
+         loadTableService();
+         }
+         }
+         }
+         }
+         ));
+         BufferedImage bImgServiceCost = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/dollar-icon.png"));
+         Image imageServiceCost = bImgServiceCost.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
 
-            popupMenu.add(
-                    new JMenuItem(new AbstractAction("Cập Nhật Giá", new ImageIcon(imageServiceCost)) {
-                        @Override
-                        public void actionPerformed(ActionEvent e
-                        ) {
-                            String costnew = JOptionPane.showInputDialog(tbService, "Nhập Giá", cost);
-                            if (costnew != null) {
-                                if (ServiceCost.insert(idService, Integer.parseInt(costnew), conn)) {
-                                    loadTableService();
-                                }
-                            }
-                        }
-                    }
-                    ));
-            conn = null;
-        } catch (Exception e) {
-            conn = null;
-            e.printStackTrace();
-        }
-        tbService.setComponentPopupMenu(popupMenu);
-        */
+         popupMenu.add(
+         new JMenuItem(new AbstractAction("Cập Nhật Giá", new ImageIcon(imageServiceCost)) {
+         @Override
+         public void actionPerformed(ActionEvent e
+         ) {
+         String costnew = JOptionPane.showInputDialog(tbService, "Nhập Giá", cost);
+         if (costnew != null) {
+         if (ServiceCost.insert(idService, Integer.parseInt(costnew), conn)) {
+         loadTableService();
+         }
+         }
+         }
+         }
+         ));
+         conn = null;
+         } catch (Exception e) {
+         conn = null;
+         e.printStackTrace();
+         }
+         tbService.setComponentPopupMenu(popupMenu);
+         */
     }
 
     private void popupTableInvoice() {
@@ -1377,7 +1376,7 @@ public class PanelTable extends javax.swing.JPanel {
         lbTotal.setText(String.valueOf(df.format(total)));
         discount = (int) (_discount + discount_money);
 
-        if (customer_pay < totalPay) {
+        if ((customer_pay + prepay) < totalPay) {
             lbChangeForCustomer.setText("Thiếu: " + String.valueOf(df.format(Math.abs(((customer_pay + prepay) - totalPay)))));
         } else {
             lbChangeForCustomer.setText(df.format((customer_pay + prepay) - totalPay));
@@ -1386,13 +1385,6 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private boolean billing() throws SQLException {
-        /*
-         1. update cac dich vu cua ban ve trang thai status=false
-         2. update ngay ket thuc endDate cua table_reservation=now()
-         3. update status ban
-         3.1. Neu ban do khong co dat truoc. status=0
-         3.2. Neu ban do co dat truoc. status=2
-         */
         conn = ConnectDB.conn();
         boolean flag = false;
         try {
@@ -1400,19 +1392,12 @@ public class PanelTable extends javax.swing.JPanel {
             if (TableService.updateStstus(idTableReservation, conn)) {
                 if (TableReservation.updateEndDate(idTableReservation, conn)) {
                     if (Invoice.insert(idTableReservation, 1, totalPay, discount, txtNoteinvoice.getText(), conn)) {
-                        System.out.println("Điều kiện :" + Discount.getByDate(conn).getCondition());
-                        try {
-                            System.out.println(Integer.parseInt(lbTotal.getText().replaceAll("\\.", "")));
-                        } catch (Exception e) {
-                            System.out.println(Integer.parseInt(lbTotal.getText().replaceAll(",", "")));
-                        }
                         int _total = 0;
                         try {
                             _total = Integer.parseInt(lbTotal.getText().replaceAll("\\.", ""));
                         } catch (Exception e) {
                             _total = Integer.parseInt(lbTotal.getText().replaceAll(",", ""));
                         }
-                        System.out.println(_total);
                         if (Discount.getByDate(conn).getCondition() < _total) {
                             TableReservationDetail table_list[] = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
                             for (int i = 0; i < table_list.length; i++) {
@@ -1457,7 +1442,11 @@ public class PanelTable extends javax.swing.JPanel {
                     } else {
                         throw new Exception();
                     }
+                } else {
+                    throw new Exception();
                 }
+            } else {
+                throw new Exception();
             }
             conn = null;
         } catch (Exception e) {
@@ -1477,18 +1466,34 @@ public class PanelTable extends javax.swing.JPanel {
             if (!txtService_Price.getText().equals("")) {
                 servicePay = txtService_Price.getText();
             }
+            int prepay;
+            try {
+                prepay = Integer.parseInt(String.valueOf(txtPrepay.getText().trim().replaceAll("\\.", "")));
+            } catch (Exception e) {
+                prepay = Integer.parseInt(String.valueOf(txtPrepay.getText().trim().replaceAll(",", "")));
+            }
+            TableReservationDetail[]tb=TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
+            String ban="";
+            for(int i=0;i<tb.length;i++){
+                int id=tb[i].getID_TABLE();
+                ban=ban+","+Table.getByID(id, conn).getNAME();
+            }
             HashMap<String, Object> parameter = new HashMap<String, Object>();
             parameter.put("idReservation", idTableReservation);
             parameter.put("totalFirst", lbTotal.getText());
             parameter.put("servicePayment", servicePay);
             parameter.put("paymentDown", df.format(discount));
-            parameter.put("totalLast", df.format(totalPay));
+            parameter.put("totalLast", df.format(totalPay - prepay));
             parameter.put("customer", lbCustomerName.getText());
             parameter.put("customer", lbCustomerName.getText());
             parameter.put("staff", lbStaff.getText());
             parameter.put("dateUse", lbBeginDate.getText());
             parameter.put("note", txtNoteinvoice.getText());
-
+            parameter.put("duatruoc", txtPrepay.getText());
+            parameter.put("tennhahang", tbRestaurant.getValues().getName());
+            parameter.put("diachi", "Địa Chỉ: " + tbRestaurant.getValues().getAddress());
+            parameter.put("dienthoai", "Điện Thoại: " + tbRestaurant.getValues().getPhone());
+            parameter.put("ban",ban);
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/Invoice.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
             JasperViewer jv = new JasperViewer(jp, false);
@@ -1548,6 +1553,7 @@ public class PanelTable extends javax.swing.JPanel {
                     int idUnitStore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
                     float num = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
                     float x;
+                    System.out.println("Cha: " + Unit.getByID(idUnitStore, ConnectDB.conn()).isParent());
                     if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
                         x = num * Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
                     } else {
@@ -2391,9 +2397,11 @@ public class PanelTable extends javax.swing.JPanel {
     }//GEN-LAST:event_btnReloadTableActionPerformed
     private void btnPaymentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPaymentActionPerformed
         if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            try {
-                if (billing()) {
-                    if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công!\nBạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công!\nBạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                printInvoice();
+                try {
+                    if (billing()) {
+
                         loadTableInvoice();
                         loadTable(idLocation);
                     } else {
@@ -2401,11 +2409,12 @@ public class PanelTable extends javax.swing.JPanel {
                         loadTable(idLocation);
 
                     }
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(PanelTable.class
-                        .getName()).log(Level.SEVERE, null, ex);
             }
+
         }
     }//GEN-LAST:event_btnPaymentActionPerformed
     private void btnViewTableByLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewTableByLocationActionPerformed
@@ -2458,7 +2467,6 @@ public class PanelTable extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_txtPrepayKeyTyped
-
     private void tbServiceMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbServiceMouseClicked
         try {
             int index = tbService.getSelectedRow();
