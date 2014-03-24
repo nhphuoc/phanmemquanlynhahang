@@ -2,6 +2,7 @@ package vn.edu.vttu.ui;
 
 import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Unit;
 
 /**
@@ -11,40 +12,50 @@ import vn.edu.vttu.data.Unit;
  *
  */
 public class test {
-    private String dvt(int id,float num){
-        String kq="";
-        TableModel tb = Unit.getBySubID(id, ConnectDB.conn());        
-        int cast=0;
-        int idsub = 0;
-        if (tb.getRowCount() > 1) {            
-            for(int i=0;i<tb.getRowCount();i++){
-                if(!Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).isParent()){                    
-                    cast=Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).getCast();
-                    idsub=Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).getId();
-                    break;
+
+    private String dvt(int id, float num) {
+        String kq = "";
+        int ids = id;
+        boolean parent = false;
+        int cast;
+        String x, y, z = null;
+        int sl;
+        String name;
+        cast = Unit.getByID(ids, ConnectDB.conn()).getCast();
+        sl = (int) (num * cast);
+        TableModel tb = Unit.getBySubID(id, ConnectDB.conn());
+        for (int i = 0; i < tb.getRowCount(); i++) {
+            parent = Unit.getByID(id, ConnectDB.conn()).isParent();
+            cast = Unit.getByID(ids, ConnectDB.conn()).getCast();
+            name = Unit.getByID(id, ConnectDB.conn()).getName();
+            if (num < cast) {
+                kq = num + " " + name;
+                break;
+            } else {
+                if (parent == false) {
+                    y = (sl / cast)+ name;
+                    z = (sl % cast)+ name;
+                    id = Unit.getByID(id, ConnectDB.conn()).getId_sub();
+                } else {
+                    y =(num / cast)+" "+name;
                 }
             }
-            float x=(float) (num*cast);
-            String y,z;
-            y=(int)(x/cast)+" "+Unit.getByID(id, ConnectDB.conn()).getName();
-            z=(int) (x%cast)+" "+Unit.getByID(idsub, ConnectDB.conn()).getName();
-            if(x%cast==0){   
-                kq=y;
-            }else{                
-                kq=y+" "+z;
-            }
-            
-        }
-        if (tb.getRowCount()==1) {
-            kq=(num+" "+Unit.getByID(id, ConnectDB.conn()).getName());
+            kq = y + " " + name + " " + z + " " + name;
         }
         return kq;
     }
 
     public static void main(String[] agrs) {
         test t = new test();
-        System.out.println(t.dvt(19, (float) 6));
-        
+        TableModel tb = RawMaterial.getAll(ConnectDB.conn());
+        for (int i = 0; i < tb.getRowCount(); i++) {
+            int idUnit = Integer.parseInt(tb.getValueAt(i, 4).toString());
+            float sl = Float.parseFloat(tb.getValueAt(i, 2).toString());
+            String name = tb.getValueAt(i, 1).toString();
+
+            System.out.println(name + " - " + t.dvt(idUnit, sl));
+        }
+
     }
 
 }

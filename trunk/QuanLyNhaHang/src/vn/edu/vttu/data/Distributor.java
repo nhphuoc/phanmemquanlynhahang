@@ -101,6 +101,24 @@ public class Distributor {
         }
         return null;
     }
+    public static boolean insertName(String name, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL distributor_add_name(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
     
     
     

@@ -139,7 +139,6 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         cobNguyenLieu.setRenderer(new PanelAddStoreInvoice.ItemRendererStore());
 
     }
-    
 
     private void fillcobNhaCungCap() {
         Vector<vn.edu.vttu.model.Distributor> model = new Vector<vn.edu.vttu.model.Distributor>();
@@ -179,10 +178,11 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         btnDel = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         cobNhaCungCap = new javax.swing.JComboBox();
-        btnThemNguyenLieu1 = new javax.swing.JButton();
+        btnThemCongty = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         txtNote = new javax.swing.JTextField();
         lbDVT = new javax.swing.JLabel();
+        btnChagesSL = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbList = new javax.swing.JTable();
 
@@ -235,6 +235,11 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         });
 
         btnThemNguyenLieu.setText("+");
+        btnThemNguyenLieu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThemNguyenLieuActionPerformed(evt);
+            }
+        });
 
         btnAddToList.setText("Thêm Vào Danh Sách");
         btnAddToList.addActionListener(new java.awt.event.ActionListener() {
@@ -250,7 +255,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
             }
         });
 
-        btnDel.setText("Xóa Khỏi Danh Sách Đang Chọn");
+        btnDel.setText("Xóa Đang Chọn");
         btnDel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDelActionPerformed(evt);
@@ -263,7 +268,12 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
 
         cobNhaCungCap.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        btnThemNguyenLieu1.setText("+");
+        btnThemCongty.setText("+");
+        btnThemCongty.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnThemCongtyActionPerformed(evt);
+            }
+        });
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(51, 153, 0));
@@ -271,6 +281,13 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
 
         lbDVT.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lbDVT.setText("DVT");
+
+        btnChagesSL.setText("Cập Nhật SL");
+        btnChagesSL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChagesSLActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -289,22 +306,26 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnThemNguyenLieu)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtDonGia, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
-                            .addComponent(lbDVT, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lbDVT, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtDonGia, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(11, 11, 11)))
                         .addGap(69, 69, 69))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnThemNguyenLieu1)
+                        .addComponent(btnThemCongty)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
                         .addComponent(btnAddToList)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnChagesSL)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnDel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -320,7 +341,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -328,7 +349,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(cobNhaCungCap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnThemNguyenLieu1))
+                    .addComponent(btnThemCongty))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -350,7 +371,8 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddToList)
                     .addComponent(btnSave)
-                    .addComponent(btnDel)))
+                    .addComponent(btnDel)
+                    .addComponent(btnChagesSL)))
         );
 
         tbList.setModel(new javax.swing.table.DefaultTableModel(
@@ -385,8 +407,8 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane1)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -405,10 +427,10 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) tbList.getModel();
         vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
         int idNguyenLieu = store.getId();
-        
+
         String tenNguyenLieu = store.getName();
-        String tenDVT=RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit();
-        int _unit=RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getUnit();
+        String tenDVT = RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit();
+        int _unit = RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getUnit();
         boolean flag = false;
         int j = 0;
         if (txtNumber.getText().equals("") || txtDonGia.getText().equals("")) {
@@ -498,6 +520,9 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                     for (int i = 0; i < tbList.getRowCount(); i++) {
                         model.removeRow(i);
                     }
+                    if(JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn in hóa đơn","Hỏi",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+                        
+                    }
                 }
             } catch (Exception e) {
                 try {
@@ -539,7 +564,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         if (!txtDonGia.getText().trim().equals("")) {
             try {
                 Long num = Long.parseLong(txtDonGia.getText().trim().replaceAll("\\.", ""));
-                String str = txtDonGia.getText().trim().replaceAll("\\.", "");                
+                String str = txtDonGia.getText().trim().replaceAll("\\.", "");
                 txtDonGia.setText(String.valueOf(df.format(num)));
             } catch (Exception e) {
                 Long num = Long.parseLong(txtDonGia.getText().trim().replaceAll(",", ""));
@@ -555,7 +580,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         if (key != evt.VK_BACK_SPACE
                 && key != evt.VK_DELETE
                 && key != evt.VK_ENTER
-                && key != evt.VK_COMMA) {            
+                && key != evt.VK_COMMA) {
             int flag = 0;
             if (stTest.indexOf(evt.getKeyChar()) == -1) {
                 flag++;
@@ -570,20 +595,87 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         //fillcobStore();
         try {
             vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
-        int idNguyenLieu = store.getId();
-        lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
+            int idNguyenLieu = store.getId();
+            lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
         } catch (Exception e) {
         }
-        
+
     }//GEN-LAST:event_cobNguyenLieuPropertyChange
+
+    private void btnChagesSLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChagesSLActionPerformed
+        DefaultTableModel model = (DefaultTableModel) tbList.getModel();
+        vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
+        int idNguyenLieu = store.getId();
+
+        String tenNguyenLieu = store.getName();
+        String tenDVT = RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit();
+        int _unit = RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getUnit();
+        boolean flag = false;
+        int j = 0;
+        if (txtNumber.getText().equals("") || txtDonGia.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng hoặc đơn giá");
+        } else {
+            float soLuong = Float.parseFloat(txtNumber.getText().replaceAll(",", "\\."));
+            int donGia = Integer.parseInt(txtDonGia.getText().trim().replaceAll("\\.", ""));
+            if (tbList.getRowCount() > 0) {
+                for (int i = 0; i < tbList.getRowCount(); i++) {
+                    if (idNguyenLieu == Integer.parseInt(String.valueOf(tbList.getValueAt(i, 0)))) {
+                        flag = false;
+                        j = i;
+                        break;
+                    } else {
+                        flag = true;
+                    }
+                }
+                if (flag == false) {
+                    float n = Float.parseFloat(String.valueOf(tbList.getValueAt(j, 2)));
+                    float m;
+                    m = soLuong;
+                    tbList.setValueAt(m, j, 2);
+                    tbList.setValueAt(m * Float.parseFloat(String.valueOf(tbList.getValueAt(j, 4))), j, 5);
+                    tbList.setValueAt(donGia, j, 4);
+                } else {
+                    model.addRow(new Object[]{idNguyenLieu, tenNguyenLieu, soLuong, tenDVT, donGia, (soLuong * donGia), _unit});
+                }
+            } else {
+                model.addRow(new Object[]{idNguyenLieu, tenNguyenLieu, soLuong, tenDVT, donGia, (soLuong * donGia), _unit});
+            }
+        }
+        tbList.getColumnModel().getColumn(6).setMaxWidth(0);
+        tbList.getColumnModel().getColumn(6).setMinWidth(0);
+        tbList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
+        tbList.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
+        tbList.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+    }//GEN-LAST:event_btnChagesSLActionPerformed
+
+    private void btnThemNguyenLieuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemNguyenLieuActionPerformed
+        JOptionPane.showOptionDialog(null, new PanelAddStore(),
+                "Thêm nguyên liệu", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+        fillcobStore();
+    }//GEN-LAST:event_btnThemNguyenLieuActionPerformed
+
+    private void btnThemCongtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemCongtyActionPerformed
+        String input = JOptionPane.showInputDialog(btnThemCongty, "Nhập tên công ty");
+        if (input != null) {
+            if (Distributor.insertName(input, ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(btnThemCongty, "Thêm thành công");
+                fillcobNhaCungCap();
+            } else {
+                JOptionPane.showMessageDialog(btnThemCongty, "<html><font color='red'>Thêm không thành công</font></html>");
+            }
+        } else {
+            JOptionPane.showMessageDialog(btnThemCongty, "Bạn chưa nhập tên công ty");
+        }
+    }//GEN-LAST:event_btnThemCongtyActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddToList;
+    private javax.swing.JButton btnChagesSL;
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnThemCongty;
     private javax.swing.JButton btnThemNguyenLieu;
-    private javax.swing.JButton btnThemNguyenLieu1;
     private javax.swing.JComboBox cobNguyenLieu;
     private javax.swing.JComboBox cobNhaCungCap;
     private javax.swing.JLabel jLabel1;

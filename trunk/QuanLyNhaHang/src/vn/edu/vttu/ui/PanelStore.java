@@ -187,7 +187,6 @@ public class PanelStore extends javax.swing.JPanel {
         cobUnit.setModel(defaultComboBoxModel);
         cobUnit.setRenderer(new PanelStore.ItemRenderer());
         conn = null;
-
     }
 
     /**
@@ -450,7 +449,7 @@ public class PanelStore extends javax.swing.JPanel {
                 if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
                     JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
                 } else {
-                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, conn)) {
+                    if (RawMaterial.insert(txtNAme.getText(),0, _unit, conn)) {
                         loadData();
                         enableControl(true);
                     } else {
@@ -469,13 +468,13 @@ public class PanelStore extends javax.swing.JPanel {
                         } catch (Exception e) {
                             _number = Float.parseFloat(txtNumber.getText().trim().replaceAll(",", ""));
                         }
-                        if (RawMaterial.update(txtNAme.getText().trim(), _number, _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
+                        if (RawMaterial.update(txtNAme.getText().trim(), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
                             loadData();
                             enableControl(true);
                         }
                     }
                 } else {
-                    if (RawMaterial.update(txtNAme.getText().trim(), Float.parseFloat(txtNumber.getText().trim()), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
+                    if (RawMaterial.update(txtNAme.getText().trim(), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
                         loadData();
                         enableControl(true);
                     }
