@@ -22,7 +22,7 @@ public class ColoredTableCellRenderer extends DefaultTableCellRenderer {
         if ((row % 2) == 0) {
             setBackground(Color.WHITE);
         } else {
-            setBackground(Color.getHSBColor(153, 205, 155));
+            setBackground(Color.decode("#9AFF9A"));
         }
 
         super.getTableCellRendererComponent(table, value, selected, focused, row, column);

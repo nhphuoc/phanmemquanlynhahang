@@ -85,8 +85,7 @@ public class Unit {
             e.printStackTrace();
         }
         return tb;
-    }
-
+    }    
     public static boolean insert(String name, Connection conn) {
         boolean flag = false;
         try {
@@ -188,7 +187,7 @@ public class Unit {
     public static Vector selectUnitByID(int id, Connection conn) {
         Vector result = new Vector();
         try {
-            String sql = "call unit_sub_get_by_unit_id(?)";
+            String sql = "call unit_sub_get_by_sub_id(?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
@@ -200,8 +199,7 @@ public class Unit {
             e.printStackTrace();
         }
         return result;
-    }
-
+    }    
     public static Unit getByID(int id, Connection conn) {
         Unit unit;
         try {
@@ -218,5 +216,18 @@ public class Unit {
         }
         return null;
     }
+    public static TableModel getBySubID(int subID,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL unit_sub_get_by_sub_id(?)}");
+            calState.setInt(1,subID);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }    
 
 }

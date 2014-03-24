@@ -84,18 +84,14 @@ public class PanelTable extends javax.swing.JPanel {
                 boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
-
             if (value != null) {
-                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;
-                // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;               
                 setText(item.getName().toUpperCase());
             }
-
             if (index == -1) {
                 vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;
                 setText("" + item.getName());
             }
-
             return this;
         }
     }
@@ -118,7 +114,6 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     class TaskWarningUser extends TimerTask {
-
         public void run() {
             conn = ConnectDB.conn();
             try {
@@ -186,6 +181,7 @@ public class PanelTable extends javax.swing.JPanel {
         popupTableInvoice();
         loadTable(idLocation);
         loadTableService();
+        fillkhCombo();
 
         TimerTask taskreservation = new TaskReservation();
         Timer timer = new Timer();

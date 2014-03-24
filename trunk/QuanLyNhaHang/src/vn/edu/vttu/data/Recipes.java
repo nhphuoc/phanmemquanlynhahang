@@ -173,9 +173,30 @@ public class Recipes {
         String count;
         boolean flag = false;
         try {
-            CallableStatement calState = conn.prepareCall("{CALL recipes_count_by_idService(?,?)}");
+            CallableStatement calState = conn.prepareCall("{CALL recipes_count_by_idService_id_raw(?,?)}");
             calState.setInt(1, idService);
             calState.setInt(2, idStore);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            count = String.valueOf(tb.getValueAt(0, 0));
+            if (count.equals("0")) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean countRecipesByIdService(int idService, Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        String count;
+        boolean flag = false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL recipes_count_by_idService(?)}");
+            calState.setInt(1, idService);            
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
             count = String.valueOf(tb.getValueAt(0, 0));

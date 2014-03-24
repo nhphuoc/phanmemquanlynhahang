@@ -19,10 +19,7 @@ public class NumberCellRenderer extends DefaultTableCellRenderer {
             label.setHorizontalAlignment(JLabel.RIGHT);
             Number num = (Number) value;
             String text = numberFormat.format(num);
-            label.setText(text);
-            if (num.doubleValue() < 0) {
-                label.setForeground(Color.RED);
-            }            
+            label.setText(text);            
 
         }
         return c;

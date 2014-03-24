@@ -5,10 +5,22 @@
  */
 package vn.edu.vttu.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
+import java.util.Vector;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Unit;
+import static vn.edu.vttu.ui.PanelService.setSelectedValueUnit;
 
 /**
  *
@@ -16,31 +28,132 @@ import vn.edu.vttu.data.Unit;
  */
 public class PanelUnit extends javax.swing.JPanel {
 
+    class ItemRenderer extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index,
+                    isSelected, cellHasFocus);
+            if (value != null) {
+                vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                setText(item.getName().toUpperCase());
+            }
+            if (index == -1) {
+                vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                setText("" + item.getName());
+            }
+            return this;
+        }
+    }
+
     /**
      * Creates new form PanelUnit
      */
     private Connection conn;
     private boolean add = false;
     private String x;
-    
+    JTable table;
+
     public PanelUnit() {
         initComponents();
-        loadData();
+        pn.removeAll();
+        loadUnit();
         enableControl(true);
+        pn.updateUI();
+        pn.repaint();
+        fillcobUnit();
+        table.getColumnModel().getColumn(3).setMaxWidth(0);
+        table.getColumnModel().getColumn(3).setMinWidth(0);
     }
-    
+
     private void loadData() {
         conn = ConnectDB.conn();
-        tbUnit.setModel(Unit.getAll(conn));
+        //tbUnit.setModel(Unit.getAll(conn));
         conn = null;
     }
-    
+
+    private void loadUnit() {
+        Vector<Vector> rowData = new Vector<Vector>();
+        TableModel tb = Unit.getAll(ConnectDB.conn());
+        for (int i = 0; i < tb.getRowCount(); i++) {
+            String name = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 3).toString()), ConnectDB.conn()).getName();
+            Vector<String> rowOne = new Vector<String>();
+            for (int j = 0; j < tb.getColumnCount(); j++) {
+                rowOne.addElement(tb.getValueAt(i, j).toString());
+            }
+            rowOne.addElement(name);
+            rowData.add(rowOne);
+        }
+        Vector<String> columnNames = new Vector<String>();
+        columnNames.addElement("Mã ĐVT");
+        columnNames.addElement("Tên ĐVT");
+        columnNames.addElement("Giá Trị");
+        columnNames.addElement("MÃ ĐVT Cha");
+        columnNames.addElement("ĐVT Cha");
+        table = new JTable(rowData, columnNames);
+        table.setGridColor(new java.awt.Color(204, 204, 204));
+        table.setRowHeight(25);
+        table.setSelectionBackground(new java.awt.Color(255, 153, 0));
+        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        table.setFont(new java.awt.Font("Tahoma", 1, 10));
+
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tbServiceMouseReleased(evt);
+            }
+
+            private void tbServiceMouseReleased(MouseEvent evt) {
+                int index = table.getSelectedRow();
+                txtID.setText(table.getValueAt(index, 0).toString());
+                txtName.setText(table.getValueAt(index, 1).toString());
+                txtCast.setText(table.getValueAt(index, 2).toString());
+                try {
+                    setSelectedUnit(cobDVT, Integer.parseInt(String.valueOf(table.getValueAt(index, 3))));
+                } catch (Exception e) {
+                }
+
+            }
+        });
+        JScrollPane scrollPane = new JScrollPane(table);
+        pn.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void fillcobUnit() {
+
+        conn = ConnectDB.conn();
+        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
+        try {
+            model = Unit.selectUnit(conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobDVT.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobDVT.setModel(defaultComboBoxModel);
+        cobDVT.setRenderer(new PanelUnit.ItemRenderer());
+        conn = null;
+
+    }
+
+    private void setSelectedUnit(JComboBox comboBox, int value) {
+        vn.edu.vttu.model.Unit item;
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            item = (vn.edu.vttu.model.Unit) comboBox.getItemAt(i);
+            if (item.getId() == value) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
     private void enableControl(boolean b) {
         btnadd.setEnabled(b);
         btnEdit.setEnabled(b);
         btnDel.setEnabled(b);
         btnSave.setEnabled(!b);
-        tbUnit.setEnabled(b);
+        //tbUnit.setEnabled(b);
         txtName.setEnabled(!b);
     }
 
@@ -57,8 +170,6 @@ public class PanelUnit extends javax.swing.JPanel {
         txtID = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tbUnit = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         btnadd = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
@@ -67,6 +178,11 @@ public class PanelUnit extends javax.swing.JPanel {
         btnDel = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JToolBar.Separator();
         btnSave = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        cobDVT = new javax.swing.JComboBox();
+        jLabel4 = new javax.swing.JLabel();
+        txtCast = new javax.swing.JTextField();
+        pn = new javax.swing.JPanel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 153, 0));
@@ -77,36 +193,6 @@ public class PanelUnit extends javax.swing.JPanel {
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 153, 0));
         jLabel2.setText("Tên:");
-
-        tbUnit = new javax.swing.JTable(){
-            public boolean isCellEditable(int rowIndex, int colIndex) {
-                return false;   //Disallow the editing of any cell
-            }
-        };
-        tbUnit.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "Tên ĐVT"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        tbUnit.setRowHeight(23);
-        tbUnit.setSelectionBackground(new java.awt.Color(255, 153, 0));
-        tbUnit.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tbUnitMouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(tbUnit);
 
         jToolBar1.setBackground(new java.awt.Color(102, 153, 255));
         jToolBar1.setFloatable(false);
@@ -165,36 +251,62 @@ public class PanelUnit extends javax.swing.JPanel {
         });
         jToolBar1.add(btnSave);
 
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel3.setText("ĐVT Cha");
+
+        cobDVT.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel4.setText("Chuyển Đổi");
+
+        pn.setLayout(new java.awt.GridLayout());
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtID, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+                    .addComponent(cobDVT, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtCast)
+                    .addComponent(txtName))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(pn, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(cobDVT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtCast, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(7, 7, 7)
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(pn, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -225,7 +337,7 @@ public class PanelUnit extends javax.swing.JPanel {
                 if (Unit.testName(txtName.getText().trim(), conn) == false) {
                     JOptionPane.showMessageDialog(getRootPane(), "Tên đơn vị tính đã có trong CSDL");
                 } else {
-                    
+
                     if (Unit.insert(txtName.getText().trim(), conn)) {
                         loadData();
                         enableControl(true);
@@ -236,15 +348,15 @@ public class PanelUnit extends javax.swing.JPanel {
             } else {
                 if (x.equals(txtName.getText().trim())) {
                     loadData();
-                     enableControl(true);
+                    enableControl(true);
                 } else {
                     if (Unit.testName(txtName.getText().trim(), conn) == false) {
                         JOptionPane.showMessageDialog(getRootPane(), "Tên đơn vị tính đã có trong CSDL");
                     } else {
-                        
+
                         if (Unit.update(txtName.getText().trim(), Integer.parseInt(txtID.getText().trim()), conn)) {
                             loadData();
-                             enableControl(true);
+                            enableControl(true);
                         } else {
                             JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công");
                         }
@@ -267,26 +379,23 @@ public class PanelUnit extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnDelActionPerformed
 
-    private void tbUnitMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbUnitMouseClicked
-        int index=tbUnit.getSelectedRow();
-        txtID.setText(String.valueOf(tbUnit.getValueAt(index, 0)));
-        txtName.setText(String.valueOf(tbUnit.getValueAt(index, 1)));
-    }//GEN-LAST:event_tbUnitMouseClicked
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnadd;
+    private javax.swing.JComboBox cobDVT;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JTable tbUnit;
+    private javax.swing.JPanel pn;
+    private javax.swing.JTextField txtCast;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables

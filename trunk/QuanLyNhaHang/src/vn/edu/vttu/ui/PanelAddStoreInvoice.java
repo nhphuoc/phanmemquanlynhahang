@@ -484,7 +484,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                             cost = Integer.parseInt(String.valueOf(tbList.getValueAt(i, 4)).trim().replaceAll(",", ""));
                         }
                         if (RawMaterialInvoiceDetail.insert(idraw, idRawInvoice, number, cost, conn)) {
-                            if (RawMaterial.updateNumber(idraw, number, conn)) {
+                            if (RawMaterial.updateNumber(idraw, -number, conn)) {
                             } else {
                                 throw new Exception();
                             }

@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,13 +86,14 @@ public class PanelCooking extends javax.swing.JPanel {
         lbServiceName.setText("Chế biến :" + nameService);
         loadRecipes();
         popuptbCook();
-        popuptbStore();        
-       
+        popuptbStore();
+
     }
+
     private void fillcobUnit(int id) {
 
         conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.ServiceType> model = new Vector<vn.edu.vttu.model.ServiceType>();
+        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
         try {
             model = Unit.selectUnitByID(id, conn);
         } catch (Exception e) {
@@ -115,6 +117,7 @@ public class PanelCooking extends javax.swing.JPanel {
         }
         tbStore.getColumnModel().getColumn(4).setMinWidth(0);
         tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+
         tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
 
@@ -125,9 +128,13 @@ public class PanelCooking extends javax.swing.JPanel {
         } else {
             tbCook.setRowSelectionInterval(0, 0);
         }
+        tbCook.getColumnModel().getColumn(4).setMinWidth(0);
+        tbCook.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbCook.getColumnModel().getColumn(5).setMinWidth(0);
+        tbCook.getColumnModel().getColumn(5).setMaxWidth(0);
         tbCook.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
-   
+
     private void popuptbCook() {
         try {
             popup = new JPopupMenu();
@@ -313,6 +320,15 @@ public class PanelCooking extends javax.swing.JPanel {
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel2.setText("Số Lượng");
 
+        txtNumber.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtNumberKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNumberKeyTyped(evt);
+            }
+        });
+
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel3.setText("ĐVT:");
 
@@ -409,7 +425,7 @@ public class PanelCooking extends javax.swing.JPanel {
     private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
         int index = tbStore.getSelectedRow();
         fillcobUnit(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
-        
+
     }//GEN-LAST:event_tbStoreMousePressed
 
     private void tbCookMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMousePressed
@@ -447,6 +463,37 @@ public class PanelCooking extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void txtNumberKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumberKeyReleased
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        if (!txtNumber.getText().trim().equals("")) {
+            try {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll("\\.", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            } catch (Exception e) {
+                Long num = Long.parseLong(txtNumber.getText().trim().replaceAll(",", ""));
+                txtNumber.setText(String.valueOf(df.format(num)));
+            }
+
+        }
+    }//GEN-LAST:event_txtNumberKeyReleased
+
+    private void txtNumberKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumberKeyTyped
+        int key = evt.getKeyChar();
+        String stTest = "0123456789";
+        if (key != evt.VK_BACK_SPACE
+                && key != evt.VK_DELETE
+                && key != evt.VK_ENTER) {
+            int flag = 0;
+            if (stTest.indexOf(evt.getKeyChar()) == -1) {
+                flag++;
+            }
+            if (flag > 0) {
+
+                evt.consume();
+            }
+        }
+    }//GEN-LAST:event_txtNumberKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

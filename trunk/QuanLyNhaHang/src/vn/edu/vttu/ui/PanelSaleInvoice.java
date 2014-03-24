@@ -5,24 +5,29 @@
  */
 package vn.edu.vttu.ui;
 
+import com.lowagie.text.Cell;
+import com.lowagie.text.Row;
 import java.awt.Component;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JList;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Staff;
-import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableService;
 
 /**
@@ -146,15 +151,7 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
         tbInvoiceList.getColumnModel().getColumn(7).setMaxWidth(0);
         tbInvoiceList.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
         tbInvoiceList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
-        /*
-         if (tbInvoiceList.getRowCount() <= 0) {
-         tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
-         tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
-         }else{
-         tbInvoiceList.getColumnModel().getColumn(6).setMinWidth(0);
-         tbInvoiceList.getColumnModel().getColumn(6).setMaxWidth(0);
-         }
-         */
+
         conn = null;
     }
 
@@ -464,30 +461,27 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
 
     private void btnExportToExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportToExcelActionPerformed
         try {
-            TableModel model = tbInvoiceList.getModel();
-            FileWriter out = new FileWriter("thongke.xls");
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                out.write(model.getColumnName(i) + "\t");
+            FileWriter excel = new FileWriter(new File("abc.xls"));
+            for (int i = 0; i < tbInvoiceList.getColumnCount(); i++) {
+                excel.write(tbInvoiceList.getColumnName(i) + "\t");
             }
-            out.write("\n");
-
-            for (int i = 0; i < model.getRowCount(); i++) {
-                for (int j = 0; j < model.getColumnCount(); j++) {
-                    String s = new String(model.getValueAt(i, j).toString().getBytes("utf-8"), "ISO-8859-1");
-                    out.write(s + "\t");
+            excel.write("\n");
+            for (int i = 0; i < tbInvoiceList.getRowCount(); i++) {
+                for (int j = 0; j < tbInvoiceList.getColumnCount(); j++) {
+                    excel.write(tbInvoiceList.getValueAt(i, j).toString() + "\t");
                 }
-                out.write("\n");
+                excel.write("\n");
             }
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            excel.close();
+        } catch (IOException ex) {
+            Logger.getLogger(PanelSaleInvoice.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnExportToExcelActionPerformed
 
     private void tbInvoiceListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbInvoiceListMouseReleased
         int index = tbInvoiceList.getSelectedRow();
         int id = Integer.parseInt(String.valueOf(tbInvoiceList.getValueAt(index, 7)));
-        loadInvoiceDetail(id);       
+        loadInvoiceDetail(id);
     }//GEN-LAST:event_tbInvoiceListMouseReleased
 
 

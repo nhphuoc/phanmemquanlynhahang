@@ -106,5 +106,24 @@ public class ServiceType {
 
         return flag;
     }    
+     public static boolean testName(String name,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean t = false;
+        try {                       
+            CallableStatement calState = conn.prepareCall("{CALL service_type_test_name(?)}");                        
+            calState.setString(1, name);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(tb.getRowCount()>=1){
+                t=false;
+            }else{
+                t=true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return t;
+    }
     
 }

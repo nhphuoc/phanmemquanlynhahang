@@ -67,7 +67,7 @@ public class TbServer {
         Statement stmt = null;
         try {
             stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM tbconnection;");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM tbserver;");
             while (rs.next()) {
                 tbserver = new TbServer(rs.getString(1), rs.getInt(2), rs.getString(3), rs.getString(4));
                 return tbserver;

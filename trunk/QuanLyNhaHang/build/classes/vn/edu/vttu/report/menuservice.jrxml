@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="421" pageHeight="595" whenNoDataType="AllSectionsNoDetail" columnWidth="381" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d786ddde-5def-40de-8e16-ee87adee96e7">
+	<property name="ireport.zoom" value="1.4641000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<parameter name="tennhahang" class="java.lang.String"/>
+	<parameter name="link" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[call service_get_all]]>
+	</queryString>
+	<field name="Tên DV" class="java.lang.String"/>
+	<field name="Loại DV" class="java.lang.String"/>
+	<field name="ĐVT" class="java.lang.String"/>
+	<field name="Đơn Giá" class="java.lang.Integer"/>
+	<field name="image" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Chi Tiết" class="java.lang.String"/>
+	<group name="Loại DV">
+		<groupExpression><![CDATA[$F{Loại DV}]]></groupExpression>
+		<groupHeader>
+			<band height="48">
+				<textField>
+					<reportElement style="SubTitle" x="47" y="13" width="334" height="24" forecolor="#006600" uuid="b675fd21-09c6-444a-95b4-ca104ac5b9b0"/>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Loại DV}]]></textFieldExpression>
+				</textField>
+				<rectangle>
+					<reportElement mode="Opaque" x="0" y="13" width="36" height="24" forecolor="#FF6600" backcolor="#FF6600" uuid="42e2e7da-effa-4805-bdec-a413cc162ffb"/>
+				</rectangle>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="380" height="33" forecolor="#009900" uuid="525e6403-049b-4852-bed0-60459f6e4262"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[THỰC ĐƠN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="37" width="383" height="20" uuid="e251b5a9-166a-447d-a05c-6690c2bad837"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tennhahang}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="35" width="383" height="1" uuid="86d65b32-4873-469d-a29a-4078a82ae0fa"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="Column header" x="78" y="21" width="139" height="15" uuid="d32c0b84-a215-41ac-8310-ceaa1e267455"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Tên DV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="217" y="21" width="69" height="15" uuid="caf03d51-05d0-4b1f-8219-4ddfab15ef6a"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[ĐVT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="286" y="21" width="94" height="15" uuid="dd0591b7-2245-48f3-92d0-92f1f9b486c4"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Đơn Giá]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="109" y="1" width="100" height="20" uuid="66cd27e8-2597-4f48-9e78-86a7bfc37b76"/>
+				<text><![CDATA[image]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="59" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="52" width="383" height="1" uuid="8733d186-d7e3-4c64-a839-4a374f914e32"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement style="Detail" x="78" y="1" width="139" height="15" uuid="da7ea738-9127-40a1-a04b-e1dc78d00ee2"/>
+				<textElement>
+					<font fontName="Times New Roman" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Tên DV}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="217" y="1" width="69" height="15" uuid="282b9f10-48cd-45f4-a9aa-f451038c67e4"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ĐVT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement style="Detail" x="286" y="1" width="94" height="15" uuid="796f19fb-0c01-467a-a8f1-05be073bccaa"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Đơn Giá}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="1" width="65" height="50" uuid="6a1a8cd8-14f6-444f-ab68-fc5ddf956487"/>
+				<imageExpression><![CDATA[$P{link}+"/"+$F{image}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="78" y="18" width="302" height="14" uuid="8f2efa46-c3fd-4909-8e5a-fb44cbc7cdf7"/>
+				<textElement>
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Chi Tiết}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="31" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="383" height="1" uuid="bc880585-7f96-479c-8677-ba75b9050238"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
