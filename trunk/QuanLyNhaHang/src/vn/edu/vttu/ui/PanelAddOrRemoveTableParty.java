@@ -320,11 +320,11 @@ public class PanelAddOrRemoveTableParty extends javax.swing.JPanel {
                         tbDanhSachBanDuocDat.setModel(TableReservation.getListTable(VariableStatic.getIdReservation(), conn));
                         conn.commit();
                     } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Không thể thêm");
+                        JOptionPane.showMessageDialog(getRootPane(), "Không thể thêm","Thông Báo",JOptionPane.ERROR_MESSAGE);
                         throw new Exception();
                     }
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Không thể thêm");
+                    JOptionPane.showMessageDialog(getRootPane(), "Không thể thêm","Thông Báo",JOptionPane.ERROR_MESSAGE);
                     throw new Exception();
                 }
             } catch (Exception e) {

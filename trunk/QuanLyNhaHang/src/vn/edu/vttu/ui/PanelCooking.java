@@ -128,8 +128,10 @@ public class PanelCooking extends javax.swing.JPanel {
         } else {
             tbCook.setRowSelectionInterval(0, 0);
         }
+        tbCook.getColumnModel().getColumn(4).setPreferredWidth(0);
         tbCook.getColumnModel().getColumn(4).setMinWidth(0);
         tbCook.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbCook.getColumnModel().getColumn(5).setPreferredWidth(0);
         tbCook.getColumnModel().getColumn(5).setMinWidth(0);
         tbCook.getColumnModel().getColumn(5).setMaxWidth(0);
         tbCook.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
@@ -149,13 +151,13 @@ public class PanelCooking extends javax.swing.JPanel {
                             if (Recipes.update(idRecipes, Float.parseFloat(number), ConnectDB.conn())) {
                                 loadRecipes();
                             } else {
-                                JOptionPane.showMessageDialog(getRootPane(), "Đã có lỗi xảy ra");
+                                JOptionPane.showMessageDialog(getRootPane(), "Đã có lỗi xảy ra","Thông Báo",JOptionPane.ERROR_MESSAGE);
                             }
                         } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập không phải là số");
+                            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập không phải là số","Thông Báo",JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
+                        JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng","Thông Báo",JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }));
@@ -167,9 +169,9 @@ public class PanelCooking extends javax.swing.JPanel {
                     if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có thật sự muốn xóa hay không", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                         if (Recipes.delete(Integer.parseInt(String.valueOf(tbCook.getValueAt(tbCook.getSelectedRow(), 0))), ConnectDB.conn())) {
                             loadRecipes();
-                            JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công");
+                            JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                         } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi","Thông Báo",JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
@@ -418,8 +420,9 @@ public class PanelCooking extends javax.swing.JPanel {
             idStore = Integer.parseInt(String.valueOf(tbStore.getValueAt(0, 0)));
         }
         tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
-        tbStore.getColumnModel().getColumn(4).setMinWidth(0);
-        tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbCook.getColumnModel().getColumn(4).setPreferredWidth(0);
+        tbCook.getColumnModel().getColumn(4).setMinWidth(0);
+        tbCook.getColumnModel().getColumn(4).setMaxWidth(0);
     }//GEN-LAST:event_txtSearchKeyReleased
 
     private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
@@ -447,13 +450,13 @@ public class PanelCooking extends javax.swing.JPanel {
             float number = Float.parseFloat(String.valueOf(txtNumber.getText()));
             if (idStore == -1) {
                 JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn nguyên liệu.\n"
-                        + "Vui lòng click vào nguyên liệu cần chọn và thực hiện lại thao tác");
+                        + "Vui lòng click vào nguyên liệu cần chọn và thực hiện lại thao tác","Thông Báo",JOptionPane.ERROR_MESSAGE);
             } else {
                 if (Recipes.countRecipesByIdService(idService, idStore, ConnectDB.conn())) {
                     if (Recipes.insert(idStore, idService, number, idsubunit, ConnectDB.conn())) {
                         loadRecipes();
                     } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi","Thông Báo",JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
                     if (Recipes.update(idStore, idService, number, ConnectDB.conn())) {

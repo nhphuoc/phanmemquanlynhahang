@@ -6,13 +6,24 @@
 package vn.edu.vttu.ui;
 
 import config.InfoRestaurant;
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Vector;
 import javax.imageio.ImageIO;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import vn.edu.vttu.data.Account;
+import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.MD5;
+import vn.edu.vttu.data.ServiceType;
+import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.sqlite.TbConnection;
 import vn.edu.vttu.sqlite.UpdateValues;
 import vn.edu.vttu.sqlite.tbRestaurant;
@@ -23,12 +34,53 @@ import vn.edu.vttu.sqlite.tbRestaurant;
  */
 public class PanelConfigSystem extends javax.swing.JPanel {
 
+    class ItemRenderer extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            try {
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+
+                if (value != null) {
+                    vn.edu.vttu.model.Staff item = (vn.edu.vttu.model.Staff) value;
+                    // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                    setText(item.getName().toUpperCase());
+                }
+
+                if (index == -1) {
+                    vn.edu.vttu.model.Staff item = (vn.edu.vttu.model.Staff) value;
+                    setText("" + item.getName());
+                }
+
+            } catch (Exception e) {
+            }
+
+            return this;
+        }
+    }
+
     /**
      * Creates new form PanelConfigSystem
      */
+    private boolean add = false;
+    private String username;
+    private int id_staff;
+    private String passs;
+
     public PanelConfigSystem() {
         initComponents();
         loadInfoRestaurant();
+        enableControl(true);
+        fillStaff();
+        tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+        tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
+        tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
+        tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setPreferredWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
     }
 
     private void loadInfoRestaurant() {
@@ -48,6 +100,159 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             lbLogo.updateUI();
             lbLogo.repaint();
         } catch (Exception e) {
+        }
+    }
+
+    private void enableControl(boolean b) {
+        btnAdd.setEnabled(b);
+        btnEdit.setEnabled(b);
+        btnDel.setEnabled(b);
+        btnSaveAccount.setEnabled(!b);
+        txtID.setEnabled(!b);
+        cobStaff.setEnabled(!b);
+        txtPass.setEnabled(!b);
+        txtUser.setEnabled(!b);
+        cobType.setEnabled(!b);
+        check.setEnabled(!b);
+    }
+
+    private void fillStaff() {
+        Vector<vn.edu.vttu.model.ServiceType> model = new Vector<vn.edu.vttu.model.ServiceType>();
+        try {
+            model = Staff.selectStaffAccount(ConnectDB.conn());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobStaff.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobStaff.setModel(defaultComboBoxModel);
+        cobStaff.setRenderer(new PanelConfigSystem.ItemRenderer());
+    }
+
+    public static void setSelectedStaff(JComboBox comboBox, int value) {
+        vn.edu.vttu.model.Staff item;
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            item = (vn.edu.vttu.model.Staff) comboBox.getItemAt(i);
+            if (item.getId() == value) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+    private void add() {
+        vn.edu.vttu.model.Staff staff = (vn.edu.vttu.model.Staff) cobStaff.getSelectedItem();
+        int id = staff.getId();
+        if (txtUser.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (txtPass.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (txtUser.getText().trim().length() > 50 || txtUser.getText().trim().length() < 3) {
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (Account.testUsername(txtUser.getText(), ConnectDB.conn()) == false) {
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (Account.testStaff(id, ConnectDB.conn()) == false) {
+            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else {
+            String pass = MD5.encryptMD5(txtPass.getText());
+            int type = 0;
+            if (cobType.getSelectedItem().equals("Administrator")) {
+                type = 0;
+            } else {
+                type = 1;
+            }
+            boolean active;
+            if (check.isSelected()) {
+                active = true;
+            } else {
+                active = false;
+            }
+
+            if (Account.insert(id, txtUser.getText(), pass, type, active, ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                enableControl(true);
+                tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
+                tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
+                tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setPreferredWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thất bại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+    }
+
+    private void update() {
+        vn.edu.vttu.model.Staff staff = (vn.edu.vttu.model.Staff) cobStaff.getSelectedItem();
+        int id = staff.getId();
+        boolean user = false;
+        boolean sstaff = false;
+        if (!username.equals(txtUser.getText())) {
+            if (Account.testUsername(txtUser.getText(), ConnectDB.conn()) == false) {
+                user = false;
+            } else {
+                user = true;
+            }
+        } else {
+            user = true;
+        }
+
+        if (id_staff != id) {
+            if (Account.testStaff(id, ConnectDB.conn()) == false) {
+                sstaff = false;
+            } else {
+                sstaff = true;
+            }
+        } else {
+            sstaff = true;
+        }
+        if (txtUser.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (txtPass.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (txtUser.getText().trim().length() > 50 || txtUser.getText().trim().length() < 3) {
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (user == false) {
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else if (sstaff == false) {
+            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else {
+            String pass = "";
+            if (passs.equals(txtPass.getText())) {
+                pass = txtPass.getText();
+            } else {
+                pass = MD5.encryptMD5(txtPass.getText());
+            }
+            int type = 0;
+            if (cobType.getSelectedItem().equals("Administrator")) {
+                type = 0;
+            } else {
+                type = 1;
+            }
+            boolean active;
+            if (check.isSelected()) {
+                active = true;
+            } else {
+                active = false;
+            }
+            int idacc = Integer.parseInt(txtID.getText());
+            if (Account.update(id, txtUser.getText(), pass, type, active, idacc, ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                enableControl(true);
+                tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
+                tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
+                tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setPreferredWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
+                tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thất bại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            }
+
         }
     }
 
@@ -107,6 +312,31 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         txtLogo = new javax.swing.JTextField();
         btnChooseLogo = new javax.swing.JButton();
         panelRestoreData = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        cobStaff = new javax.swing.JComboBox();
+        jLabel22 = new javax.swing.JLabel();
+        check = new javax.swing.JCheckBox();
+        jLabel23 = new javax.swing.JLabel();
+        txtID = new javax.swing.JTextField();
+        cobType = new javax.swing.JComboBox();
+        txtUser = new javax.swing.JTextField();
+        jToolBar1 = new javax.swing.JToolBar();
+        btnAdd = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        btnEdit = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
+        btnDel = new javax.swing.JButton();
+        jSeparator4 = new javax.swing.JToolBar.Separator();
+        btnSaveAccount = new javax.swing.JButton();
+        jSeparator5 = new javax.swing.JToolBar.Separator();
+        btnReload = new javax.swing.JButton();
+        jLabel24 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbAccount = new javax.swing.JTable();
+        txtPass = new javax.swing.JPasswordField();
         panelBackupdata = new javax.swing.JPanel();
         txtLink = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
@@ -262,7 +492,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 76, Short.MAX_VALUE)
+            .addGap(0, 51, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -273,7 +503,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 109, Short.MAX_VALUE)
+            .addGap(0, 83, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout panelUserLayout = new javax.swing.GroupLayout(panelUser);
@@ -312,7 +542,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 505, Short.MAX_VALUE)
+            .addGap(0, 454, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -323,7 +553,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 505, Short.MAX_VALUE)
+            .addGap(0, 454, Short.MAX_VALUE)
         );
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
@@ -485,7 +715,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 .addComponent(lbLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSave)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout panelRestaurantInfoLayout = new javax.swing.GroupLayout(panelRestaurantInfo);
@@ -510,18 +740,185 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
         tabTrash.addTab("Thông Tin Nhà Hàng", panelRestaurantInfo);
 
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel14.setText("Quyền");
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel15.setText("Password");
+
+        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel21.setText("Nhân Viên:");
+
+        cobStaff.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel22.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel22.setText("Username:");
+
+        check.setText("Hoạt Động");
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel23.setText("ID:");
+
+        txtID.setEditable(false);
+
+        cobType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Administrator", "Nhân Viên" }));
+
+        jToolBar1.setBackground(new java.awt.Color(153, 204, 255));
+        jToolBar1.setFloatable(false);
+        jToolBar1.setRollover(true);
+
+        btnAdd.setBackground(new java.awt.Color(153, 204, 255));
+        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/add-icon_24x24.png"))); // NOI18N
+        btnAdd.setText("Thêm");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnAdd);
+        jToolBar1.add(jSeparator2);
+
+        btnEdit.setBackground(new java.awt.Color(153, 204, 255));
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/edit-icon-24x24.png"))); // NOI18N
+        btnEdit.setText("Sửa");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnEdit);
+        jToolBar1.add(jSeparator3);
+
+        btnDel.setBackground(new java.awt.Color(153, 204, 255));
+        btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/delete-icon-24x24.png"))); // NOI18N
+        btnDel.setText("Xóa");
+        btnDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnDel);
+        jToolBar1.add(jSeparator4);
+
+        btnSaveAccount.setBackground(new java.awt.Color(153, 204, 255));
+        btnSaveAccount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon-24x24.png"))); // NOI18N
+        btnSaveAccount.setText("Lưu");
+        btnSaveAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveAccountActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnSaveAccount);
+        jToolBar1.add(jSeparator5);
+
+        btnReload.setBackground(new java.awt.Color(153, 204, 255));
+        btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Refresh-icon-24x24.png"))); // NOI18N
+        btnReload.setText("Reload");
+        btnReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnReload);
+
+        jLabel24.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel24.setText("Tìm Kiếm: ");
+
+        tbAccount.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tbAccount.setGridColor(new java.awt.Color(204, 204, 204));
+        tbAccount.setRowHeight(25);
+        tbAccount.setSelectionBackground(new java.awt.Color(255, 153, 0));
+        tbAccount.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tbAccount.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tbAccountMouseReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbAccount);
+
         javax.swing.GroupLayout panelRestoreDataLayout = new javax.swing.GroupLayout(panelRestoreData);
         panelRestoreData.setLayout(panelRestoreDataLayout);
         panelRestoreDataLayout.setHorizontalGroup(
             panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 811, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
+            .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                        .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel22)
+                            .addComponent(jLabel23))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtUser)
+                            .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                                .addComponent(jLabel21)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cobStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                                .addComponent(jLabel15)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel14)
+                                .addGap(18, 18, 18)
+                                .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(check))))
+                    .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 125, Short.MAX_VALUE))
         );
         panelRestoreDataLayout.setVerticalGroup(
             panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 505, Short.MAX_VALUE)
+            .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel21)
+                    .addComponent(cobStaff, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel15)
+                    .addComponent(jLabel14)
+                    .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(check)
+                    .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE))
         );
 
-        tabTrash.addTab("Khôi Phục Dữ Liệu", panelRestoreData);
+        tabTrash.addTab("Quản Lý Tài Khoản", panelRestoreData);
 
         jButton2.setText("...");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -562,7 +959,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                     .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton3)
-                .addContainerGap(270, Short.MAX_VALUE))
+                .addContainerGap(219, Short.MAX_VALUE))
         );
 
         tabTrash.addTab("Sao Lưu Dữ Liệu", panelBackupdata);
@@ -595,25 +992,25 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (txtName.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nhà hàng");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nhà hàng","Thông Báo",JOptionPane.ERROR_MESSAGE);
             txtName.requestFocus();
         } else if (txtAddress.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập địa chỉ");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập địa chỉ","Thông Báo",JOptionPane.ERROR_MESSAGE);
             txtAddress.requestFocus();
         } else if (txtPhone.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại","Thông Báo",JOptionPane.ERROR_MESSAGE);
             txtPhone.requestFocus();
         } else if (txtEmail.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại","Thông Báo",JOptionPane.ERROR_MESSAGE);
             txtEmail.requestFocus();
         } else {
             UpdateValues update = new UpdateValues();
             if (update.updateRestaurant(txtName.getText().trim(), txtAddress.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim(),
                     txtLogo.getText(), Integer.parseInt(txtHourNomal.getText()), Integer.parseInt(txtParty.getText()), Integer.parseInt(txtWarning.getText()))) {
-                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công");
+                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 loadInfoRestaurant();
             } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công");
+                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -626,9 +1023,9 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         try {
             JFileChooser fchooser = new JFileChooser();
             fchooser.showOpenDialog(getRootPane());
-            fchooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
+            fchooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             File f = fchooser.getSelectedFile();
-            txtLink.setText(f.getAbsolutePath());            
+            txtLink.setText(f.getAbsolutePath());
         } catch (Exception e) {
 
         }
@@ -640,7 +1037,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         String p = TbConnection.getValues().getPass();
         String db = TbConnection.getValues().getDbname();
         executeCmd = "mysqldump - u " + u + " -p" + p + " " + db
-                + " -r "+txtLink.getText()+"/backup.sql";
+                + " -r " + txtLink.getText() + "/backup.sql";
         try {
             Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
             int processComplete = runtimeProcess.waitFor();
@@ -655,10 +1052,99 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        add = true;
+        enableControl(false);
+        txtUser.setText("");
+        txtPass.setText("");
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        add = false;
+        enableControl(false);
+        username = txtUser.getText();
+        vn.edu.vttu.model.Staff staff = (vn.edu.vttu.model.Staff) cobStaff.getSelectedItem();
+        id_staff = staff.getId();
+        passs = txtPass.getText();
+        System.out.println(passs);
+
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnSaveAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveAccountActionPerformed
+        if (add == true) {
+            add();
+        } else {
+            update();
+        }
+    }//GEN-LAST:event_btnSaveAccountActionPerformed
+
+    private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
+        tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+        enableControl(true);
+        tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
+        tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
+        tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setPreferredWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
+        tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
+    }//GEN-LAST:event_btnReloadActionPerformed
+
+    private void tbAccountMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbAccountMouseReleased
+        int index = tbAccount.getSelectedRow();
+        txtID.setText(tbAccount.getValueAt(index, 0).toString());
+        txtUser.setText(tbAccount.getValueAt(index, 3).toString());
+        String quyen = tbAccount.getValueAt(index, 4).toString();
+        if (quyen.equals("Administrator")) {
+            cobType.setSelectedItem("Administrator");
+        } else {
+            cobType.setSelectedItem("Nhân Viên");
+        }
+        String trangthai = tbAccount.getValueAt(index, 5).toString();
+        if (trangthai.equals("Hoạt Động")) {
+            check.setSelected(true);
+        } else {
+            check.setSelected(false);
+        }
+        setSelectedStaff(cobStaff, Integer.parseInt(tbAccount.getValueAt(index, 6).toString()));
+        txtPass.setText(tbAccount.getValueAt(index, 7).toString());
+
+    }//GEN-LAST:event_tbAccountMouseReleased
+
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+        if (txtID.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn tài khoản nào");
+        } else {
+            if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa tài khoản này", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                if (Account.delete(Integer.parseInt(txtID.getText()), ConnectDB.conn())) {
+                    JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                    tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                    enableControl(true);
+                    tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
+                    tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
+                    tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
+                    tbAccount.getColumnModel().getColumn(7).setPreferredWidth(0);
+                    tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
+                    tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
+
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Xóa thành không công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnDelActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnChooseLogo;
+    private javax.swing.JButton btnDel;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnReload;
     private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSaveAccount;
+    private javax.swing.JCheckBox check;
+    private javax.swing.JComboBox cobStaff;
+    private javax.swing.JComboBox cobType;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -667,12 +1153,18 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -692,21 +1184,32 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JPasswordField jPasswordField2;
     private javax.swing.JPasswordField jPasswordField3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator5;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel lbLogo;
     private javax.swing.JPanel panelBackupdata;
     private javax.swing.JPanel panelRestaurantInfo;
     private javax.swing.JPanel panelRestoreData;
     private javax.swing.JPanel panelUser;
     private javax.swing.JTabbedPane tabTrash;
+    private javax.swing.JTable tbAccount;
     private javax.swing.JTextField txtAddress;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtHourNomal;
+    private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtLink;
     private javax.swing.JTextField txtLogo;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtParty;
+    private javax.swing.JPasswordField txtPass;
     private javax.swing.JTextField txtPhone;
+    private javax.swing.JTextField txtUser;
     private javax.swing.JTextField txtWarning;
     // End of variables declaration//GEN-END:variables
 }

@@ -183,4 +183,21 @@ public class Staff {
         return result;
     }
     
+    public static Vector selectStaffAccount(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "CALL staff_get_all()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();                        
+            while (rs.next()) {                
+                vn.edu.vttu.model.Staff tb = new vn.edu.vttu.model.Staff(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return result;
+    }
+    
 }

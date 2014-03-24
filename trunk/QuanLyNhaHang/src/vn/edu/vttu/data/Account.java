@@ -9,6 +9,9 @@ package vn.edu.vttu.data;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.ResultSet;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -60,16 +63,16 @@ public class Account {
     public void setType(int type) {
         this.type = type;
     }
-    public static boolean insert(int id_staff, String user,String pass,int type, Connection conn) {
+    public static boolean insert(int id_staff, String user,String pass,int type,boolean active, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL account_add(?,?,?,?)";
+            String sql = "CALL account_add(?,?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1,id_staff);
             callstate.setString(2,user);
             callstate.setString(3,pass);
             callstate.setInt(4,type);
-            
+            callstate.setBoolean(5,active);            
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -82,6 +85,98 @@ public class Account {
         }
 
         return flag;
+    }
+    public static boolean update(int id_staff, String user,String pass,int type,boolean active,int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL account_update(?,?,?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1,id_staff);
+            callstate.setString(2,user);
+            callstate.setString(3,pass);
+            callstate.setInt(4,type);
+            callstate.setBoolean(5,active);            
+            callstate.setInt(6,id);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+    public static boolean delete(int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL account_del(?)";
+            CallableStatement callstate = conn.prepareCall(sql);;            
+            callstate.setInt(1,id);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
+    public static boolean testUsername(String username,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean t=false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL account_test_user(?)}");
+            calState.setString(1, username);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(Integer.parseInt(tb.getValueAt(0, 0).toString())>=1){
+                t=false;
+            }else{
+                t=true;
+            }
+        } catch (Exception e) {
+            t=false;
+        }
+        return t;
+    }
+    public static boolean testStaff(int id,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean t=false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL account_test_staff(?)}");
+            calState.setInt(1, id);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(Integer.parseInt(tb.getValueAt(0, 0).toString())>=1){
+                t=false;
+            }else{
+                t=true;
+            }
+        } catch (Exception e) {
+            t=false;
+        }
+        return t;
+    }
+    public static TableModel accountGetAll(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;        
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL account_get_all()}");            
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);                         
+        } catch (Exception e) {            
+        }
+        return tb;
     }
     
 }

@@ -182,22 +182,22 @@ public class PanelInsertTable extends javax.swing.JPanel {
             int idLocation = tbLocation.getId();
             int numberPeople = 1;
             if (txtTableName.getText().equals("") || txtTableName.getText().length() > 30) {
-                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên bàn hoặc tên bàn lớn hơn 30 ký tự");
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên bàn hoặc tên bàn lớn hơn 30 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
             } else if (txtNumberOfChair.getText().equals("")) {
                 txtNumberOfChair.setText("1");
                 numberPeople = 1;
             } else {
                 if (Table.testTableName(txtTableName.getText(), conn)) {
                     if (Table.insertNewTable(txtTableName.getText(), 2, idLocation, numberPeople, conn)) {
-                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Bàn Thành Công");
+                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Bàn Thành Công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                         txtTableName.setText("");
                         txtTableName.requestFocus();
                         txtNumberOfChair.setText(String.valueOf(numberPeople));
                     } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi","Thông Báo",JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có, xin chọn tên bàn khác");
+                    JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có, xin chọn tên bàn khác","Thông Báo",JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception e) {

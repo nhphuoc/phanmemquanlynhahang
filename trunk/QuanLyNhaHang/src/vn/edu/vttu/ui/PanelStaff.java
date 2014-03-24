@@ -54,10 +54,7 @@ public class PanelStaff extends javax.swing.JPanel {
     public PanelStaff() {
         initComponents();
         loadData();
-        bindingText(0);
-        txtUser.setEnabled(false);
-        txtPass.setEnabled(false);
-        checkActive.setEnabled(false);
+        bindingText(0);        
         enableButton(true);
     }
 
@@ -72,8 +69,7 @@ public class PanelStaff extends javax.swing.JPanel {
         txtEmail.setEnabled(!b);
         dtBirthDay.setEnabled(!b);
         cobSex.setEnabled(!b);
-        tbStaff.setEnabled(b);
-        btnAddAcount.setEnabled(b);
+        tbStaff.setEnabled(b);        
     }
 
     private void loadData() {
@@ -145,13 +141,6 @@ public class PanelStaff extends javax.swing.JPanel {
         jSeparator5 = new javax.swing.JToolBar.Separator();
         btnPrint = new javax.swing.JButton();
         jSeparator6 = new javax.swing.JToolBar.Separator();
-        btnAddAcount = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
-        txtUser = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        txtPass = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        checkActive = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbStaff = new javax.swing.JTable();
         txtSearch = new javax.swing.JTextField();
@@ -275,30 +264,6 @@ public class PanelStaff extends javax.swing.JPanel {
         jToolBar1.add(btnPrint);
         jToolBar1.add(jSeparator6);
 
-        btnAddAcount.setBackground(new java.awt.Color(153, 204, 255));
-        btnAddAcount.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/secrecy-icon.png"))); // NOI18N
-        btnAddAcount.setText("Thêm Tài Khoản");
-        btnAddAcount.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddAcountActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(btnAddAcount);
-
-        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(51, 153, 0));
-        jLabel9.setText("Username:");
-
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(51, 153, 0));
-        jLabel10.setText("Pass:");
-
-        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(51, 153, 0));
-        jLabel11.setText("Active:");
-
-        checkActive.setText("Hoạt Động");
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -307,10 +272,6 @@ public class PanelStaff extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtUser))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(60, 60, 60)
@@ -322,34 +283,25 @@ public class PanelStaff extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel10))
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-                    .addComponent(txtName)
-                    .addComponent(txtPass))
+                    .addComponent(txtName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jLabel11))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cobSex, 0, 111, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(dtBirthDay, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
-                            .addComponent(txtAdress))
-                        .addGap(26, 26, 26))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(checkActive)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(cobSex, 0, 111, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dtBirthDay, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE))
+                    .addComponent(txtAdress))
+                .addGap(26, 26, 26))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -373,17 +325,9 @@ public class PanelStaff extends javax.swing.JPanel {
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
                     .addComponent(txtAdress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10)
-                    .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
-                    .addComponent(checkActive))
-                .addGap(21, 21, 21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         tbStaff.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -439,13 +383,13 @@ public class PanelStaff extends javax.swing.JPanel {
         panelStaffInfoLayout.setVerticalGroup(
             panelStaffInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelStaffInfoLayout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelStaffInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Thông Tin Nhân Viên", panelStaffInfo);
@@ -584,15 +528,6 @@ public class PanelStaff extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_txtPhoneKeyTyped
 
-    private void btnAddAcountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAcountActionPerformed
-        txtUser.setEnabled(true);
-        txtPass.setEnabled(true);
-        checkActive.setEnabled(true);
-        if(txtUser.getText().equals("")){
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên tài khoản");
-        }
-    }//GEN-LAST:event_btnAddAcountActionPerformed
-
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
         loadData();
         enableButton(true);
@@ -601,18 +536,14 @@ public class PanelStaff extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
-    private javax.swing.JButton btnAddAcount;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnPrint;
     private javax.swing.JButton btnReload;
     private javax.swing.JButton btnSave;
-    private javax.swing.JCheckBox checkActive;
     private javax.swing.JComboBox cobSex;
     private com.toedter.calendar.JDateChooser dtBirthDay;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -620,7 +551,6 @@ public class PanelStaff extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -639,9 +569,7 @@ public class PanelStaff extends javax.swing.JPanel {
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtName;
-    private javax.swing.JTextField txtPass;
     private javax.swing.JTextField txtPhone;
     private javax.swing.JTextField txtSearch;
-    private javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
 }

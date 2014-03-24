@@ -434,7 +434,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         boolean flag = false;
         int j = 0;
         if (txtNumber.getText().equals("") || txtDonGia.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng hoặc đơn giá");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng hoặc đơn giá","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             float soLuong = Float.parseFloat(txtNumber.getText().replaceAll(",", "\\."));
             int donGia = Integer.parseInt(txtDonGia.getText().trim().replaceAll("\\.", ""));
@@ -462,6 +462,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                 model.addRow(new Object[]{idNguyenLieu, tenNguyenLieu, soLuong, tenDVT, donGia, (soLuong * donGia), _unit});
             }
         }
+        tbList.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbList.getColumnModel().getColumn(6).setMaxWidth(0);
         tbList.getColumnModel().getColumn(6).setMinWidth(0);
         tbList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
@@ -472,6 +473,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         DefaultTableModel model = (DefaultTableModel) tbList.getModel();
         model.removeRow(tbList.getSelectedRow());
+        tbList.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbList.getColumnModel().getColumn(6).setMaxWidth(0);
         tbList.getColumnModel().getColumn(6).setMinWidth(0);
         tbList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
@@ -482,7 +484,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (tbList.getRowCount() <= 0) {
-            JOptionPane.showMessageDialog(getRootPane(), "Chưa có nguyên liệu nào trong danh sách hóa đơn");
+            JOptionPane.showMessageDialog(getRootPane(), "Chưa có nguyên liệu nào trong danh sách hóa đơn","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             vn.edu.vttu.model.Distributor store = (vn.edu.vttu.model.Distributor) cobNhaCungCap.getSelectedItem();
             int distributor = store.getId();
@@ -515,7 +517,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                         }
                     }
                     conn.commit();
-                    JOptionPane.showMessageDialog(getRootPane(), "Thêm hóa đơn thành công");
+                    JOptionPane.showMessageDialog(getRootPane(), "Thêm hóa đơn thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                     DefaultTableModel model = (DefaultTableModel) tbList.getModel();
                     for (int i = 0; i < tbList.getRowCount(); i++) {
                         model.removeRow(i);
@@ -527,7 +529,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
             } catch (Exception e) {
                 try {
                     conn.rollback();
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi" + e.getMessage());
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi" + e.getMessage(),"Thông Báo",JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
                 } catch (SQLException ex) {
                     Logger.getLogger(PanelAddStoreInvoice.class.getName()).log(Level.SEVERE, null, ex);
@@ -613,7 +615,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         boolean flag = false;
         int j = 0;
         if (txtNumber.getText().equals("") || txtDonGia.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng hoặc đơn giá");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng hoặc đơn giá","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             float soLuong = Float.parseFloat(txtNumber.getText().replaceAll(",", "\\."));
             int donGia = Integer.parseInt(txtDonGia.getText().trim().replaceAll("\\.", ""));
@@ -641,6 +643,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                 model.addRow(new Object[]{idNguyenLieu, tenNguyenLieu, soLuong, tenDVT, donGia, (soLuong * donGia), _unit});
             }
         }
+        tbList.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbList.getColumnModel().getColumn(6).setMaxWidth(0);
         tbList.getColumnModel().getColumn(6).setMinWidth(0);
         tbList.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
@@ -658,13 +661,13 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         String input = JOptionPane.showInputDialog(btnThemCongty, "Nhập tên công ty");
         if (input != null) {
             if (Distributor.insertName(input, ConnectDB.conn())) {
-                JOptionPane.showMessageDialog(btnThemCongty, "Thêm thành công");
+                JOptionPane.showMessageDialog(btnThemCongty, "Thêm thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 fillcobNhaCungCap();
             } else {
-                JOptionPane.showMessageDialog(btnThemCongty, "<html><font color='red'>Thêm không thành công</font></html>");
+                JOptionPane.showMessageDialog(btnThemCongty, "Thêm không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(btnThemCongty, "Bạn chưa nhập tên công ty");
+            JOptionPane.showMessageDialog(btnThemCongty, "Bạn chưa nhập tên công ty","Thông Báo",JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnThemCongtyActionPerformed
 

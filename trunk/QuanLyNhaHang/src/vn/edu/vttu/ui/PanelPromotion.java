@@ -42,11 +42,15 @@ public class PanelPromotion extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         tbListPromotion.setModel(Discount.getListPromotion(conn));
         if (tbListPromotion.getRowCount() <= 0) {
+            tbListPromotion.getColumnModel().getColumn(9).setPreferredWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setPreferredWidth(0);
             tbListPromotion.getColumnModel().getColumn(9).setMinWidth(0);
             tbListPromotion.getColumnModel().getColumn(10).setMinWidth(0);
             tbListPromotion.getColumnModel().getColumn(9).setMaxWidth(0);
             tbListPromotion.getColumnModel().getColumn(10).setMaxWidth(0);
         } else {
+            tbListPromotion.getColumnModel().getColumn(9).setPreferredWidth(0);
+            tbListPromotion.getColumnModel().getColumn(10).setPreferredWidth(0);
             tbListPromotion.getColumnModel().getColumn(9).setMinWidth(0);
             tbListPromotion.getColumnModel().getColumn(10).setMinWidth(0);
             tbListPromotion.getColumnModel().getColumn(9).setMaxWidth(0);
@@ -579,11 +583,11 @@ public class PanelPromotion extends javax.swing.JPanel {
         String datetimeEnd = formatter.format(dtEndDate.getDate());
         Timestamp tsEnd = Timestamp.valueOf(datetimeEnd);
         if (txtName.getText().trim().length() > 50 || txtName.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên chương trình hoặc tên >50 ký tự");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên chương trình hoặc tên >50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else if (dtBeginDate.getDate().compareTo(new Date()) < 0) {
-            JOptionPane.showMessageDialog(getRootPane(), "Ngày bắt đầu phải lớn hơn ngày hiện tại");
+            JOptionPane.showMessageDialog(getRootPane(), "Ngày bắt đầu phải lớn hơn ngày hiện tại","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else if (dtEndDate.getDate().compareTo(dtBeginDate.getDate()) < 0) {
-            JOptionPane.showMessageDialog(getRootPane(), "Ngày kết thúc phải lớn hơn ngày bắt đầy");
+            JOptionPane.showMessageDialog(getRootPane(), "Ngày kết thúc phải lớn hơn ngày bắt đầu","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else if (txtCostPromotion.getText().trim().equals("")) {
             txtCostPromotion.setText("0");
         } else {
@@ -616,17 +620,17 @@ public class PanelPromotion extends javax.swing.JPanel {
             String detail = txtDetail.getText();
             if (add == true) {
                 if (Discount.testDate(tsBegin, conn) == false || Discount.testDate(tsEnd, conn) == false) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đã có chương trình khuyến mãi khác");
+                    JOptionPane.showMessageDialog(getRootPane(), "Đã có chương trình khuyến mãi khác","Thông Báo",JOptionPane.ERROR_MESSAGE);
                 } else {
                     if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
-                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Thành Công");
+                        JOptionPane.showMessageDialog(getRootPane(), "Thêm Thành Công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                         loadData();
                         enableControl(true);
                     }
                 }
             } else {
                 if (txtID.getText().trim().equals("")) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi nào");
+                    JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi nào","Thông Báo",JOptionPane.ERROR_MESSAGE);
                 } else {
                     int id = Integer.parseInt(txtID.getText().trim());
                     try {
@@ -635,6 +639,7 @@ public class PanelPromotion extends javax.swing.JPanel {
                             if (Discount.insert(name, type, tsBegin, tsEnd, condition, conditionvalue, value, detail, conn)) {
                                 conn.commit();
                                 loadData();
+                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật Thành Công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                                 enableControl(true);
                             } else {
                                 throw new Exception();
@@ -646,7 +651,7 @@ public class PanelPromotion extends javax.swing.JPanel {
                     } catch (Exception e) {
                         try {
                             conn.rollback();
-                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi","Thông Báo",JOptionPane.ERROR_MESSAGE);
                         } catch (SQLException ex) {
                             Logger.getLogger(PanelPromotion.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -660,11 +665,12 @@ public class PanelPromotion extends javax.swing.JPanel {
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         if (txtID.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn chương trình khuyến mãi","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa chương trình khuyến mãi này không", "hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 conn = ConnectDB.conn();
                 if (Discount.delete(Integer.parseInt(txtID.getText()), conn)) {
+                    JOptionPane.showMessageDialog(getRootPane(), "Thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                     loadData();
                 }
             }

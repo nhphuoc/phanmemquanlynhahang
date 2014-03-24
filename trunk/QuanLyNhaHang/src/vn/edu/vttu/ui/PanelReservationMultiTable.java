@@ -150,7 +150,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
     private boolean reservationTable(Timestamp ts, int idCustomer) {
         boolean flag = false;
         if (testDate(ts) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Thời gian đặt phải lớn hơn thời gian hiện tại");
+            JOptionPane.showMessageDialog(getRootPane(), "Thời gian đặt phải lớn hơn thời gian hiện tại","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             try {
                 conn = ConnectDB.conn();
@@ -456,7 +456,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 String datetime = formatter.format(dtDateReservation.getDate());
                 Timestamp ts = Timestamp.valueOf(datetime);
                 if (reservationTable(ts, idCustomer)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công");
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                     DefaultTableModel dm = (DefaultTableModel) tbListTableReservation.getModel();
                     for (int i = 0; i < tbListTableReservation.getRowCount(); i++) {
                         dm.removeRow(i);
@@ -464,11 +464,11 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                     dm.setNumRows(0);
                     btnSave.setEnabled(false);
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công");
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(getRootPane(), "Xin lỗi, Bạn chưa chọn bàn để đặt");
+            JOptionPane.showMessageDialog(getRootPane(), "Xin lỗi, Bạn chưa chọn bàn để đặt","Thông Báo",JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 

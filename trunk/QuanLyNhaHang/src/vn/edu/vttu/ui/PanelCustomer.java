@@ -99,7 +99,7 @@ public class PanelCustomer extends javax.swing.JPanel {
                 Logger.getLogger(PanelCustomer.class.getName()).log(Level.SEVERE, null, ex);
             }
             //Date ts = new Date(datetime);
-            
+
         }
         txtID.setText(String.valueOf(tbCustomer.getValueAt(index, 0)));
         txtName.setText(String.valueOf(tbCustomer.getValueAt(index, 1)));
@@ -465,7 +465,7 @@ public class PanelCustomer extends javax.swing.JPanel {
         txtEmail.setText("");
         txtPhone.setText("");
         txtName.requestFocus();
-                
+
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
@@ -476,18 +476,18 @@ public class PanelCustomer extends javax.swing.JPanel {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         EmailValidator validator = new EmailValidator();
         Date dt = dtBirtday.getDate();
-        Date ds = new java.sql.Date(dt.getTime());        
+        Date ds = new java.sql.Date(dt.getTime());
         if (txtName.getText().trim().equals("") || txtName.getText().trim().length() > 50) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên khách hàng hoặc nhập sai");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên khách hàng hoặc nhập sai", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocus();
         } else if (txtPhone.getText().trim().length() > 13) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai số điện thoại");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai số điện thoại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtPhone.requestFocus();
         } else if (!validator.validate(txtEmail.getText().trim())) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai Email");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai Email", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtEmail.requestFocus();
         } else if ((dt.getYear() + 1900) - (new Date().getYear() + 1900) > 18) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai năm sinh");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai năm sinh", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             dtBirtday.requestFocus();
         } else {
             String name = txtName.getText().trim();
@@ -504,17 +504,19 @@ public class PanelCustomer extends javax.swing.JPanel {
             if (add) {
                 if (Customer.insert(name, sex, (java.sql.Date) ds, phone, address, email, conn)) {
                     loadTbCustomer();
+                    JOptionPane.showMessageDialog(getRootPane(), "Thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     enableButton(true);
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Không thành công");
+                    JOptionPane.showMessageDialog(getRootPane(), "Không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 int id = Integer.parseInt(txtID.getText());
                 if (Customer.updateAll(id, name, sex, (java.sql.Date) ds, phone, address, email, conn)) {
                     loadTbCustomer();
+                    JOptionPane.showMessageDialog(getRootPane(), "Thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     enableButton(true);
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Không thành công");
+                    JOptionPane.showMessageDialog(getRootPane(), "Không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
                 }
             }
             conn = null;
@@ -548,7 +550,7 @@ public class PanelCustomer extends javax.swing.JPanel {
     }//GEN-LAST:event_txtSearchKeyReleased
 
     private void txtPhoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhoneKeyTyped
-       int key = evt.getKeyChar();
+        int key = evt.getKeyChar();
         String st = txtPhone.getText();
         String stTest = "0123456789";
         if (key != evt.VK_BACK_SPACE
@@ -566,20 +568,24 @@ public class PanelCustomer extends javax.swing.JPanel {
     }//GEN-LAST:event_txtPhoneKeyTyped
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
-       if (txtID.getText().trim().equals("")) {
+        if (txtID.getText().trim().equals("")) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn khách hàng");
         } else {
             conn = ConnectDB.conn();
-            if (Customer.countCustomerUsing(Integer.parseInt(txtID.getText().trim()),conn)) {
+            if (Customer.countCustomerUsing(Integer.parseInt(txtID.getText().trim()), conn)) {
                 if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có thật sự muốn xóa khách hàng này không?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-
-                    if (Customer.delete(Integer.parseInt(txtID.getText().trim()), conn)) {
-                        JOptionPane.showMessageDialog(getRootPane(), "Đã xóa thành công");
-                        loadTbCustomer();
+                    try {
+                        if (Customer.delete(Integer.parseInt(txtID.getText().trim()), conn)) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                            loadTbCustomer();
+                        }
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Không thể xóa khách hàng này", "Thông Báo", JOptionPane.ERROR_MESSAGE);
                     }
-                }                 
-            }else{
-                JOptionPane.showMessageDialog(getRootPane(), "Khách hàng đang sử dụng dịch vụ hoặc có hóa đơn đang đặt, không thể xóa");
+
+                }
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Khách hàng đang sử dụng dịch vụ hoặc có hóa đơn đang đặt, không thể xóa", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnDelActionPerformed

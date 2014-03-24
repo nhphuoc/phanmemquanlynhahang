@@ -88,8 +88,7 @@ public class PanelMergeTable extends javax.swing.JPanel {
         Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
         try {
             model = TableLocation.selectTableLocation(ConnectDB.conn());
-        } catch (Exception e) {
-            System.out.println("Lỗi đổ dữ liệu vào combobox location "+e.toString());
+        } catch (Exception e) {            
         }
 
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
@@ -104,8 +103,7 @@ public class PanelMergeTable extends javax.swing.JPanel {
         Vector<vn.edu.vttu.model.Table> model = new Vector<vn.edu.vttu.model.Table>();
         try {
             model = Table.selectTableByLocation(idLocation, 2, ConnectDB.conn());
-        } catch (Exception e) {
-            System.out.println("Lỗi đổ dữ liệu vào combobox table "+e.toString());
+        } catch (Exception e) {            
         }
 
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);

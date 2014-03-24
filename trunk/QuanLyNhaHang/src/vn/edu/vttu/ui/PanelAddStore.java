@@ -143,17 +143,17 @@ public class PanelAddStore extends javax.swing.JPanel {
         vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobDVT.getSelectedItem();
         int _unit = unit.getId();
         if (txtName.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nguyên liệu");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nguyên liệu","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else if (RawMaterial.testName(txtName.getText().trim(), ConnectDB.conn()) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL");
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else if (txtName.getText().trim().length() > 50) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập tên quá dài");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập tên lơn hơn 50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             if (RawMaterial.insert(txtName.getText(),0, _unit, ConnectDB.conn())) {
-                JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công");
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 txtName.setText("");
             }else{
-                JOptionPane.showMessageDialog(getRootPane(), "<html><font color='red'>Thêm không thành công</font></html>");
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
