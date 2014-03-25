@@ -21,6 +21,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Distributor;
+import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.RawMaterialInvoice;
@@ -491,7 +492,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
             Connection conn = ConnectDB.conn();
             try {
                 conn.setAutoCommit(false);
-                if (RawMaterialInvoice.insert(1, distributor, txtNote.getText(), conn)) {
+                if (RawMaterialInvoice.insert(LoginInformation.getId_staff(), distributor, txtNote.getText(), conn)) {
                     int idRawInvoice = RawMaterialInvoice.getMaxID(conn).getId();
                     for (int i = 0; i < tbList.getRowCount(); i++) {
                         int idraw = Integer.parseInt(String.valueOf(tbList.getValueAt(i, 0)));

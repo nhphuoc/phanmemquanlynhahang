@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.PaymentInvoice;
 
 /**
@@ -219,7 +220,7 @@ public class PanelWritePaymentInvoice extends javax.swing.JPanel {
                 cost = Integer.parseInt(txtCost.getText().trim().replaceAll(",", ""));
             }
             
-            if (PaymentInvoice.insert(tsStart, 2, cost, txtInfo.getText().trim(), txtNote.getText().trim(), ConnectDB.conn())) {
+            if (PaymentInvoice.insert(tsStart, LoginInformation.getId_staff(), cost, txtInfo.getText().trim(), txtNote.getText().trim(), ConnectDB.conn())) {
                 JOptionPane.showMessageDialog(getRootPane(), "Thêm hóa đơn thành công");
                 txtCost.setText("");
                 txtInfo.setText("");

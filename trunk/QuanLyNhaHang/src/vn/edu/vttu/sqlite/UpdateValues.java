@@ -48,5 +48,36 @@ public class UpdateValues {
         }
         return flag;
     }
+    
+    public boolean updateConnection(String db, String ip, int port, String u, String p) {
+        Connection c = null;
+        Statement stmt = null;
+        boolean flag = false;
+        try {
+            ConnectSQLite cn = new ConnectSQLite();
+            c = cn.connectSQLite();
+            c.setAutoCommit(false);
+            CreateTable reateTB = new CreateTable();
+            reateTB.create();
+            stmt = c.createStatement();
+            String sql = "UPDATE tbconnection set NAME_DB='" + db + "',IP_DB='" + ip + "',PORT_DB='" + port + "',USER_DB='" + u + "',PASS_DB='" + p + "'";
+            stmt.executeUpdate(sql);
+            c.commit();
+            stmt.close();
+            c.close();
+            flag = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            flag = false;
+        }finally{
+            try {
+                stmt.close();
+                c.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(InsertValues.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return flag;
+    }
 
 }

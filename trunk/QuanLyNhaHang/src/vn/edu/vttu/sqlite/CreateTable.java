@@ -45,6 +45,7 @@ public class CreateTable {
             f = true;
             stmt.close();
         } catch (Exception e) {
+            System.out.println("Lỗi "+e.toString());
             f = false;
         } finally {
             try {

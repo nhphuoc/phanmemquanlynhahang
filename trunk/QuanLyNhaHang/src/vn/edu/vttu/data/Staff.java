@@ -101,6 +101,24 @@ public class Staff {
         this.email=email;
         this.pin=pin;
     }
+    public Staff(String name){        
+        this.name=name;
+    }
+    public static Staff getById(int id, Connection conn) {
+        Staff staff = null;
+        try {
+            String sql = "call staff_get_by_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);            
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                staff = new Staff(rs.getString(2));                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return staff;
+    }
     public static TableModel getAll(Connection conn) {
         TableModel tb = null;
         ResultSet rs;

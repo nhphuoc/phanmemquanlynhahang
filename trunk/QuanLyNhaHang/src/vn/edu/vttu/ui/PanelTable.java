@@ -62,9 +62,11 @@ import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Discount;
 import vn.edu.vttu.data.DiscountDetail;
+import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.data.SystemLog;
 import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableType;
@@ -85,7 +87,7 @@ public class PanelTable extends javax.swing.JPanel {
             super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
             if (value != null) {
-                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;               
+                vn.edu.vttu.model.TableLocation item = (vn.edu.vttu.model.TableLocation) value;
                 setText(item.getName().toUpperCase());
             }
             if (index == -1) {
@@ -114,6 +116,7 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     class TaskWarningUser extends TimerTask {
+
         public void run() {
             conn = ConnectDB.conn();
             try {
@@ -177,7 +180,7 @@ public class PanelTable extends javax.swing.JPanel {
 
     public PanelTable() {
         initComponents();
-        popupTableService();
+        lbStaff.setText(Staff.getById(LoginInformation.getId_staff(), ConnectDB.conn()).getName());       
         popupTableInvoice();
         loadTable(idLocation);
         loadTableService();
@@ -379,19 +382,19 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-                            conn=ConnectDB.conn();
+                            conn = ConnectDB.conn();
                             String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn");
                             if (tablename != null) {
                                 if (Table.testTableName(tablename, conn)) {
                                     if (Table.insertNewTable(tablename, TableType.getByMaxID(conn).getId(), TableLocation.getByMinID(conn).getID(), 10, conn)) {
                                         JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn thành công");
-                                        loadTable(idLocation);                                        
-                                    }else{
+                                        loadTable(idLocation);
+                                    } else {
                                         JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn không thành công");
                                     }
-                                }else{
+                                } else {
                                     JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có");
-                                }                                        
+                                }
                             }
                         }
                     }));
@@ -670,77 +673,6 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
     }
-
-    private void popupTableService() {
-        /*
-         try {
-         popupMenu = new JPopupMenu();
-         BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/back-icon.png"));
-         Image imageCalService = bImgCalService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-         popupMenu.add(new JMenuItem(new AbstractAction("Gọi dịch vụ này", new ImageIcon(imageCalService)) {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-         callService();
-         }
-         }
-         ));
-
-         popupMenu.addSeparator();
-         BufferedImage bImgAddService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/add-icon.png"));
-         Image imageAddService = bImgAddService.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-
-         popupMenu.add(
-         new JMenuItem(new AbstractAction("Thêm Dịch Vụ", new ImageIcon(imageAddService)) {
-         @Override
-         public void actionPerformed(ActionEvent e
-         ) {
-
-         }
-         }));
-         BufferedImage bImgServiceChangeName = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
-         Image imageServiceChangeName = bImgServiceChangeName.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-
-         popupMenu.add(
-         new JMenuItem(new AbstractAction("Đổi Tên", new ImageIcon(imageServiceChangeName)) {
-         @Override
-         public void actionPerformed(ActionEvent e
-         ) {
-
-         String name = JOptionPane.showInputDialog(tbService, "Nhập tên dịch vụ", sv_name);
-         if (name != null) {
-         if (Service.updateName(name, idService, conn)) {
-         loadTableService();
-         }
-         }
-         }
-         }
-         ));
-         BufferedImage bImgServiceCost = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/dollar-icon.png"));
-         Image imageServiceCost = bImgServiceCost.getScaledInstance(18, 18, Image.SCALE_SMOOTH);
-
-         popupMenu.add(
-         new JMenuItem(new AbstractAction("Cập Nhật Giá", new ImageIcon(imageServiceCost)) {
-         @Override
-         public void actionPerformed(ActionEvent e
-         ) {
-         String costnew = JOptionPane.showInputDialog(tbService, "Nhập Giá", cost);
-         if (costnew != null) {
-         if (ServiceCost.insert(idService, Integer.parseInt(costnew), conn)) {
-         loadTableService();
-         }
-         }
-         }
-         }
-         ));
-         conn = null;
-         } catch (Exception e) {
-         conn = null;
-         e.printStackTrace();
-         }
-         tbService.setComponentPopupMenu(popupMenu);
-         */
-    }
-
     private void popupTableInvoice() {
         try {
             //conn = ConnectDB.conn();
@@ -1396,7 +1328,7 @@ public class PanelTable extends javax.swing.JPanel {
             conn.setAutoCommit(false);
             if (TableService.updateStstus(idTableReservation, conn)) {
                 if (TableReservation.updateEndDate(idTableReservation, conn)) {
-                    if (Invoice.insert(idTableReservation, 1, totalPay, discount, txtNoteinvoice.getText(), conn)) {
+                    if (Invoice.insert(idTableReservation,LoginInformation.getId_staff(), totalPay, discount, txtNoteinvoice.getText(), conn)) {
                         int _total = 0;
                         try {
                             _total = Integer.parseInt(lbTotal.getText().replaceAll("\\.", ""));
@@ -1557,8 +1489,7 @@ public class PanelTable extends javax.swing.JPanel {
                     int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
                     int idUnitStore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
                     float num = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-                    float x;
-                    System.out.println("Cha: " + Unit.getByID(idUnitStore, ConnectDB.conn()).isParent());
+                    float x;                    
                     if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
                         x = num * Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
                     } else {

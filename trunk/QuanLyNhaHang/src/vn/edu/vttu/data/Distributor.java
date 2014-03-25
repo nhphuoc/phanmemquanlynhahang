@@ -12,6 +12,8 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Vector;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -70,6 +72,31 @@ public class Distributor {
         this.phone=phone;
         this.email=email;
     }
+    public static TableModel getAll(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;        
+        try {
+            String sql = "call distributor_gel_all()";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            rs = callstate.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);            
+        } catch (Exception e) {            
+        }
+        return tb;
+    }
+    public static TableModel searchName(String key,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;        
+        try {
+            String sql = "call distributor_search(?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setString(1,key);
+            rs = callstate.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);            
+        } catch (Exception e) {            
+        }
+        return tb;
+    }
     public static Vector selectDistributor(Connection conn) {
         Vector result = new Vector();
         try {
@@ -109,6 +136,67 @@ public class Distributor {
             callstate.setString(1, name);            
             int x = callstate.executeUpdate();
             if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean insert(String name,String phone,String email,String address, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL distributor_add(?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);            
+            callstate.setString(2, phone);            
+            callstate.setString(3, email);            
+            callstate.setString(4, address);            
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean update(String name,String phone,String email,String address,int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL distributor_update(?,?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);            
+            callstate.setString(2, phone);            
+            callstate.setString(3, email);            
+            callstate.setString(4, address);            
+            callstate.setInt(5, id);            
+            int x = callstate.executeUpdate();
+            if (x >=0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean delete(int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL distributor_del(?)";
+            CallableStatement callstate = conn.prepareCall(sql);           
+            callstate.setInt(1, id);            
+            int x = callstate.executeUpdate();
+            if (x ==1) {
                 flag = true;
             } else {
                 flag = false;

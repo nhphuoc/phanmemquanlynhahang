@@ -9,6 +9,7 @@ import config.InfoRestaurant;
 import config.readxml;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import vn.edu.vttu.sqlite.CreateTable;
 import vn.edu.vttu.sqlite.TbConnection;
 import vn.edu.vttu.ui.loadConnection;
 
@@ -27,7 +28,8 @@ public class ConnectDB {
     public static Connection conn() {
         Connection cn =null;        
         try {
-            
+            CreateTable ccr = new CreateTable();
+            ccr.create();
             db = TbConnection.getValues().getDbname() + "?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";            
             usr = TbConnection.getValues().getUser();
             pass = TbConnection.getValues().getPass();

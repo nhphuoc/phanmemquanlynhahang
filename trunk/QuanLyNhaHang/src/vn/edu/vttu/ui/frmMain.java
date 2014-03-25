@@ -10,6 +10,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.LoginInformation;
+import vn.edu.vttu.data.Staff;
 
 /**
  *
@@ -22,6 +25,9 @@ public class frmMain extends javax.swing.JFrame {
      */
     public frmMain() {
         initComponents();
+        this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        String u = Staff.getById(LoginInformation.getId_staff(), ConnectDB.conn()).getName();
+        lbLoginUser.setText("Nhân Viên: " + u);
         main.removeAll();
         PanelTable pn_table = new PanelTable();
         main.add(pn_table);
@@ -50,9 +56,11 @@ public class frmMain extends javax.swing.JFrame {
         btnStaff = new javax.swing.JButton();
         btnDifferentMoney = new javax.swing.JButton();
         btnStatistics = new javax.swing.JButton();
+        btnDistributor = new javax.swing.JButton();
+        btnUnit = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lbLoginUser = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PHẦN MỀM QUẢN LÝ NHÀ HÀNG - RSM");
@@ -213,6 +221,31 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnStatistics);
 
+        btnDistributor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
+        btnDistributor.setText("Nhà Cung Cấp");
+        btnDistributor.setFocusable(false);
+        btnDistributor.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDistributor.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnDistributor.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnDistributor.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnDistributor.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDistributor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDistributorActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnDistributor);
+
+        btnUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
+        btnUnit.setText("Đơn Vị Tính");
+        btnUnit.setFocusable(false);
+        btnUnit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnUnit.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnUnit.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnUnit.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnUnit.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(btnUnit);
+
         jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
         jButton7.setText("Trợ Giúp");
         jButton7.setFocusable(false);
@@ -223,7 +256,9 @@ public class frmMain extends javax.swing.JFrame {
         jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton7);
 
-        jLabel1.setText("Đăng Nhập:nhphuo ");
+        lbLoginUser.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lbLoginUser.setForeground(new java.awt.Color(255, 0, 51));
+        lbLoginUser.setText("Đăng Nhập:nhphuo ");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -231,22 +266,22 @@ public class frmMain extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
+                .addComponent(lbLoginUser, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel1))
+                .addComponent(lbLoginUser))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 963, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 963, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -303,7 +338,7 @@ public class frmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStaffActionPerformed
 
     private void btnInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInvoiceActionPerformed
-       main.removeAll();
+        main.removeAll();
         PanelInvoce panelinvoice = new PanelInvoce();
         main.add(panelinvoice);
         main.revalidate();
@@ -327,7 +362,7 @@ public class frmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStoreActionPerformed
 
     private void btnStatisticsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStatisticsActionPerformed
-      main.removeAll();
+        main.removeAll();
         PanelMenuStatistics panelmenustatitics = new PanelMenuStatistics();
         main.add(panelmenustatitics);
         main.revalidate();
@@ -335,12 +370,20 @@ public class frmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnStatisticsActionPerformed
 
     private void btnDifferentMoneyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDifferentMoneyActionPerformed
-       main.removeAll();
+        main.removeAll();
         PanelPaymentInvoice panelpaymentInvoive = new PanelPaymentInvoice();
         main.add(panelpaymentInvoive);
         main.revalidate();
         main.repaint();
     }//GEN-LAST:event_btnDifferentMoneyActionPerformed
+
+    private void btnDistributorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDistributorActionPerformed
+        main.removeAll();
+        PanelDistributor panelDistributor = new PanelDistributor();
+        main.add(panelDistributor);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnDistributorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -372,13 +415,14 @@ public class frmMain extends javax.swing.JFrame {
                 GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
                 Rectangle bounds = env.getMaximumWindowBounds();
                 frm.setMaximizedBounds(bounds);
-                frm.setExtendedState(frm.getExtendedState() | JFrame.MAXIMIZED_BOTH);                
+                frm.setExtendedState(frm.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDifferentMoney;
+    private javax.swing.JButton btnDistributor;
     private javax.swing.JButton btnInvoice;
     private javax.swing.JButton btnPromotion;
     private javax.swing.JButton btnService;
@@ -386,12 +430,13 @@ public class frmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnStatistics;
     private javax.swing.JButton btnStore;
     private javax.swing.JButton btnSystem;
+    private javax.swing.JButton btnUnit;
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton7;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel lbLoginUser;
     private javax.swing.JPanel main;
     // End of variables declaration//GEN-END:variables
 }
