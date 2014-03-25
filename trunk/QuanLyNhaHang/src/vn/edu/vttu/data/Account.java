@@ -93,7 +93,7 @@ public class Account {
         }
         return t;
     }
-
+    
     public static Account login(String u, String p, Connection conn) {
         Account acc = null;
         try {
@@ -230,6 +230,26 @@ public class Account {
         } catch (Exception e) {
         }
         return tb;
+    }
+    public static boolean updatePass(String user,String pass, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL account_update_pass(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setString(1, user);            
+            callstate.setString(2, pass);            
+            int x = callstate.executeUpdate();
+            if (x >=0 && x<2) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
     }
 
 }

@@ -15,6 +15,15 @@ public class LoginInformation {
     public static String user;
     public static int type;
     public static int id_staff;
+    public static String pass;
+
+    public static String getPass() {
+        return pass;
+    }
+
+    public static void setPass(String pass) {
+        LoginInformation.pass = pass;
+    }
 
     public static int getId() {
         return id;

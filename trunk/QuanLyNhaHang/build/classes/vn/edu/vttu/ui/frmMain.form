@@ -293,7 +293,7 @@
         <Component class="javax.swing.JButton" name="btnDistributor">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/vn/edu/vttu/image/Help-icon.png"/>
+              <Image iconType="3" name="/vn/edu/vttu/image/companies-icon.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Nh&#xe0; Cung C&#x1ea5;p"/>
             <Property name="focusable" type="boolean" value="false"/>
@@ -316,7 +316,7 @@
         <Component class="javax.swing.JButton" name="btnUnit">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/vn/edu/vttu/image/Help-icon.png"/>
+              <Image iconType="3" name="/vn/edu/vttu/image/balance-unbalance-icon.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="&#x110;&#x1a1;n V&#x1ecb; T&#xed;nh"/>
             <Property name="focusable" type="boolean" value="false"/>

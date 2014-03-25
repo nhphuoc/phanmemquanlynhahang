@@ -28,6 +28,17 @@ public class frmLogin extends javax.swing.JFrame {
      * Creates new form frmLogin
      */
     public frmLogin() {
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
         initComponents();
         this.setLocationRelativeTo(null);        
     }
@@ -44,6 +55,8 @@ public class frmLogin extends javax.swing.JFrame {
                 LoginInformation.setId(Account.login(txtU.getText(),MD5.encryptMD5(txtP.getText()), ConnectDB.conn()).getId());
                 LoginInformation.setId_staff(Account.login(txtU.getText(),MD5.encryptMD5(txtP.getText()), ConnectDB.conn()).getId_staff());
                 LoginInformation.setType(Account.login(txtU.getText(),MD5.encryptMD5(txtP.getText()), ConnectDB.conn()).getType());
+                LoginInformation.setUser(Account.login(txtU.getText(),MD5.encryptMD5(txtP.getText()), ConnectDB.conn()).getUser());
+                LoginInformation.setPass(Account.login(txtU.getText(),MD5.encryptMD5(txtP.getText()), ConnectDB.conn()).getPass());
                 this.hide();
                 new frmMain().setVisible(true);
             }else{

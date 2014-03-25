@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.Account;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.MD5;
 import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.Staff;
@@ -74,6 +75,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         loadInfoRestaurant();
         enableControl(true);
         fillStaff();
+        lbUsername.setText(LoginInformation.getUser());
         tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
         tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
@@ -341,6 +343,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         txtLink = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -382,6 +385,11 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
         btnSaveChangesPass.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
         btnSaveChangesPass.setText("Lưu Lại");
+        btnSaveChangesPass.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveChangesPassActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(204, 0, 0));
@@ -934,6 +942,8 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("Restore");
+
         javax.swing.GroupLayout panelBackupdataLayout = new javax.swing.GroupLayout(panelBackupdata);
         panelBackupdata.setLayout(panelBackupdataLayout);
         panelBackupdataLayout.setHorizontalGroup(
@@ -941,25 +951,29 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             .addGroup(panelBackupdataLayout.createSequentialGroup()
                 .addGroup(panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelBackupdataLayout.createSequentialGroup()
-                        .addGap(45, 45, 45)
+                        .addGap(159, 159, 159)
                         .addComponent(txtLink, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButton2))
                     .addGroup(panelBackupdataLayout.createSequentialGroup()
-                        .addGap(226, 226, 226)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(271, Short.MAX_VALUE))
+                        .addGap(266, 266, 266)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(43, 43, 43)
+                        .addComponent(jButton1)))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
         panelBackupdataLayout.setVerticalGroup(
             panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelBackupdataLayout.createSequentialGroup()
-                .addGap(178, 178, 178)
+                .addGap(160, 160, 160)
                 .addGroup(panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtLink, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton3)
-                .addContainerGap(219, Short.MAX_VALUE))
+                .addGroup(panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton1))
+                .addContainerGap(237, Short.MAX_VALUE))
         );
 
         tabTrash.addTab("Sao Lưu Dữ Liệu", panelBackupdata);
@@ -1036,8 +1050,9 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         String u = TbConnection.getValues().getUser();
         String p = TbConnection.getValues().getPass();
         String db = TbConnection.getValues().getDbname();
+        //String Mysqlpath = getMysqlBinPath(u, p, db);
         executeCmd = "mysqldump - u " + u + " -p" + p + " " + db
-                + " -r " + txtLink.getText() + "/backup.sql";
+                + " -r, backup.sql";
         try {
             Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
             int processComplete = runtimeProcess.waitFor();
@@ -1133,6 +1148,28 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnDelActionPerformed
 
+    private void btnSaveChangesPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveChangesPassActionPerformed
+       if(!MD5.encryptMD5(txtPassOld.getText()).equals(LoginInformation.getPass())){
+           JOptionPane.showMessageDialog(getRootPane(), "Mật khẩu cũ không đúng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+           txtPassOld.requestFocus();
+       }else if(txtPassNew.getText().equals("")){
+           JOptionPane.showMessageDialog(getRootPane(), "Chưa nhập mật khẩu mới","Thông Báo",JOptionPane.ERROR_MESSAGE);
+           txtPassOld.requestFocus();
+       }else if(!txtRePass.getText().equals(txtPassNew.getText())){
+           JOptionPane.showMessageDialog(getRootPane(), "Nhập lại mật khẩu không đúng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+           txtRePass.requestFocus();
+       }else{
+           if(Account.updatePass(LoginInformation.getUser(),MD5.encryptMD5(txtRePass.getText()),ConnectDB.conn())){
+               JOptionPane.showMessageDialog(getRootPane(), "Cập nhật mật khẩu thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);    
+               txtPassOld.setText("");
+               txtPassNew.setText("");
+               txtRePass.setText("");
+           }else{
+               JOptionPane.showMessageDialog(getRootPane(), "Thất Bại","Thông Báo",JOptionPane.INFORMATION_MESSAGE);               
+           }
+       }
+    }//GEN-LAST:event_btnSaveChangesPassActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -1146,6 +1183,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     private javax.swing.JCheckBox check;
     private javax.swing.JComboBox cobStaff;
     private javax.swing.JComboBox cobType;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;

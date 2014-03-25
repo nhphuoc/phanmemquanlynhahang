@@ -68,9 +68,9 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
             float value = 0;
             try {
                 try {
-                    value = Float.parseFloat(String.valueOf(tbResult.getValueAt(i, 5)).trim().replaceAll("\\.", "")) / 1000;
+                    value = Float.parseFloat(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll("\\.", "")) / 1000;
                 } catch (Exception e) {
-                    value = Float.parseFloat(String.valueOf(tbResult.getValueAt(i, 5)).trim().replaceAll(",", "")) / 1000;
+                    value = Float.parseFloat(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll(",", "")) / 1000;
                 }
             } catch (Exception e) {
                 value = 0;

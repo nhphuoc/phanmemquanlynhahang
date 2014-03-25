@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import vn.edu.vttu.sqlite.CreateTable;
 import vn.edu.vttu.sqlite.TbConnection;
-import vn.edu.vttu.ui.loadConnection;
 
 /**
  *

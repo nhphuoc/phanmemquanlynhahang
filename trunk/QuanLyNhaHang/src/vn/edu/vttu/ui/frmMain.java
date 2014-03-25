@@ -24,7 +24,19 @@ public class frmMain extends javax.swing.JFrame {
      * Creates new form frmMain
      */
     public frmMain() {
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(frmMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
         initComponents();
+        
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         String u = Staff.getById(LoginInformation.getId_staff(), ConnectDB.conn()).getName();
         lbLoginUser.setText("Nhân Viên: " + u);
@@ -221,7 +233,7 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnStatistics);
 
-        btnDistributor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
+        btnDistributor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/companies-icon.png"))); // NOI18N
         btnDistributor.setText("Nhà Cung Cấp");
         btnDistributor.setFocusable(false);
         btnDistributor.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -236,7 +248,7 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnDistributor);
 
-        btnUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
+        btnUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/balance-unbalance-icon.png"))); // NOI18N
         btnUnit.setText("Đơn Vị Tính");
         btnUnit.setFocusable(false);
         btnUnit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);

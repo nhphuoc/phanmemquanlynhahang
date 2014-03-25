@@ -13,7 +13,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
 import org.xml.sax.XMLReader;
-import vn.edu.vttu.ui.loadConnection;
 
 /**
  *

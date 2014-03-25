@@ -97,8 +97,6 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         btnStatitics = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        lbTotalInvoice = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         lbTotalPay = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -144,14 +142,6 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         jButton1.setText("Xuất Ra Excel");
         jToolBar2.add(jButton1);
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(102, 153, 0));
-        jLabel4.setText("Tổng Số Dịch Vụ:");
-
-        lbTotalInvoice.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lbTotalInvoice.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbTotalInvoice.setText("0 Hóa Đơn");
-
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(102, 153, 0));
         jLabel5.setText("Tổng Doanh Thu:");
@@ -167,7 +157,6 @@ public class PanelStatiticsService extends javax.swing.JPanel {
             .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                             .addComponent(jLabel2)
@@ -182,9 +171,7 @@ public class PanelStatiticsService extends javax.swing.JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbTotalInvoice, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbTotalPay, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(lbTotalPay, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -203,14 +190,10 @@ public class PanelStatiticsService extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbTotalInvoice)
-                .addGap(12, 12, 12)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbTotalPay, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addContainerGap(222, Short.MAX_VALUE))
         );
 
         tbResult.setModel(new javax.swing.table.DefaultTableModel(
@@ -268,6 +251,18 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         tbResult.setModel(TableService.getStatiticsService(tsStart, tsToDate, ConnectDB.conn()));
         tbResult.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
         showChart();
+        int total=0;
+        for(int i=0;i<tbResult.getRowCount();i++){
+            int x=0;
+            try {
+                x=Integer.parseInt(tbResult.getValueAt(i, 4).toString().replaceAll("\\.", ""));
+            } catch (Exception e) {
+                x=Integer.parseInt(tbResult.getValueAt(i, 4).toString().replaceAll(",", ""));
+            }           
+            total=total+x;                    
+        }
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        lbTotalPay.setText(df.format(total)+" VNĐ");
     }//GEN-LAST:event_btnStatiticsActionPerformed
 
 
@@ -278,13 +273,11 @@ public class PanelStatiticsService extends javax.swing.JPanel {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
-    private javax.swing.JLabel lbTotalInvoice;
     private javax.swing.JLabel lbTotalPay;
     private javax.swing.JPanel pnChart;
     private javax.swing.JTable tbResult;
