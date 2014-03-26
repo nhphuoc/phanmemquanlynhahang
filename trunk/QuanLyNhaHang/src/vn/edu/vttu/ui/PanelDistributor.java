@@ -315,6 +315,7 @@ public class PanelDistributor extends javax.swing.JPanel {
                 if (Distributor.insert(txtName.getText().trim(), txtSDT.getText().trim(), txtEmail.getText().trim(), txtAddres.getText().trim(), ConnectDB.conn())) {
                     JOptionPane.showMessageDialog(getRootPane(), "Thêm nhà cung cấp thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     tbDistributor.setModel(Distributor.getAll(ConnectDB.conn()));
+                    tbDistributor.getTableHeader().setReorderingAllowed(false);
                     enableButton(true);
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
@@ -324,6 +325,7 @@ public class PanelDistributor extends javax.swing.JPanel {
                 if (Distributor.update(txtName.getText().trim(), txtSDT.getText().trim(), txtEmail.getText().trim(), txtAddres.getText().trim(), Integer.parseInt(txtID.getText()), ConnectDB.conn())) {
                     JOptionPane.showMessageDialog(getRootPane(), "Cập nhật nhà cung cấp thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     tbDistributor.setModel(Distributor.getAll(ConnectDB.conn()));
+                    tbDistributor.getTableHeader().setReorderingAllowed(false);
                     enableButton(true);
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
@@ -341,6 +343,7 @@ public class PanelDistributor extends javax.swing.JPanel {
                 if (Distributor.delete(Integer.parseInt(txtID.getText()), ConnectDB.conn())) {
                     JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     tbDistributor.setModel(Distributor.getAll(ConnectDB.conn()));
+                    tbDistributor.getTableHeader().setReorderingAllowed(false);
                     enableButton(true);
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
@@ -359,12 +362,14 @@ public class PanelDistributor extends javax.swing.JPanel {
             txtAddres.setText(tbDistributor.getValueAt(index, 4).toString());
         } catch (Exception e) {
         }
+        tbDistributor.getTableHeader().setReorderingAllowed(false);
 
     }//GEN-LAST:event_tbDistributorMouseReleased
 
     private void txtSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyReleased
         try {
             tbDistributor.setModel(Distributor.searchName(txtSearch.getText(), ConnectDB.conn()));
+            tbDistributor.getTableHeader().setReorderingAllowed(false);
         } catch (Exception e) {
         }
     }//GEN-LAST:event_txtSearchKeyReleased
@@ -372,6 +377,7 @@ public class PanelDistributor extends javax.swing.JPanel {
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
         try {
             tbDistributor.setModel(Distributor.getAll(ConnectDB.conn()));
+            tbDistributor.getTableHeader().setReorderingAllowed(false);
         } catch (Exception e) {
         }
     }//GEN-LAST:event_btnReloadActionPerformed

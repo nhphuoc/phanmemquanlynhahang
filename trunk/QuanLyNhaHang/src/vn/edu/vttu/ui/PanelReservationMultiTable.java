@@ -100,6 +100,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
             tbListTable.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
         }
+        tbListTable.getTableHeader().setReorderingAllowed(false);
         conn = null;
     }
 
@@ -275,6 +276,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tbListTable);
 
+        tbListTableReservation.getTableHeader().setReorderingAllowed(false);
         tbListTableReservation.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 

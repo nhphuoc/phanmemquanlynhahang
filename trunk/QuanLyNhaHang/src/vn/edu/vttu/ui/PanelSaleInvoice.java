@@ -21,10 +21,22 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.Number;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
+import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Staff;
@@ -388,12 +400,10 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(tbInvoiceList);
 
+        tbInvoiceDetail.getTableHeader().setReorderingAllowed(false);
         tbInvoiceDetail.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
@@ -428,8 +438,7 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel8)
                 .addGap(11, 11, 11)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -460,22 +469,16 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
     }//GEN-LAST:event_dtToDatePropertyChange
 
     private void btnExportToExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportToExcelActionPerformed
-        try {
-            FileWriter excel = new FileWriter(new File("abc.xls"));
-            for (int i = 0; i < tbInvoiceList.getColumnCount(); i++) {
-                excel.write(tbInvoiceList.getColumnName(i) + "\t");
-            }
-            excel.write("\n");
-            for (int i = 0; i < tbInvoiceList.getRowCount(); i++) {
-                for (int j = 0; j < tbInvoiceList.getColumnCount(); j++) {
-                    excel.write(tbInvoiceList.getValueAt(i, j).toString() + "\t");
-                }
-                excel.write("\n");
-            }
-            excel.close();
-        } catch (IOException ex) {
-            Logger.getLogger(PanelSaleInvoice.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ExportExcel ex = new ExportExcel();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String from = formatter.format(dtFromDate.getDate());
+        String to = formatter.format(dtToDate.getDate());
+        String fileName = "THONG_KE_HOA_DON_TU_NGAY_" + from + "_DEN_" + to;
+        String sheetName = "THỐNG KÊ HÓA ĐƠN";
+        String header = "THỐNG KÊ HÓA ĐƠN TỪ NGÀY " + from + " ĐẾN " + to;
+        int col = tbInvoiceList.getColumnCount() - 1;
+        int row = tbInvoiceList.getRowCount();        
+        ex.exportExcel(fileName, header, sheetName, col, row, tbInvoiceList.getModel());
     }//GEN-LAST:event_btnExportToExcelActionPerformed
 
     private void tbInvoiceListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbInvoiceListMouseReleased

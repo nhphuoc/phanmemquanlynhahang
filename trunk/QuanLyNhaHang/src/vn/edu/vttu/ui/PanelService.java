@@ -204,6 +204,7 @@ public class PanelService extends javax.swing.JPanel {
              }
              */
             bindingTexFeild(index);
+            tbService.getTableHeader().setReorderingAllowed(false);
             conn = null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -303,8 +304,7 @@ public class PanelService extends javax.swing.JPanel {
                 lbstatus.setText("");
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {            
         }
 
     }

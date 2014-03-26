@@ -77,6 +77,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         fillStaff();
         lbUsername.setText(LoginInformation.getUser());
         tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+        tbAccount.getTableHeader().setReorderingAllowed(false);
         tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
         tbAccount.getColumnModel().getColumn(6).setMaxWidth(0);
@@ -103,6 +104,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             lbLogo.repaint();
         } catch (Exception e) {
         }
+        
     }
 
     private void enableControl(boolean b) {
@@ -173,6 +175,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             if (Account.insert(id, txtUser.getText(), pass, type, active, ConnectDB.conn())) {
                 JOptionPane.showMessageDialog(getRootPane(), "Thêm tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                tbAccount.getTableHeader().setReorderingAllowed(false);
                 enableControl(true);
                 tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
                 tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
@@ -244,6 +247,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             if (Account.update(id, txtUser.getText(), pass, type, active, idacc, ConnectDB.conn())) {
                 JOptionPane.showMessageDialog(getRootPane(), "Cập nhật tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                tbAccount.getTableHeader().setReorderingAllowed(false);
                 enableControl(true);
                 tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
                 tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
@@ -1095,6 +1099,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
         tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+        tbAccount.getTableHeader().setReorderingAllowed(false);
         enableControl(true);
         tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
         tbAccount.getColumnModel().getColumn(6).setMinWidth(0);
@@ -1133,6 +1138,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 if (Account.delete(Integer.parseInt(txtID.getText()), ConnectDB.conn())) {
                     JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
+                    tbAccount.getTableHeader().setReorderingAllowed(false);
                     enableControl(true);
                     tbAccount.getColumnModel().getColumn(6).setPreferredWidth(0);
                     tbAccount.getColumnModel().getColumn(6).setMinWidth(0);

@@ -15,6 +15,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.NumberCellRenderer;
 
@@ -80,7 +81,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
 
         JFreeChart chart = ChartFactory.createLineChart("THỐNG KÊ DOANH THU\nTỪ " + title + " " + begin + " ĐẾN " + title + " " + end, title, "Số Tiền(Đơn vị: nghìn đồng)", dataset);
         CategoryPlot p = chart.getCategoryPlot();
-        p.setRangeGridlinePaint(Color.black);        
+        p.setRangeGridlinePaint(Color.black);
         ChartPanel CP = new ChartPanel(chart);
         pnChart.removeAll();
         pnChart.add(CP);
@@ -110,7 +111,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         jToolBar1 = new javax.swing.JToolBar();
         btnStatitics = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         lbTotalInvoice = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -157,12 +158,17 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         jToolBar2.setFloatable(false);
         jToolBar2.setRollover(true);
 
-        jButton1.setBackground(new java.awt.Color(31, 114, 70));
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
-        jButton1.setText("Xuất Ra Excel");
-        jToolBar2.add(jButton1);
+        btnExport.setBackground(new java.awt.Color(31, 114, 70));
+        btnExport.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnExport.setForeground(new java.awt.Color(255, 255, 255));
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
+        btnExport.setText("Xuất Ra Excel");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(btnExport);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(102, 153, 0));
@@ -241,6 +247,11 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
                 .addContainerGap(108, Short.MAX_VALUE))
         );
 
+        tbResult = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbResult.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -264,7 +275,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tbResult);
 
         pnChart.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        pnChart.setLayout(new java.awt.GridLayout());
+        pnChart.setLayout(new java.awt.GridLayout(1, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -313,6 +324,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         tbResult.getColumnModel().getColumn(1).setCellRenderer(new NumberCellRenderer());
         tbResult.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         tbResult.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
+        tbResult.getTableHeader().setReorderingAllowed(false);
         int row = tbResult.getRowCount();
         int totalInvoice = 0;
         for (int i = 0; i < row; i++) {
@@ -322,7 +334,7 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         for (int i = 0; i < row; i++) {
             int value = 0;
             try {
-                value= Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll("\\.", ""));
+                value = Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll("\\.", ""));
             } catch (Exception e) {
                 value = Integer.parseInt(String.valueOf(tbResult.getValueAt(i, 3)).trim().replaceAll(",", ""));
             }
@@ -334,13 +346,56 @@ public class PanelStatiticsRevenue extends javax.swing.JPanel {
         //lbStatus.setText("Tổng số hóa đơn: "+);
     }//GEN-LAST:event_btnStatiticsActionPerformed
 
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        ExportExcel ex = new ExportExcel();
+        int index = cobStatiticsCondition.getSelectedIndex();
+        String fileName = "", from = "", to = "", header = "";
+        SimpleDateFormat formatter;
+        switch (index) {
+            case 0:
+                formatter = new SimpleDateFormat("dd-MM-yyyy");
+                from = formatter.format(dtFormDate.getDate());
+                to = formatter.format(dtToDate.getDate());
+                fileName = "THONG_KE_DOANH_THU_TU_NGAY_" + from + "_DEN_" + to;
+                header = "THỐNG KÊ DOANH THU TỪ NGÀY " + from + " ĐẾN " + to;
+                break;
+            case 1:
+                formatter = new SimpleDateFormat("MM-yyyy");
+                from = formatter.format(dtFormDate.getDate());
+                to = formatter.format(dtToDate.getDate());
+                fileName = "THONG_KE_DOANH_THU_TU_THANG_" + from + "_DEN_" + to;
+                header = "THỐNG KÊ DOANH THU TỪ THÁNG " + from + " ĐẾN " + to;
+                break;
+            case 2:
+                formatter = new SimpleDateFormat("yyyy");
+                from = formatter.format(dtFormDate.getDate());
+                to = formatter.format(dtToDate.getDate());
+                fileName = "THONG_KE_DOANH_THU_TU_NAM_" + from + "_DEN_" + to;
+                header = "THỐNG KÊ DOANH THU TỪ NĂM " + from + " ĐẾN " + to;
+                break;
+            default:
+                formatter = new SimpleDateFormat("dd-MM-yyyy");
+                from = formatter.format(dtFormDate.getDate());
+                to = formatter.format(dtToDate.getDate());
+                fileName = "TTHONG_KE_DOANH_THU_TU_NGAY_" + from + "_DEN_" + to;
+                header = "THỐNG KÊ DOANH THU TỪ NGÀY " + from + " ĐẾN " + to;
+                break;
+
+        }
+
+        String sheetName = "THỐNG KÊ DOANH THU";
+        int col = tbResult.getColumnCount();
+        int row = tbResult.getRowCount();
+        ex.exportExcel(fileName, header, sheetName, col, row, tbResult.getModel());
+    }//GEN-LAST:event_btnExportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnStatitics;
     private javax.swing.JComboBox cobStatiticsCondition;
     private com.toedter.calendar.JDateChooser dtFormDate;
     private com.toedter.calendar.JDateChooser dtToDate;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

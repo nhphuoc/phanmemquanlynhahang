@@ -131,6 +131,7 @@ public class PanelAccount extends javax.swing.JPanel {
         jLabel6.setForeground(new java.awt.Color(51, 153, 0));
         jLabel6.setText("Tìm Kiếm: ");
 
+        tbAccount.getTableHeader().setReorderingAllowed(false);
         tbAccount.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

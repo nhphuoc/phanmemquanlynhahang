@@ -9,12 +9,17 @@ import java.awt.Color;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Vector;
+import javax.swing.table.DefaultTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.PaymentInvoice;
@@ -24,6 +29,54 @@ import vn.edu.vttu.data.PaymentInvoice;
  * @author nhphuoc
  */
 public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel {
+
+    public class ColumnSorter implements Comparator {
+
+        int colIndex;
+        boolean ascending;
+
+        ColumnSorter(int colIndex, boolean ascending) {
+            this.colIndex = colIndex;
+            this.ascending = ascending;
+        }
+
+        public int compare(Object a, Object b) {
+            Vector v1 = (Vector) a;
+            Vector v2 = (Vector) b;
+            Object o1 = v1.get(colIndex);
+            Object o2 = v2.get(colIndex);
+
+            // Treat empty strains like nulls
+            if (o1 instanceof String && ((String) o1).length() == 0) {
+                o1 = null;
+            }
+            if (o2 instanceof String && ((String) o2).length() == 0) {
+                o2 = null;
+            }
+
+            // Sort nulls so they appear last, regardless
+            // of sort order
+            if (o1 == null && o2 == null) {
+                return 0;
+            } else if (o1 == null) {
+                return 1;
+            } else if (o2 == null) {
+                return -1;
+            } else if (o1 instanceof Comparable) {
+                if (ascending) {
+                    return ((Comparable) o1).compareTo(o2);
+                } else {
+                    return ((Comparable) o2).compareTo(o1);
+                }
+            } else {
+                if (ascending) {
+                    return o1.toString().compareTo(o2.toString());
+                } else {
+                    return o2.toString().compareTo(o1.toString());
+                }
+            }
+        }
+    }
 
     /**
      * Creates new form PanelStatiticsRevenue
@@ -59,8 +112,14 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         tbResult.setModel(PaymentInvoice.getPaymentInvoiceRawmaterialInvoiceByYear(tsStart, tsToDate, ConnectDB.conn()));
     }
 
-    private void showChart(String title, String begin, String end) {
+    public void sortAllRowsBy(DefaultTableModel model, int colIndex, boolean ascending) {
+        Vector data = model.getDataVector();
+        Collections.sort(data, new ColumnSorter(colIndex, ascending));
+        model.fireTableStructureChanged();
+    }
 
+    private void showChart(String title, String begin, String end) {
+        /*
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         int row = tbResult.getRowCount();
@@ -91,7 +150,7 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         //ChartFrame frame = new ChartFrame("Thống kê doanh thu", chart);
         //frame.setSize(450, 350);
         //frame.setVisible(true);
-
+        */
     }
 
     /**
@@ -113,20 +172,11 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         jToolBar1 = new javax.swing.JToolBar();
         btnStatitics = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        lbPhieuChi = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        lbTongTienPhieuChi = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        lbPhieuNhap = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        lbTongTienHoaDonNhap = new javax.swing.JLabel();
+        btnExport = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         lbTongChi = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbResult = new javax.swing.JTable();
-        pnChart = new javax.swing.JPanel();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 153, 0));
@@ -166,44 +216,17 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         jToolBar2.setFloatable(false);
         jToolBar2.setRollover(true);
 
-        jButton1.setBackground(new java.awt.Color(31, 114, 70));
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
-        jButton1.setText("Xuất Ra Excel");
-        jToolBar2.add(jButton1);
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(102, 153, 0));
-        jLabel4.setText("Số Phiếu Chi:");
-
-        lbPhieuChi.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lbPhieuChi.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbPhieuChi.setText("0");
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(102, 153, 0));
-        jLabel5.setText("Tổng Tiền Phiếu Chi:");
-
-        lbTongTienPhieuChi.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lbTongTienPhieuChi.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbTongTienPhieuChi.setText("0 VNĐ");
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(102, 153, 0));
-        jLabel6.setText("Số HĐ Nhập:");
-
-        lbPhieuNhap.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lbPhieuNhap.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbPhieuNhap.setText("0");
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(102, 153, 0));
-        jLabel7.setText("Tổng Tiền Hóa Đơn Nhập");
-
-        lbTongTienHoaDonNhap.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lbTongTienHoaDonNhap.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbTongTienHoaDonNhap.setText("0 VNĐ");
+        btnExport.setBackground(new java.awt.Color(31, 114, 70));
+        btnExport.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnExport.setForeground(new java.awt.Color(255, 255, 255));
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
+        btnExport.setText("Xuất Ra Excel");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(btnExport);
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(102, 153, 0));
@@ -211,7 +234,7 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
 
         lbTongChi.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         lbTongChi.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lbTongChi.setText("0 VNĐ");
+        lbTongChi.setText("0");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -220,43 +243,25 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
             .addComponent(jToolBar2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbTongTienPhieuChi, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(cobStatiticsCondition, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel2)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(dtFormDate, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel3)
+                            .addGap(18, 33, Short.MAX_VALUE)
+                            .addComponent(dtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel1)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(cobStatiticsCondition, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel2)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(dtFormDate, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel3)
-                                    .addGap(18, 33, Short.MAX_VALUE)
-                                    .addComponent(dtToDate, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(lbPhieuChi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(lbPhieuNhap, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbTongTienHoaDonNhap, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbTongChi, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                        .addComponent(jLabel8)
+                        .addGap(29, 29, 29)
+                        .addComponent(lbTongChi, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,27 +282,11 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToolBar2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(20, 20, 20)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(lbPhieuChi))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(lbPhieuNhap))
-                .addGap(14, 14, 14)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lbTongTienPhieuChi, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbTongTienHoaDonNhap, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel8)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lbTongChi, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                    .addComponent(jLabel8)
+                    .addComponent(lbTongChi, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tbResult.setModel(new javax.swing.table.DefaultTableModel(
@@ -322,9 +311,6 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         tbResult.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tbResult);
 
-        pnChart.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        pnChart.setLayout(new java.awt.GridLayout(1, 0));
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -332,17 +318,12 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
-                    .addComponent(pnChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -354,52 +335,87 @@ public class PanelStatiticsPaymentRawmaterialInvoice extends javax.swing.JPanel 
         switch (index) {
             case 0:
                 statiticsDay();
-                showChart("Ngày", format.format(dtFormDate.getDate()), format.format(dtToDate.getDate()));// thống kê theo ngày
+                sortAllRowsBy((DefaultTableModel) tbResult.getModel(), 0, true);
+                //showChart("Ngày", format.format(dtFormDate.getDate()), format.format(dtToDate.getDate()));// thống kê theo ngày
                 break;
             case 1:
                 statiticsMonth();
-                showChart("Tháng", format1.format(dtFormDate.getDate()), format1.format(dtToDate.getDate()));
+                sortAllRowsBy((DefaultTableModel) tbResult.getModel(), 0, true);
+                //showChart("Tháng", format1.format(dtFormDate.getDate()), format1.format(dtToDate.getDate()));
                 break;
             case 2:
                 statiticsYear();
-                showChart("Năm", format2.format(dtFormDate.getDate()), format2.format(dtToDate.getDate()));
+                sortAllRowsBy((DefaultTableModel) tbResult.getModel(), 0, true);
+                //showChart("Năm", format2.format(dtFormDate.getDate()), format2.format(dtToDate.getDate()));
                 break;
             default:
                 statiticsDay();
-                showChart("Ngày", format.format(dtFormDate.getDate()), format.format(dtToDate.getDate()));// thống kê theo ngày
+                sortAllRowsBy((DefaultTableModel) tbResult.getModel(), 0, true);
+                //showChart("Ngày", format.format(dtFormDate.getDate()), format.format(dtToDate.getDate()));// thống kê theo ngày
                 break;
-        }        
+        }
         tbResult.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
-        tbResult.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());        
-        
-        //lbStatus.setText("Tổng số hóa đơn: "+);
+        tbResult.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
+        float tong = 0;
+        for(int i=0;i<tbResult.getRowCount();i++){
+            float x;
+            try {
+                x=Float.parseFloat(tbResult.getValueAt(i, 3).toString());
+            } catch (Exception e) {
+                x=Float.parseFloat(tbResult.getValueAt(i, 3).toString().replaceAll(",", ""));
+            }
+            tong=tong+x;
+        }
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        lbTongChi.setText(df.format(tong));
+        tbResult.getTableHeader().setReorderingAllowed(false);
     }//GEN-LAST:event_btnStatiticsActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        ExportExcel ex = new ExportExcel();
+        int index = cobStatiticsCondition.getSelectedIndex();
+        String parten="dd-MM-yyyy";
+        switch(index){
+            case 0:
+                parten="dd-MM-yyyy";
+                break;
+            case 1: 
+                parten="MM-yyyy";
+                break;
+            case 2:
+                parten="yyyy";
+                break;
+            default:
+                parten="dd-MM-yyyy";
+                break;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(parten);
+        String from = formatter.format(dtFormDate.getDate());
+        String to = formatter.format(dtToDate.getDate());
+        String fileName = "THONG_KE_CHI_PHI_TU_NGAY_" + from + "_DEN_" + to;
+        String sheetName = "THỐNG KÊ CHI PHÍ";
+        String header = "THỐNG KÊ CHI PHÍ TỪ " + from + " ĐẾN " + to;
+        int col = tbResult.getColumnCount();
+        int row = tbResult.getRowCount();        
+        ex.exportExcel(fileName, header, sheetName, col, row, tbResult.getModel());
+    }//GEN-LAST:event_btnExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnStatitics;
     private javax.swing.JComboBox cobStatiticsCondition;
     private com.toedter.calendar.JDateChooser dtFormDate;
     private com.toedter.calendar.JDateChooser dtToDate;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JToolBar jToolBar2;
-    private javax.swing.JLabel lbPhieuChi;
-    private javax.swing.JLabel lbPhieuNhap;
     private javax.swing.JLabel lbTongChi;
-    private javax.swing.JLabel lbTongTienHoaDonNhap;
-    private javax.swing.JLabel lbTongTienPhieuChi;
-    private javax.swing.JPanel pnChart;
     private javax.swing.JTable tbResult;
     // End of variables declaration//GEN-END:variables
 }

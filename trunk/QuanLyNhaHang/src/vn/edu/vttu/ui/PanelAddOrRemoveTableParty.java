@@ -73,6 +73,7 @@ public class PanelAddOrRemoveTableParty extends javax.swing.JPanel {
             tbDanhSachBan.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
         }
+        tbDanhSachBan.getTableHeader().setReorderingAllowed(false);
     }
 
     private void fillkhCombo(Connection conn) {
@@ -159,6 +160,7 @@ public class PanelAddOrRemoveTableParty extends javax.swing.JPanel {
                 return false;   //Disallow the editing of any cell
             }
         };
+        tbDanhSachBanDuocDat.getTableHeader().setReorderingAllowed(false);
         tbDanhSachBanDuocDat.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},

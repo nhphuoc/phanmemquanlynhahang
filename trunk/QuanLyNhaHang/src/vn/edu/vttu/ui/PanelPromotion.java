@@ -60,6 +60,7 @@ public class PanelPromotion extends javax.swing.JPanel {
         tbListPromotion.getColumnModel().getColumn(6).setCellRenderer(new NumberCellRenderer());
         tbListPromotion.getColumnModel().getColumn(9).setCellRenderer(new NumberCellRenderer());
         tbListPromotion.getColumnModel().getColumn(10).setCellRenderer(new NumberCellRenderer());
+        tbListPromotion.getTableHeader().setReorderingAllowed(false);
         conn = null;
     }
 

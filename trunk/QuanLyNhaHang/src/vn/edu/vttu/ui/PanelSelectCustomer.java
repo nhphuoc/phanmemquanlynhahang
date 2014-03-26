@@ -30,7 +30,7 @@ public class PanelSelectCustomer extends javax.swing.JPanel {
      * Creates new form pn
      */
     private JPopupMenu popupMenuTableInvoice;
-    private Connection conn=ConnectDB.conn();
+    private Connection conn = ConnectDB.conn();
 
     public PanelSelectCustomer() {
         initComponents();
@@ -41,8 +41,13 @@ public class PanelSelectCustomer extends javax.swing.JPanel {
 
     private void loadTable() {
         tbCustomer.setModel(Customer.getLimit(conn));
-        tbCustomer.setRowSelectionInterval(0, 0);
+        try {
+            tbCustomer.setRowSelectionInterval(0, 0);
+        } catch (Exception e) {
+        }
+
         Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+        tbCustomer.getTableHeader().setReorderingAllowed(false);
     }
 
     private void popupTableCustomer() {
@@ -145,8 +150,8 @@ public class PanelSelectCustomer extends javax.swing.JPanel {
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void txtSearchCustomerKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchCustomerKeyReleased
-        tbCustomer.setModel(Customer.searchNamePhone(txtSearchCustomer.getText(),conn));
-        tbCustomer.setRowSelectionInterval(0, 0);  
+        tbCustomer.setModel(Customer.searchNamePhone(txtSearchCustomer.getText(), conn));
+        tbCustomer.setRowSelectionInterval(0, 0);
         Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
 
     }//GEN-LAST:event_txtSearchCustomerKeyReleased

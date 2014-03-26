@@ -6,10 +6,25 @@
 
 package vn.edu.vttu.ui;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.RawMaterialInvoice;
 import vn.edu.vttu.data.RawMaterialInvoiceDetail;
 
@@ -53,7 +68,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         jToolBar3 = new javax.swing.JToolBar();
         btnSearch = new javax.swing.JButton();
         jToolBar4 = new javax.swing.JToolBar();
-        jButton2 = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbStoreInvoice = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -109,12 +124,17 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         jToolBar4.setFloatable(false);
         jToolBar4.setRollover(true);
 
-        jButton2.setBackground(new java.awt.Color(31, 114, 70));
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
-        jButton2.setText("Xuất Ra Excel");
-        jToolBar4.add(jButton2);
+        btnExport.setBackground(new java.awt.Color(31, 114, 70));
+        btnExport.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnExport.setForeground(new java.awt.Color(255, 255, 255));
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
+        btnExport.setText("Xuất Ra Excel");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        jToolBar4.add(btnExport);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -177,6 +197,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tbStoreInvoice.setGridColor(new java.awt.Color(204, 204, 204));
         tbStoreInvoice.setRowHeight(25);
         tbStoreInvoice.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbStoreInvoice.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -270,39 +291,34 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         loadTableStoreInvoiceDetail(id);
     }//GEN-LAST:event_tbStoreInvoiceMouseReleased
 
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        ExportExcel ex = new ExportExcel();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String from = formatter.format(dtfromdate.getDate());
+        String to = formatter.format(dttodate.getDate());
+        String fileName = "THONG_KE_HOA_NHAP_KHO_TU_NGAY_" + from + "_DEN_" + to;
+        String sheetName = "THỐNG KÊ NHẬP KHO";
+        String header = "THỐNG KÊ HÓA ĐƠN NHẬP KHO TỪ NGÀY " + from + " ĐẾN " + to;
+        int col = tbStoreInvoice.getColumnCount();
+        int row = tbStoreInvoice.getRowCount();        
+        ex.exportExcel(fileName, header, sheetName, col, row, tbStoreInvoice.getModel());
+    }//GEN-LAST:event_btnExportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnExportToExcel;
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnSearch;
-    private javax.swing.JButton btnSearchInvoice;
-    private javax.swing.JComboBox cobCustomer;
-    private javax.swing.JComboBox cobStaff;
-    private com.toedter.calendar.JDateChooser dtFromDate;
-    private com.toedter.calendar.JDateChooser dtToDate;
     private com.toedter.calendar.JDateChooser dtfromdate;
     private com.toedter.calendar.JDateChooser dttodate;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JToolBar jToolBar2;
     private javax.swing.JToolBar jToolBar3;
     private javax.swing.JToolBar jToolBar4;
-    private javax.swing.JLabel lbNumberInvoice;
-    private javax.swing.JLabel lbTotal;
     private javax.swing.JTable tbRawmaterialDetail;
     private javax.swing.JTable tbStoreInvoice;
     // End of variables declaration//GEN-END:variables

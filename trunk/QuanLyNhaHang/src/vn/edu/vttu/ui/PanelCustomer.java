@@ -84,6 +84,7 @@ public class PanelCustomer extends javax.swing.JPanel {
 
         } catch (Exception e) {
         }
+         tbCustomer.getTableHeader().setReorderingAllowed(false);
         conn = null;
     }
 

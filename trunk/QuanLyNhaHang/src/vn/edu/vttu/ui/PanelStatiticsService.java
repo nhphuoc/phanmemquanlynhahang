@@ -14,6 +14,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.data.general.DefaultPieDataset;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.Invoice;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.TableService;
@@ -96,7 +97,7 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         jToolBar1 = new javax.swing.JToolBar();
         btnStatitics = new javax.swing.JButton();
         jToolBar2 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         lbTotalPay = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -135,12 +136,17 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         jToolBar2.setFloatable(false);
         jToolBar2.setRollover(true);
 
-        jButton1.setBackground(new java.awt.Color(31, 114, 70));
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
-        jButton1.setText("Xuất Ra Excel");
-        jToolBar2.add(jButton1);
+        btnExport.setBackground(new java.awt.Color(31, 114, 70));
+        btnExport.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnExport.setForeground(new java.awt.Color(255, 255, 255));
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Excel-icon.png"))); // NOI18N
+        btnExport.setText("Xuất Ra Excel");
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        jToolBar2.add(btnExport);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(102, 153, 0));
@@ -196,6 +202,11 @@ public class PanelStatiticsService extends javax.swing.JPanel {
                 .addContainerGap(222, Short.MAX_VALUE))
         );
 
+        tbResult = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbResult.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -265,12 +276,25 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         lbTotalPay.setText(df.format(total)+" VNĐ");
     }//GEN-LAST:event_btnStatiticsActionPerformed
 
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+       ExportExcel ex = new ExportExcel();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String from = formatter.format(dtFormDate.getDate());
+        String to = formatter.format(dtToDate.getDate());
+        String fileName = "THONG_DICH_VU_TU_NGAY_" + from + "_DEN_" + to;
+        String sheetName = "THỐNG SỬ DỤNG DỊCH VỤ";
+        String header = "THỐNG KÊ SỬ DỤNG DỊCH VỤ TỪ NGÀY " + from + " ĐẾN " + to;
+        int col = tbResult.getColumnCount();
+        int row = tbResult.getRowCount();        
+        ex.exportExcel(fileName, header, sheetName, col, row, tbResult.getModel());
+    }//GEN-LAST:event_btnExportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnStatitics;
     private com.toedter.calendar.JDateChooser dtFormDate;
     private com.toedter.calendar.JDateChooser dtToDate;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;

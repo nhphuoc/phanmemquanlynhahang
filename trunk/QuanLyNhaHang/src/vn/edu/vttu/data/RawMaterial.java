@@ -24,8 +24,6 @@ public class RawMaterial {
     private int unit;
     private String namenit;
 
-    
-
     public int getId() {
         return id;
     }
@@ -57,6 +55,7 @@ public class RawMaterial {
     public void setUnit(int unit) {
         this.unit = unit;
     }
+
     public String getNamenit() {
         return namenit;
     }
@@ -64,13 +63,15 @@ public class RawMaterial {
     public void setNamenit(String namenit) {
         this.namenit = namenit;
     }
-    public RawMaterial(int id, String name, float number, int unit,String nameunit) {
+
+    public RawMaterial(int id, String name, float number, int unit, String nameunit) {
         this.id = id;
         this.name = name;
         this.number = number;
         this.unit = unit;
-        this.namenit=nameunit;
+        this.namenit = nameunit;
     }
+
     public static RawMaterial getByID(int id, Connection conn) {
         RawMaterial raw;
         try {
@@ -79,13 +80,14 @@ public class RawMaterial {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5),rs.getString(4));
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getString(4));
                 return raw;
             }
         } catch (Exception e) {
         }
         return null;
     }
+
     public static TableModel getAll(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
@@ -98,7 +100,8 @@ public class RawMaterial {
         }
         return tb;
     }
-    public static TableModel search(String key,Connection conn) {
+
+    public static TableModel search(String key, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {
@@ -111,12 +114,13 @@ public class RawMaterial {
         }
         return tb;
     }
-    public static boolean insert(String name,float num, int unit, Connection conn) {
+
+    public static boolean insert(String name, float num, int unit, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL raw_material_add(?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setString(1, name);          
+            callstate.setString(1, name);
             callstate.setFloat(2, num);
             callstate.setInt(3, unit);
             int x = callstate.executeUpdate();
@@ -132,16 +136,17 @@ public class RawMaterial {
 
         return flag;
     }
-    public static boolean update(String name,int unit,int id, Connection conn) {
+
+    public static boolean update(String name, int unit, int id, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_update(?,?,?,?)";
+            String sql = "CALL raw_material_update(?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
-            callstate.setString(1, name);            
+            callstate.setString(1, name);
             callstate.setInt(2, unit);
             callstate.setInt(3, id);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -153,6 +158,7 @@ public class RawMaterial {
 
         return flag;
     }
+
     public static boolean delete(int id, Connection conn) {
         boolean flag = false;
         try {
@@ -161,7 +167,7 @@ public class RawMaterial {
 
             callstate.setInt(1, id);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x >= 0) {
                 flag = true;
             } else {
                 flag = false;
@@ -173,35 +179,37 @@ public class RawMaterial {
 
         return flag;
     }
-    public static boolean testName(String name,Connection conn) {
+
+    public static boolean testName(String name, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        boolean flag=false;
+        boolean flag = false;
         try {
             CallableStatement calState = conn.prepareCall("{CALL raw_material_test_name(?)}");
             calState.setString(1, name);
-            rs = calState.executeQuery();            
+            rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
-            if(tb.getRowCount()>0){
-                flag=false;
-            }else{
-                flag=true;
+            if (tb.getRowCount() > 0) {
+                flag = false;
+            } else {
+                flag = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            flag=false;
+            flag = false;
         }
         return flag;
     }
-    public static boolean updateNumber(int id,float number, Connection conn) {
+
+    public static boolean updateNumber(int id, float number, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL raw_material_update_number(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(2, id);
-            callstate.setFloat(1, number);            
+            callstate.setFloat(1, number);
             int x = callstate.executeUpdate();
-            if (x ==1) {
+            if (x == 1) {
                 flag = true;
             } else {
                 flag = false;
@@ -212,7 +220,8 @@ public class RawMaterial {
         }
         return flag;
     }
-    public static TableModel getNumber(int id,Connection conn) {
+
+    public static TableModel getNumber(int id, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
         try {
@@ -225,6 +234,7 @@ public class RawMaterial {
         }
         return tb;
     }
+
     public static Vector selectRawmaterial(Connection conn) {
         Vector result = new Vector();
         try {
@@ -235,9 +245,7 @@ public class RawMaterial {
                 vn.edu.vttu.model.StoreList tb = new vn.edu.vttu.model.StoreList(rs.getInt(1), rs.getString(2));
                 result.add(tb);
             }
-        } catch (Exception e) {
-
-            e.printStackTrace();
+        } catch (Exception e) {          
         }
         return result;
     }

@@ -237,6 +237,7 @@ public class PanelPaymentInvoice extends javax.swing.JPanel {
         Timestamp tsToDate = Timestamp.valueOf(datetimeEnd);
         tbInvoicePayment.setModel(PaymentInvoice.getByDate(tsStart, tsToDate, ConnectDB.conn()));
         tbInvoicePayment.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
+        tbInvoicePayment.getTableHeader().setReorderingAllowed(false);
         int numberInvoice=tbInvoicePayment.getRowCount();
         int total=0;
         for(int i=0;i<tbInvoicePayment.getRowCount();i++){

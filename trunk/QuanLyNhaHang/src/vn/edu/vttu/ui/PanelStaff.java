@@ -79,6 +79,7 @@ public class PanelStaff extends javax.swing.JPanel {
             tbStaff.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
         }
+         tbStaff.getTableHeader().setReorderingAllowed(false);
     }
 
     private void bindingText(int index) {

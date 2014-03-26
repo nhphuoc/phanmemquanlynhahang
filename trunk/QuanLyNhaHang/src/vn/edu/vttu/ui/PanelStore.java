@@ -144,7 +144,8 @@ public class PanelStore extends javax.swing.JPanel {
                 txtNumber.setText(table.getValueAt(index, 2).toString());
                 setSelectedValue(cobUnit, Integer.parseInt(table.getValueAt(index, 3).toString()));
             }
-        });        
+        }); 
+        table.getTableHeader().setReorderingAllowed(false);
         pn.updateUI();
         pn.repaint();
 
