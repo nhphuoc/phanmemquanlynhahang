@@ -139,6 +139,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
         tbListTable.getColumnModel().getColumn(8).setMaxWidth(0);
         tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
+        tbListTable.getTableHeader().setReorderingAllowed(false);
 
     }
 
@@ -468,12 +469,14 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
     private void loadTableService() {
         tbService.setModel(Service.getAllLimit(ConnectDB.conn()));
+        tbService.getTableHeader().setReorderingAllowed(false);
     }
 
     private void loadTableInvoice(int idReservation) {
         tbInvoice.setModel(TableService.getByIdReservation(idReservation, ConnectDB.conn()));
         tbInvoice.getColumnModel().getColumn(6).setMinWidth(0);
         tbInvoice.getColumnModel().getColumn(6).setMaxWidth(0);
+        tbInvoice.getTableHeader().setReorderingAllowed(false);
         DecimalFormat df = new DecimalFormat("#,###,###");
         lbTotal.setText(df.format(total()));
     }
@@ -1094,6 +1097,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
             tbListTable.getColumnModel().getColumn(8).setMaxWidth(0);
             tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
+            tbListTable.getTableHeader().setReorderingAllowed(false);
         } catch (Exception e) {
 
         }
@@ -1131,7 +1135,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             tbListTable.getColumnModel().getColumn(7).setMaxWidth(0);
             tbListTable.getColumnModel().getColumn(8).setMaxWidth(0);
             tbListTable.getColumnModel().getColumn(9).setMaxWidth(0);
-
+            tbListTable.getTableHeader().setReorderingAllowed(false);
         } catch (Exception e) {
             e.printStackTrace();
         }

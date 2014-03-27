@@ -44,6 +44,7 @@ public class PanelTableReservation extends javax.swing.JPanel {
     private void loadCustomer() {
         tbCustomer.setModel(Customer.getLimit(conn));
         tbCustomer.setRowSelectionInterval(0, 0);
+        tbCustomer.getTableHeader().setReorderingAllowed(false);
     }
 
     private Timestamp getTime() {
@@ -203,6 +204,7 @@ public class PanelTableReservation extends javax.swing.JPanel {
             e.printStackTrace();
             tbCustomer.setModel(Customer.getLimit(conn));
             VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+            tbCustomer.getTableHeader().setReorderingAllowed(false);
         }
     }//GEN-LAST:event_txtCustomerNameKeyReleased
 

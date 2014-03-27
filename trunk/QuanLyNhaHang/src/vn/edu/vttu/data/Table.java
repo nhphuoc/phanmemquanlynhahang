@@ -156,7 +156,7 @@ public class Table {
         try {
             String sql = "SELECT * FROM `table` WHERE `table`.`location`=" + idLocation + " AND `table`.`isActive`=TRUE;";
             CallableStatement calState = conn.prepareCall(sql);
-            ResultSet rs = calState.executeQuery(sql);
+            ResultSet rs = calState.executeQuery();
             rs.last();
             tables = new Table[rs.getRow()];
             rs.beforeFirst();

@@ -6,23 +6,9 @@
 
 package vn.edu.vttu.ui;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import jxl.Workbook;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.ExportExcel;
 import vn.edu.vttu.data.RawMaterialInvoice;
@@ -45,6 +31,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
     }
     private void loadTableStoreInvoice(Timestamp from, Timestamp to){
         tbStoreInvoice.setModel(RawMaterialInvoice.getByDate(from,to,ConnectDB.conn()));
+         tbStoreInvoice.getTableHeader().setReorderingAllowed(false);
     }
     private void loadTableStoreInvoiceDetail(int id){
         tbRawmaterialDetail.setModel(RawMaterialInvoiceDetail.getByIdRawmaterial(id, ConnectDB.conn()));
@@ -282,6 +269,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         String datetime2 = formatter.format(dttodate.getDate());
         Timestamp to = Timestamp.valueOf(datetime2);
         loadTableStoreInvoice(from, to);
+        tbStoreInvoice.getTableHeader().setReorderingAllowed(false);
         
     }//GEN-LAST:event_btnSearchActionPerformed
 

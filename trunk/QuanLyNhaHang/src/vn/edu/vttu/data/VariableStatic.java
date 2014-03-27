@@ -20,7 +20,7 @@ public class VariableStatic {
     public static java.sql.Timestamp dateTimeReservation; 
     public static boolean status;
     private static int idTable_Change;
-    private static int idSystemLog;
+    private static int idRequest;
     private static int typeService;
     private static String typeServiceName;    
     private static int idService;    
@@ -76,12 +76,12 @@ public class VariableStatic {
     }
     private static int costService;
 
-    public static int getIdSystemLog() {
-        return idSystemLog;
+    public static int getIdRequest() {
+        return idRequest;
     }
 
-    public static void setIdSystemLog(int idSystemLog) {
-        VariableStatic.idSystemLog = idSystemLog;
+    public static void setIdRequest(int idRequest) {
+        VariableStatic.idRequest = idRequest;
     }
 
     public static int getIdTable_Change() {

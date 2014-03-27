@@ -261,6 +261,7 @@ public class PanelStatiticsService extends javax.swing.JPanel {
         Timestamp tsToDate = Timestamp.valueOf(datetimeEnd);
         tbResult.setModel(TableService.getStatiticsService(tsStart, tsToDate, ConnectDB.conn()));
         tbResult.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+        tbResult.getTableHeader().setReorderingAllowed(false);
         showChart();
         int total=0;
         for(int i=0;i<tbResult.getRowCount();i++){

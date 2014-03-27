@@ -9,6 +9,8 @@ package vn.edu.vttu.sqlite;
  *
  * @author nhphuoc
  */
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.*;
 
 public class ConnectSQLite {
@@ -16,8 +18,8 @@ public class ConnectSQLite {
     public Connection connectSQLite() {
         Connection c = null;        
         try {
-            Class.forName("org.sqlite.JDBC");
-            c = DriverManager.getConnection("jdbc:sqlite:config.db");
+            Class.forName("org.sqlite.JDBC");            
+            c = DriverManager.getConnection("jdbc:sqlite:config/config.db");
             
         } catch (Exception e) {            
             e.printStackTrace();
