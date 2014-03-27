@@ -99,11 +99,12 @@ public class Discount {
         this.value=value;
         this.detail=detail;
     }
-    public static Discount getByDate(Connection conn) {
+    public static Discount getByDate(Timestamp dt,Connection conn) {
         Discount discount;
         try {
-            String sql = "call discount_get_by_date()";
-            CallableStatement callstate = conn.prepareCall(sql);            
+            String sql = "call discount_get_by_date(?)";
+            CallableStatement callstate = conn.prepareCall(sql);   
+            callstate.setTimestamp(1, dt);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
                 discount = new Discount(rs.getInt("id"), rs.getString("name"), rs.getInt("type"), rs.getTimestamp("beginDate"),rs.getTimestamp("endDate"),rs.getInt("valueInvoice"),rs.getInt("value"), rs.getString("detail"));

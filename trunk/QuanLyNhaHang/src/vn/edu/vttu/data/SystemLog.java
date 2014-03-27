@@ -63,8 +63,25 @@ public class SystemLog {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return slog;
-        
+        return slog;        
+    }
+    public static boolean insert(String info, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL system_log_add(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, info);            
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
     }
     
 }

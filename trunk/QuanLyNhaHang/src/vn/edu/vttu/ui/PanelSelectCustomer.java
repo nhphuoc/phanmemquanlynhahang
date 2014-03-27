@@ -43,10 +43,10 @@ public class PanelSelectCustomer extends javax.swing.JPanel {
         tbCustomer.setModel(Customer.getLimit(conn));
         try {
             tbCustomer.setRowSelectionInterval(0, 0);
+            Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
         } catch (Exception e) {
         }
-
-        Customer.setID(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+        
         tbCustomer.getTableHeader().setReorderingAllowed(false);
     }
 

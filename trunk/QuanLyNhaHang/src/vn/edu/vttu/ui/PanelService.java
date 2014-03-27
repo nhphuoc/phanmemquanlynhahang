@@ -44,6 +44,7 @@ import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.ServiceType;
+import vn.edu.vttu.data.SystemLog;
 import vn.edu.vttu.data.Unit;
 import vn.edu.vttu.data.UploadFile;
 import vn.edu.vttu.data.VariableStatic;
@@ -347,7 +348,7 @@ public class PanelService extends javax.swing.JPanel {
                         UploadFile ftpUploader = new UploadFile(TbServer.getValues().getIp(),
                                 TbServer.getValues().getUser(), TbServer.getValues().getPass());
                         ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
-                        ftpUploader.disconnect();
+                        ftpUploader.disconnect();                        
                         conn.commit();
                         flag = true;
                     }
@@ -410,8 +411,7 @@ public class PanelService extends javax.swing.JPanel {
                                 ftpUploader.disconnect();
                             } catch (Exception e) {
                                 throw new Exception();
-                            }
-
+                            }                            
                             conn.commit();
                             flag = true;
                         } else {
@@ -864,12 +864,14 @@ public class PanelService extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (add == true) {
-            if (add()) {
+            if (add()) {    
+                SystemLog.insert("service", ConnectDB.conn());
                 enableButton(true);
                 loadTableService(indexx);
             }
         } else {
             if (update()) {
+                SystemLog.insert("service", ConnectDB.conn());
                 enableButton(true);
                 System.out.println(indexx);
                 loadTableService(indexx);

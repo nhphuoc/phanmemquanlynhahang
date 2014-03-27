@@ -404,6 +404,7 @@ public class PanelTable extends javax.swing.JPanel {
                                 if (Table.testTableName(tablename, conn)) {
                                     if (Table.insertNewTable(tablename, TableType.getByMaxID(conn).getId(), TableLocation.getByMinID(conn).getID(), 10, conn)) {
                                         JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn thành công");
+                                        SystemLog.insert("table", conn);
                                         loadTable(idLocation);
                                     } else {
                                         JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn không thành công");
@@ -432,6 +433,7 @@ public class PanelTable extends javax.swing.JPanel {
                                         JOptionPane.showMessageDialog(getRootPane(), "Tên bàn " + tablename + " đã có, vui lòng chọn tên khác");
                                     } else {
                                         if (Table.updateTableName(tablename, idTable, conn)) {
+                                            SystemLog.insert("table", conn);
                                             JOptionPane.showMessageDialog(getRootPane(), "Cập nhật bàn thành công");
                                             loadTable(idLocation);
                                         } else {
@@ -459,7 +461,7 @@ public class PanelTable extends javax.swing.JPanel {
 
             popup.addSeparator();
             popup.add(
-                    new JMenuItem(new AbstractAction("Quản Lý Khu Vực", new ImageIcon(image12)) {
+                    new JMenuItem(new AbstractAction("Quản Lý Vị Trí", new ImageIcon(image12)) {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
@@ -473,7 +475,6 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void loadTable(int idLoca) {
-
         conn = ConnectDB.conn();
         layout_table.removeAll();
         enableButton(false);
@@ -717,7 +718,7 @@ public class PanelTable extends javax.swing.JPanel {
                         cn.setAutoCommit(false);
                         if (ClientRequest.getById(idRequired, cn).getId_request() >= 2) {
                             if (ClientRequest.accept(idRequired, true, ConnectDB.conn())) {
-                                loadTableRequire();                                
+                                loadTableRequire();
                             } else {
                                 throw new SQLException();
                             }
@@ -930,7 +931,6 @@ public class PanelTable extends javax.swing.JPanel {
                                 }
                             }
                             conn = null;
-
                         }
                     }
                     ));
@@ -993,7 +993,6 @@ public class PanelTable extends javax.swing.JPanel {
                     t = false;
                     JOptionPane.showMessageDialog(getRootPane(), "Có lỗi xảy ra!");
                 }
-
             }
         }
         conn = null;
@@ -1355,7 +1354,13 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void totalPay() {
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:00");
+        Timestamp ts;
+        if (beginDate == null) {
+            ts = Timestamp.valueOf(formatter.format(formatter.format(new Date())));
+        } else {
+            ts = Timestamp.valueOf(formatter.format(beginDate));
+        }
         conn = ConnectDB.conn();
         DecimalFormat df = new DecimalFormat("#,###,###");
         float service_Charges = 0;
@@ -1372,22 +1377,6 @@ public class PanelTable extends javax.swing.JPanel {
             }
 
         }
-        /*
-         if (!txtDiscountMoney.getText().trim().equals("")) {
-         discount_money = Integer.parseInt(txtDiscountMoney.getText().trim().replaceAll("\\.", ""));
-
-         }
-         if (!txtDiscountPercent.getText().trim().equals("")) {
-         if (Integer.parseInt(txtDiscountPercent.getText()) < 100 && Integer.parseInt(txtDiscountPercent.getText()) >= 0) {
-         discount_percent = Integer.parseInt(txtDiscountPercent.getText().trim());
-         } else {
-         JOptionPane.showMessageDialog(txtDiscountPercent, "Nhập sai phần trăm");
-         txtDiscountPercent.setText("100");
-         }
-
-         }
-         */
-
         if (!txtCustomerPay.getText().trim().equals("")) {
             try {
                 customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
@@ -1406,18 +1395,18 @@ public class PanelTable extends javax.swing.JPanel {
         }
 
         float total = TableService.totalPayment(idTableReservation, conn);
-        if (!Discount.getByDate(conn).getName().equals("Không có khuyến mãi")) {
-            if (total >= Discount.getByDate(conn).getCondition()) {
-                if (Discount.getByDate(conn).getType() == 0) {
-                    discount_percent = Discount.getByDate(conn).getValue();
+        if (!Discount.getByDate(ts, conn).getName().equals("Không có khuyến mãi")) {
+            if (total >= Discount.getByDate(ts, conn).getCondition()) {
+                if (Discount.getByDate(ts, conn).getType() == 0) {
+                    discount_percent = Discount.getByDate(ts, conn).getValue();
                     txtDiscountPercent.setText(String.valueOf(discount_percent));
                 }
             } else {
                 txtDiscountPercent.setText("");
             }
-            if (Discount.getByDate(conn).getType() == 1) {
-                if (total >= Discount.getByDate(conn).getCondition()) {
-                    discount_money = Discount.getByDate(conn).getValue();
+            if (Discount.getByDate(ts, conn).getType() == 1) {
+                if (total >= Discount.getByDate(ts, conn).getCondition()) {
+                    discount_money = Discount.getByDate(ts, conn).getValue();
                     txtDiscountMoney.setText(df.format(discount_money));
                 } else {
                     txtDiscountMoney.setText("");
@@ -1448,6 +1437,13 @@ public class PanelTable extends javax.swing.JPanel {
 
     private boolean billing() throws SQLException {
         conn = ConnectDB.conn();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+        Timestamp ts;
+        if (beginDate == null) {
+            ts = Timestamp.valueOf(formatter.format(formatter.format(new Date())));
+        } else {
+            ts = Timestamp.valueOf(formatter.format(beginDate));
+        }
         boolean flag = false;
         try {
             conn.setAutoCommit(false);
@@ -1459,8 +1455,8 @@ public class PanelTable extends javax.swing.JPanel {
                             _total = Integer.parseInt(lbTotal.getText().replaceAll("\\.", ""));
                         } catch (Exception e) {
                             _total = Integer.parseInt(lbTotal.getText().replaceAll(",", ""));
-                        }
-                        if (Discount.getByDate(conn).getCondition() < _total) {
+                        }                        
+                        if (Discount.getByDate(ts, conn).getCondition() >= _total) {
                             TableReservationDetail table_list[] = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
                             for (int i = 0; i < table_list.length; i++) {
                                 if (TableReservation.countidTableReservation(table_list[i].getID_TABLE(), conn) > 0) {
@@ -1479,7 +1475,7 @@ public class PanelTable extends javax.swing.JPanel {
                             }
                             conn.commit();
                         } else {
-                            if (DiscountDetail.insert(Invoice.getMaxID(conn), Discount.getByDate(conn).getId(), conn)) {
+                            if (DiscountDetail.insert(Invoice.getMaxID(conn), Discount.getByDate(ts, conn).getId(), conn)) {
                                 TableReservationDetail table_list[] = TableReservationDetail.getListTableByIdReservation(idTableReservation, conn);
                                 for (int i = 0; i < table_list.length; i++) {
                                     if (TableReservation.countidTableReservation(table_list[i].getID_TABLE(), conn) > 0) {

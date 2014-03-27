@@ -37,9 +37,12 @@ public class PanelCustomer extends javax.swing.JPanel {
         }
 
         public boolean validate(final String hex) {
-
-            matcher = pattern.matcher(hex);
-            return matcher.matches();
+            if (hex.endsWith("")) {
+                return true;
+            } else {
+                matcher = pattern.matcher(hex);
+                return matcher.matches();
+            }
         }
     }
 
@@ -84,7 +87,7 @@ public class PanelCustomer extends javax.swing.JPanel {
 
         } catch (Exception e) {
         }
-         tbCustomer.getTableHeader().setReorderingAllowed(false);
+        tbCustomer.getTableHeader().setReorderingAllowed(false);
         conn = null;
     }
 
@@ -487,7 +490,7 @@ public class PanelCustomer extends javax.swing.JPanel {
         } else if (!validator.validate(txtEmail.getText().trim())) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai Email", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtEmail.requestFocus();
-        } else if ((dt.getYear() + 1900) - (new Date().getYear() + 1900) > 18) {
+        } else if (((dt.getYear() + 1900) - (new Date().getYear() + 1900)) > 18) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập sai năm sinh", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             dtBirtday.requestFocus();
         } else {
