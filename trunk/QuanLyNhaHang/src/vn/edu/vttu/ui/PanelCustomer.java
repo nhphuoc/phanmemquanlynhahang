@@ -10,13 +10,20 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
+import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -528,6 +535,19 @@ public class PanelCustomer extends javax.swing.JPanel {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        try {
+            HashMap<String, Object> parameter = new HashMap<String, Object>();
+            parameter.put("tennhahang", tbRestaurant.getValues().getName());
+            parameter.put("diachi", "Địa Chỉ: " + tbRestaurant.getValues().getAddress());
+            parameter.put("sdt", "Điện Thoại: " + tbRestaurant.getValues().getPhone());
+            parameter.put("logo",tbRestaurant.getValues().getLogo());
+            JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/customer.jrxml"));
+            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());
+            JasperViewer jv = new JasperViewer(jp, false);
+            jv.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }//GEN-LAST:event_btnPrintActionPerformed
 

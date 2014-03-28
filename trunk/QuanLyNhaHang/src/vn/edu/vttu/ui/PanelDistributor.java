@@ -378,7 +378,9 @@ public class PanelDistributor extends javax.swing.JPanel {
         try {
             tbDistributor.setModel(Distributor.getAll(ConnectDB.conn()));
             tbDistributor.getTableHeader().setReorderingAllowed(false);
+            enableButton(true);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnReloadActionPerformed
 

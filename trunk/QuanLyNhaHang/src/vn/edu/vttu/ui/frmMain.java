@@ -82,7 +82,7 @@ public class frmMain extends javax.swing.JFrame {
         btnDifferentMoney = new javax.swing.JButton();
         btnStatistics = new javax.swing.JButton();
         btnDistributor = new javax.swing.JButton();
-        btnUnit = new javax.swing.JButton();
+        btnDanhMuc = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         lbLoginUser = new javax.swing.JLabel();
@@ -262,15 +262,20 @@ public class frmMain extends javax.swing.JFrame {
         });
         jToolBar1.add(btnDistributor);
 
-        btnUnit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/balance-unbalance-icon.png"))); // NOI18N
-        btnUnit.setText("Đơn Vị Tính");
-        btnUnit.setFocusable(false);
-        btnUnit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnUnit.setMaximumSize(new java.awt.Dimension(77, 75));
-        btnUnit.setMinimumSize(new java.awt.Dimension(77, 75));
-        btnUnit.setPreferredSize(new java.awt.Dimension(77, 75));
-        btnUnit.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(btnUnit);
+        btnDanhMuc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/catalog-icon.png"))); // NOI18N
+        btnDanhMuc.setText("Danh Mục");
+        btnDanhMuc.setFocusable(false);
+        btnDanhMuc.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnDanhMuc.setMaximumSize(new java.awt.Dimension(77, 75));
+        btnDanhMuc.setMinimumSize(new java.awt.Dimension(77, 75));
+        btnDanhMuc.setPreferredSize(new java.awt.Dimension(77, 75));
+        btnDanhMuc.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnDanhMuc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDanhMucActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnDanhMuc);
 
         jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Help-icon.png"))); // NOI18N
         jButton7.setText("Trợ Giúp");
@@ -417,6 +422,14 @@ public class frmMain extends javax.swing.JFrame {
         main.repaint();
     }//GEN-LAST:event_btnDistributorActionPerformed
 
+    private void btnDanhMucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDanhMucActionPerformed
+       main.removeAll();
+        PanelCatolog panelcatolog = new PanelCatolog();
+        main.add(panelcatolog);
+        main.revalidate();
+        main.repaint();
+    }//GEN-LAST:event_btnDanhMucActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -453,6 +466,7 @@ public class frmMain extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDanhMuc;
     private javax.swing.JButton btnDifferentMoney;
     private javax.swing.JButton btnDistributor;
     private javax.swing.JButton btnInvoice;
@@ -462,7 +476,6 @@ public class frmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnStatistics;
     private javax.swing.JButton btnStore;
     private javax.swing.JButton btnSystem;
-    private javax.swing.JButton btnUnit;
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton7;

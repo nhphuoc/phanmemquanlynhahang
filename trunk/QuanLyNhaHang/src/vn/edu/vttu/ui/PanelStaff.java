@@ -10,13 +10,20 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Staff;
+import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -262,6 +269,11 @@ public class PanelStaff extends javax.swing.JPanel {
         btnPrint.setBackground(new java.awt.Color(153, 204, 255));
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/print-icon-24x24.png"))); // NOI18N
         btnPrint.setText("Print");
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnPrint);
         jToolBar1.add(jSeparator6);
 
@@ -533,6 +545,22 @@ public class PanelStaff extends javax.swing.JPanel {
         loadData();
         enableButton(true);
     }//GEN-LAST:event_btnReloadActionPerformed
+
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        try {
+            HashMap<String, Object> parameter = new HashMap<String, Object>();
+            parameter.put("tennhahang", tbRestaurant.getValues().getName());
+            parameter.put("diachi", "Địa Chỉ: " + tbRestaurant.getValues().getAddress());
+            parameter.put("sdt", "Điện Thoại: " + tbRestaurant.getValues().getPhone());
+            parameter.put("logo",tbRestaurant.getValues().getLogo());
+            JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/staff.jrxml"));
+            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());
+            JasperViewer jv = new JasperViewer(jp, false);
+            jv.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_btnPrintActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

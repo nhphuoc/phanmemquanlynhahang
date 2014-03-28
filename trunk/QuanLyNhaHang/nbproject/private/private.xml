@@ -3,11 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Discount.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelSelectCustomer.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelTable.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelCustomer.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Customer.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelDistributor.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelService.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelCatolog.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/frmMain.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelReservationMultiTable.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Table.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelAddTable.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelViewReservation.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/RawMaterialInvoiceDetail.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelStatiticsRevenue.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelStoreInvoice.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelAddStoreInvoice.java</file>
         </group>
     </open-files>
 </project-private>

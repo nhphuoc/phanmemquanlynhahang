@@ -7,10 +7,12 @@
 package vn.edu.vttu.ui;
 
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.ExportExcel;
+import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterialInvoice;
 import vn.edu.vttu.data.RawMaterialInvoiceDetail;
 
@@ -35,6 +37,10 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
     }
     private void loadTableStoreInvoiceDetail(int id){
         tbRawmaterialDetail.setModel(RawMaterialInvoiceDetail.getByIdRawmaterial(id, ConnectDB.conn()));
+        tbRawmaterialDetail.getTableHeader().setReorderingAllowed(false);
+        tbRawmaterialDetail.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
+        tbRawmaterialDetail.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
+        tbRawmaterialDetail.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
     }
 
     /**
@@ -56,6 +62,8 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         btnSearch = new javax.swing.JButton();
         jToolBar4 = new javax.swing.JToolBar();
         btnExport = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        lbTotal = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbStoreInvoice = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -123,6 +131,15 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         });
         jToolBar4.add(btnExport);
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 102, 0));
+        jLabel1.setText("Tổng Cộng");
+
+        lbTotal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        lbTotal.setForeground(new java.awt.Color(255, 51, 0));
+        lbTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbTotal.setText("0");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -142,6 +159,13 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(dttodate, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(31, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,6 +183,10 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
                 .addComponent(jToolBar3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToolBar4, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -269,8 +297,20 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
         String datetime2 = formatter.format(dttodate.getDate());
         Timestamp to = Timestamp.valueOf(datetime2);
         loadTableStoreInvoice(from, to);
+        tbStoreInvoice.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
         tbStoreInvoice.getTableHeader().setReorderingAllowed(false);
-        
+        int total = 0;
+        for(int i=0;i<tbStoreInvoice.getRowCount();i++){
+            float n=0;
+            try {
+                n=Float.parseFloat(tbStoreInvoice.getValueAt(i, 3).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+           total=(int) (total+n);
+        }
+        DecimalFormat df = new DecimalFormat("#,###,###");
+        lbTotal.setText(df.format(total));
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void tbStoreInvoiceMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreInvoiceMouseReleased
@@ -298,6 +338,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
     private javax.swing.JButton btnSearch;
     private com.toedter.calendar.JDateChooser dtfromdate;
     private com.toedter.calendar.JDateChooser dttodate;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel8;
@@ -307,6 +348,7 @@ public class PanelStoreInvoice extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JToolBar jToolBar3;
     private javax.swing.JToolBar jToolBar4;
+    private javax.swing.JLabel lbTotal;
     private javax.swing.JTable tbRawmaterialDetail;
     private javax.swing.JTable tbStoreInvoice;
     // End of variables declaration//GEN-END:variables

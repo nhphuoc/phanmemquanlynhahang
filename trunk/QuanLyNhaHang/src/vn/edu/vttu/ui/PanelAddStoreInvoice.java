@@ -528,6 +528,7 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
                     for (int i = 0; i < tbList.getRowCount(); i++) {
                         model.removeRow(i);
                     }
+                    model.setNumRows(0);
                     if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn in hóa đơn", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 
                     }

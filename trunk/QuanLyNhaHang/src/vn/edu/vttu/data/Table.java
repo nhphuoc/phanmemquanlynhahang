@@ -398,6 +398,18 @@ public class Table {
         }
         return result;
     }
+    public static TableModel tableGetAll(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_get_All()}");
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
    
 
 }
