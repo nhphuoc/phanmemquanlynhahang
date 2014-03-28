@@ -1,6 +1,9 @@
 package vn.edu.vttu.ui;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
@@ -51,32 +54,25 @@ public class test {
         return kq;
     }
 
-    public static void main(String[] agrs) {
-        //test t = new test();
-        JFileChooser chooser = new JFileChooser();
-        chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("Chọ thư mục");
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);        
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            System.out.println("getCurrentDirectory(): "
-                    + chooser.getCurrentDirectory());
-            System.out.println("getSelectedFile() : "
-                    + chooser.getSelectedFile());
-        } else {
-            System.out.println("No Selection ");
+    public static void main(String[] agrs) throws IOException {
+        try {
+            //test t = new test();
+            String dbName = "vttu_restaurant";
+            String dbUser = "root";
+            String dbPass = "";
+            String executeCmd = "";
+             String x="mysqldump -h localhost -port 3306 -u root -p   --add-drop-database -B c9 -r bk.sql";
+            executeCmd = "mysqldump - u root -p  vttu_restaurant -r backup1.sql";
+            //Process runtimeProcess = Runtime.getRuntime().exec(x);
+            Process runtimeProcess=Runtime.getRuntime().exec("mysqldump -u root -p  c9 < backup2.sql");
+            int processComplete = runtimeProcess.waitFor();
+            if(processComplete==0){
+                System.out.println("Thành công");
+            }else{
+                System.out.println("Lỗi");
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    /*
-     TableModel tb = RawMaterial.getAll(ConnectDB.conn());
-     for (int i = 0; i < tb.getRowCount(); i++) {
-     int idUnit = Integer.parseInt(tb.getValueAt(i, 4).toString());
-     float sl = Float.parseFloat(tb.getValueAt(i, 2).toString());
-     String name = tb.getValueAt(i, 1).toString();
-
-     System.out.println(name + " - " + t.dvt(idUnit, sl));
-     }
-     */
 }
