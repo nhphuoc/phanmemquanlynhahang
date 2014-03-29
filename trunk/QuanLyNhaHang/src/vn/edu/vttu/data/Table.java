@@ -321,6 +321,28 @@ public class Table {
         }
         return flag;
     }
+    public static boolean update(String name, int type, int location, int chair,int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_update(?,?,?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setInt(2, type);
+            callstate.setInt(3, location);
+            callstate.setInt(4, chair);
+            callstate.setInt(5, id);
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
     public static boolean testTableName(String name, Connection conn) {
         TableModel tb = null;
@@ -413,3 +435,4 @@ public class Table {
    
 
 }
+

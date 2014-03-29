@@ -80,29 +80,32 @@ public class PanelStore extends javax.swing.JPanel {
 
     private String dvt(int id, float num) {
         String kq = "";
-        TableModel tb = Unit.getBySubID(id, ConnectDB.conn());
-        int cast = 0;
-        int idsub = 0;
-        if (tb.getRowCount() > 1) {
-            for (int i = 0; i < tb.getRowCount(); i++) {
-                if (!Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).isParent()) {
-                    cast = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).getCast();
-                    idsub = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()), ConnectDB.conn()).getId();
-                    break;
+        Connection cn = ConnectDB.conn();
+        int idunit = RawMaterial.getByID(id, cn).getUnit();
+        boolean parent = Unit.getByID(idunit, cn).isParent();
+        String name = RawMaterial.getByID(id, cn).getName();
+        if (parent) {
+            int x=RawMaterial.getByID(id, cn).getId_unit_sub();
+            if (x!=0) {
+                int idunitsub = RawMaterial.getByID(id, cn).getId_unit_sub();
+                int cast = Unit.getByID(idunitsub, ConnectDB.conn()).getCast();
+                float n = (num * cast) % cast;
+                int m = (int) (num * cast) / cast;
+                if (n == 0) {
+                    kq = m + " " + Unit.getByID(idunit, cn).getName();
+                } else {
+                    if (m == 0) {
+                        kq = n + " " + Unit.getByID(idunitsub, cn).getName();
+                    } else {
+                        kq = m + " " + Unit.getByID(idunit, cn).getName() + " "
+                                + n + " " + Unit.getByID(idunitsub, cn).getName();
+                    }
                 }
-            }
-            float x = (float) (num * cast);
-            String y = (int) (x / cast) + " " + Unit.getByID(id, ConnectDB.conn()).getName();
-            String z = (int) (x % cast) + " " + Unit.getByID(idsub, ConnectDB.conn()).getName();
-            if (x % cast == 0) {
-                kq = y;
             } else {
-                kq = (y + " " + z);
+                
             }
-
-        }
-        if (tb.getRowCount() == 1) {
-            kq = (num + " " + Unit.getByID(id, ConnectDB.conn()).getName());
+        } else {
+            kq = (int)num + " " + Unit.getByID(idunit, cn).getName();
         }
         return kq;
     }
@@ -116,7 +119,8 @@ public class PanelStore extends javax.swing.JPanel {
             for (int j = 0; j < 2; j++) {
                 rowOne.addElement(tb.getValueAt(i, j).toString());
             }
-            rowOne.addElement(dvt(Integer.parseInt(tb.getValueAt(i, 4).toString()), Float.parseFloat(tb.getValueAt(i, 2).toString())));
+
+            rowOne.addElement(dvt(Integer.parseInt(tb.getValueAt(i, 0).toString()), Float.parseFloat(tb.getValueAt(i, 2).toString())));
             rowOne.addElement(tb.getValueAt(i, 4).toString());
             rowData.addElement(rowOne);
         }
@@ -126,12 +130,12 @@ public class PanelStore extends javax.swing.JPanel {
         columnNames.addElement("Số Lượng");
         columnNames.addElement("");
 
-        table = new JTable(rowData, columnNames);        
+        table = new JTable(rowData, columnNames);
         table.setGridColor(new java.awt.Color(204, 204, 204));
         table.setRowHeight(25);
         table.setSelectionBackground(new java.awt.Color(255, 153, 0));
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        table.setFont(new java.awt.Font("Tahoma", 1, 12));        
+        table.setFont(new java.awt.Font("Tahoma", 1, 12));
         table.getColumnModel().getColumn(3).setMaxWidth(0);
         table.getColumnModel().getColumn(3).setMinWidth(0);
         JScrollPane scrollPane = new JScrollPane(table);
@@ -144,7 +148,7 @@ public class PanelStore extends javax.swing.JPanel {
                 txtNumber.setText(table.getValueAt(index, 2).toString());
                 setSelectedValue(cobUnit, Integer.parseInt(table.getValueAt(index, 3).toString()));
             }
-        }); 
+        });
         table.getTableHeader().setReorderingAllowed(false);
         pn.updateUI();
         pn.repaint();
@@ -450,7 +454,7 @@ public class PanelStore extends javax.swing.JPanel {
                 if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
                     JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
                 } else {
-                    if (RawMaterial.insert(txtNAme.getText(),0, _unit, conn)) {
+                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, conn)) {
                         loadData();
                         enableControl(true);
                     } else {

@@ -429,7 +429,6 @@ public class PanelCooking extends javax.swing.JPanel {
     private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
         int index = tbStore.getSelectedRow();
         fillcobUnit(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
-
     }//GEN-LAST:event_tbStoreMousePressed
 
     private void tbCookMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMousePressed

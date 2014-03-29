@@ -22,6 +22,8 @@ public class RawMaterial {
     private String name;
     private float number;
     private int unit;
+    private int id_unit_sub;
+
     private String namenit;
 
     public int getId() {
@@ -64,11 +66,20 @@ public class RawMaterial {
         this.namenit = namenit;
     }
 
-    public RawMaterial(int id, String name, float number, int unit, String nameunit) {
+    public int getId_unit_sub() {
+        return id_unit_sub;
+    }
+
+    public void setId_unit_sub(int id_unit_sub) {
+        this.id_unit_sub = id_unit_sub;
+    }
+
+    public RawMaterial(int id, String name, float number, int unit,int id_unit_sub, String nameunit) {
         this.id = id;
         this.name = name;
         this.number = number;
         this.unit = unit;
+        this.id_unit_sub=id_unit_sub;
         this.namenit = nameunit;
     }
 
@@ -80,7 +91,7 @@ public class RawMaterial {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getString(4));
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5),rs.getInt(6), rs.getString(4));
                 return raw;
             }
         } catch (Exception e) {
@@ -245,7 +256,7 @@ public class RawMaterial {
                 vn.edu.vttu.model.StoreList tb = new vn.edu.vttu.model.StoreList(rs.getInt(1), rs.getString(2));
                 result.add(tb);
             }
-        } catch (Exception e) {          
+        } catch (Exception e) {
         }
         return result;
     }

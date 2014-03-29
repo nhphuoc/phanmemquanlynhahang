@@ -216,18 +216,21 @@ public class Unit {
         }
         return null;
     }
-    public static TableModel getBySubID(int subID,Connection conn) {
-        TableModel tb = null;
-        ResultSet rs;
+    public static Unit getBySubID(int idSub, Connection conn) {
+        Unit unit;
         try {
-            CallableStatement calState = conn.prepareCall("{CALL unit_sub_get_by_sub_id(?)}");
-            calState.setInt(1,subID);
-            rs = calState.executeQuery();
-            tb = DbUtils.resultSetToTableModel(rs);
+            String sql = "call unit_sub_get_by_id(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idSub);
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                unit = new Unit(rs.getInt("id"), rs.getString("name"), rs.getInt("id_unit_id"), rs.getInt("cast"), rs.getBoolean("isParent"));
+                return unit;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return tb;
-    }    
+        return null;
+    }
 
 }

@@ -147,7 +147,7 @@ public class TableService {
             callstate.setInt(2, num);
             callstate.setInt(3, id_reservation);
             int x = callstate.executeUpdate();
-            if (x >=0) {
+            if (x>=1) {
                 flag = true;
             } else {
                 flag = false;
@@ -156,7 +156,6 @@ public class TableService {
             flag = false;
             e.printStackTrace();
         }
-
         return flag;
     }
 

@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
+import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 
 /**
  *
@@ -122,6 +124,26 @@ public class TableLocation {
             e.printStackTrace();
         }
         return flag;
+    }
+    public static boolean tableLocationTestName(String name,Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean t=false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_location_test_name(?)}");
+            calState.setString(1, name);
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            if(tb.getRowCount()<=0){
+                t=true;
+            }else{
+                t=false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(tb.getRowCount());
+        return t;
     }
     
     
