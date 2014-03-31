@@ -23,11 +23,11 @@ import vn.edu.vttu.data.Account;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.MD5;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.sqlite.TbConnection;
 import vn.edu.vttu.sqlite.UpdateValues;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -87,16 +87,17 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     }
 
     private void loadInfoRestaurant() {
-        txtName.setText(tbRestaurant.getValues().getName());
-        txtPhone.setText(tbRestaurant.getValues().getPhone());
-        txtEmail.setText(tbRestaurant.getValues().getEmail());
-        txtAddress.setText(tbRestaurant.getValues().getAddress());
-        txtHourNomal.setText(String.valueOf(tbRestaurant.getValues().getHourReservationNomal()));
-        txtParty.setText(String.valueOf(tbRestaurant.getValues().getHourReservationParty()));
-        txtWarning.setText(String.valueOf(tbRestaurant.getValues().getMinuteWarning()));
-        txtLogo.setText(tbRestaurant.getValues().getLogo());
+        RestaurantInfo rsInfo=RestaurantInfo.getinfo(ConnectDB.conn());
+        txtName.setText(rsInfo.getName());
+        txtPhone.setText(rsInfo.getPhone());
+        txtEmail.setText(rsInfo.getEmail());
+        txtAddress.setText(rsInfo.getAddress());
+        txtHourNomal.setText(rsInfo.getHourReservationNomal()+"");
+        txtParty.setText(rsInfo.getHourReservationParty()+"");
+        txtWarning.setText(rsInfo.getMinuteWarning()+"");
+        txtLogo.setText(rsInfo.getLogo());
         try {
-            BufferedImage bImg = ImageIO.read(new File(tbRestaurant.getValues().getLogo()));
+            BufferedImage bImg = ImageIO.read(new File(rsInfo.getLogo()));
             Image image = bImg.getScaledInstance(220, 105, Image.SCALE_SMOOTH);
             ImageIcon format = new ImageIcon(image);
             lbLogo.setIcon(format);
@@ -1021,10 +1022,18 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         } else if (txtEmail.getText().equals("")) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại","Thông Báo",JOptionPane.ERROR_MESSAGE);
             txtEmail.requestFocus();
-        } else {
-            UpdateValues update = new UpdateValues();
-            if (update.updateRestaurant(txtName.getText().trim(), txtAddress.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim(),
-                    txtLogo.getText(), Integer.parseInt(txtHourNomal.getText()), Integer.parseInt(txtParty.getText()), Integer.parseInt(txtWarning.getText()))) {
+        } else {            
+            if (RestaurantInfo.update(
+                    txtName.getText().trim(),
+                    txtPhone.getText().trim(),
+                    txtAddress.getText().trim(),
+                    txtEmail.getText().trim(),
+                    txtLogo.getText(),
+                    Integer.parseInt(txtHourNomal.getText()),
+                    Integer.parseInt(txtParty.getText()),
+                    Integer.parseInt(txtWarning.getText()),
+                    ConnectDB.conn()
+                    )) {
                 JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
                 loadInfoRestaurant();
             } else {
@@ -1132,7 +1141,9 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         if (txtID.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn tài khoản nào");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn tài khoản nào","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        }else if(LoginInformation.getId()==Integer.parseInt(txtID.getText())){
+            JOptionPane.showMessageDialog(getRootPane(), "Tài khoản đang đăng nhập, không thể xóa","Thông Báo",JOptionPane.ERROR_MESSAGE);
         } else {
             if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa tài khoản này", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 if (Account.delete(Integer.parseInt(txtID.getText()), ConnectDB.conn())) {

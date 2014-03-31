@@ -41,6 +41,7 @@ import vn.edu.vttu.data.ColoredTableCellRenderer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.ServiceCost;
 import vn.edu.vttu.data.ServiceType;
@@ -49,7 +50,6 @@ import vn.edu.vttu.data.Unit;
 import vn.edu.vttu.data.UploadFile;
 import vn.edu.vttu.data.VariableStatic;
 import vn.edu.vttu.sqlite.TbServer;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -174,6 +174,7 @@ public class PanelService extends javax.swing.JPanel {
     private String filename;
     private String fileAddress;
     private int indexx = 0;
+    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
 
     public PanelService() {
         initComponents();
@@ -1012,7 +1013,7 @@ public class PanelService extends javax.swing.JPanel {
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         try {
             HashMap<String, Object> parameter = new HashMap<String, Object>();
-            parameter.put("tennhahang", tbRestaurant.getValues().getName());
+            parameter.put("tennhahang", rs.getName());
             parameter.put("link", "http://" + TbServer.getValues().getIp() + "/Restaurant/web");
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/menuservice.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());

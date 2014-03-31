@@ -20,11 +20,11 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -39,14 +39,18 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index,
                     isSelected, cellHasFocus);
-            if (value != null) {
-                vn.edu.vttu.model.Customer item = (vn.edu.vttu.model.Customer) value;
-                setText(item.getName());
+            try {
+                if (value != null) {
+                    vn.edu.vttu.model.Customer item = (vn.edu.vttu.model.Customer) value;
+                    setText(item.getName());
+                }
+                if (index == -1) {
+                    vn.edu.vttu.model.Customer item = (vn.edu.vttu.model.Customer) value;
+                    setText("" + item.getName());
+                }
+            } catch (Exception e) {
             }
-            if (index == -1) {
-                vn.edu.vttu.model.Customer item = (vn.edu.vttu.model.Customer) value;
-                setText("" + item.getName());
-            }
+
             return this;
         }
     }
@@ -79,6 +83,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
     private int idTable;
     private String listTable = "";
     private int idlocation;
+    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
 
     public PanelReservationMultiTable() {
         initComponents();
@@ -95,7 +100,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
 
     private void loadTable(Timestamp ts, int location) {
         conn = ConnectDB.conn();
-        tbListTable.setModel(Table.getByDateNotReservation(ts, tbRestaurant.getValues().getHourReservationParty(), location, conn));
+        tbListTable.setModel(Table.getByDateNotReservation(ts, rs.getHourReservationParty(), location, conn));
         try {
             tbListTable.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
@@ -151,7 +156,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
     private boolean reservationTable(Timestamp ts, int idCustomer) {
         boolean flag = false;
         if (testDate(ts) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Thời gian đặt phải lớn hơn thời gian hiện tại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Thời gian đặt phải lớn hơn thời gian hiện tại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
                 conn = ConnectDB.conn();
@@ -458,7 +463,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                 String datetime = formatter.format(dtDateReservation.getDate());
                 Timestamp ts = Timestamp.valueOf(datetime);
                 if (reservationTable(ts, idCustomer)) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     DefaultTableModel dm = (DefaultTableModel) tbListTableReservation.getModel();
                     for (int i = 0; i < tbListTableReservation.getRowCount(); i++) {
                         dm.removeRow(i);
@@ -466,11 +471,11 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
                     dm.setNumRows(0);
                     btnSave.setEnabled(false);
                 } else {
-                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(getRootPane(), "Xin lỗi, Bạn chưa chọn bàn để đặt","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Xin lỗi, Bạn chưa chọn bàn để đặt", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -554,7 +559,7 @@ public class PanelReservationMultiTable extends javax.swing.JPanel {
     }//GEN-LAST:event_txtPrepayKeyReleased
 
     private void txtPrepayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrepayKeyTyped
-        int key = evt.getKeyChar();        
+        int key = evt.getKeyChar();
         String stTest = "0123456789";
         if (key != evt.VK_BACK_SPACE
                 && key != evt.VK_DELETE

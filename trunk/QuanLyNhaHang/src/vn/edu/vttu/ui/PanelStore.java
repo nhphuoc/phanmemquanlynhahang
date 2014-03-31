@@ -16,14 +16,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
-import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.Unit;
 
 /**
@@ -40,7 +37,32 @@ public class PanelStore extends javax.swing.JPanel {
             try {
                 super.getListCellRendererComponent(list, value, index,
                         isSelected, cellHasFocus);
+                if (value != null) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                    // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                    setText(item.getName().toUpperCase());
+                }
 
+                if (index == -1) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                    setText("" + item.getName());
+                }
+
+            } catch (Exception e) {
+            }
+
+            return this;
+        }
+    }
+
+    class ItemRendererUnitSub extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            try {
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
                 if (value != null) {
                     vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
                     // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
@@ -85,12 +107,18 @@ public class PanelStore extends javax.swing.JPanel {
         boolean parent = Unit.getByID(idunit, cn).isParent();
         String name = RawMaterial.getByID(id, cn).getName();
         if (parent) {
-            int x=RawMaterial.getByID(id, cn).getId_unit_sub();
-            if (x!=0) {
-                int idunitsub = RawMaterial.getByID(id, cn).getId_unit_sub();
+            int x = RawMaterial.getByID(id, cn).getId_unit_sub();
+            if (x != 0) {
+                int idunitsub = RawMaterial.getByID(id, cn).getId_unit_sub();                
                 int cast = Unit.getByID(idunitsub, ConnectDB.conn()).getCast();
-                float n = (num * cast) % cast;
-                int m = (int) (num * cast) / cast;
+                if(cast==0){
+                    cast=1;
+                }
+                int n;
+                n = (int) (num * cast) % cast;
+                int m;
+                m = (int) (num * cast) / cast;
+
                 if (n == 0) {
                     kq = m + " " + Unit.getByID(idunit, cn).getName();
                 } else {
@@ -102,10 +130,10 @@ public class PanelStore extends javax.swing.JPanel {
                     }
                 }
             } else {
-                
+
             }
         } else {
-            kq = (int)num + " " + Unit.getByID(idunit, cn).getName();
+            kq = (int) num + " " + Unit.getByID(idunit, cn).getName();
         }
         return kq;
     }
@@ -122,6 +150,7 @@ public class PanelStore extends javax.swing.JPanel {
 
             rowOne.addElement(dvt(Integer.parseInt(tb.getValueAt(i, 0).toString()), Float.parseFloat(tb.getValueAt(i, 2).toString())));
             rowOne.addElement(tb.getValueAt(i, 4).toString());
+            rowOne.addElement(tb.getValueAt(i, 2).toString());
             rowData.addElement(rowOne);
         }
         Vector<String> columnNames = new Vector<String>();
@@ -129,15 +158,20 @@ public class PanelStore extends javax.swing.JPanel {
         columnNames.addElement("Tên Nguyên Liệu");
         columnNames.addElement("Số Lượng");
         columnNames.addElement("");
+        columnNames.addElement("sl");
 
         table = new JTable(rowData, columnNames);
+
         table.setGridColor(new java.awt.Color(204, 204, 204));
         table.setRowHeight(25);
         table.setSelectionBackground(new java.awt.Color(255, 153, 0));
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table.setFont(new java.awt.Font("Tahoma", 1, 12));
-        table.getColumnModel().getColumn(3).setMaxWidth(0);
+        table.getColumnModel().getColumn(4).setMinWidth(0);
+        table.getColumnModel().getColumn(4).setMaxWidth(0);
         table.getColumnModel().getColumn(3).setMinWidth(0);
+        table.getColumnModel().getColumn(3).setMaxWidth(0);
+        table.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
         JScrollPane scrollPane = new JScrollPane(table);
         pn.add(scrollPane, BorderLayout.CENTER);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -145,7 +179,7 @@ public class PanelStore extends javax.swing.JPanel {
                 int index = table.getSelectedRow();
                 txtID.setText(table.getValueAt(index, 0).toString());
                 txtNAme.setText(table.getValueAt(index, 1).toString());
-                txtNumber.setText(table.getValueAt(index, 2).toString());
+                txtNumber.setText(String.valueOf(Float.parseFloat(table.getValueAt(index, 4).toString())));
                 setSelectedValue(cobUnit, Integer.parseInt(table.getValueAt(index, 3).toString()));
             }
         });
@@ -194,6 +228,23 @@ public class PanelStore extends javax.swing.JPanel {
         conn = null;
     }
 
+    private void fillcobUnitSub(int idUnit) {
+
+        conn = ConnectDB.conn();
+        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
+        try {
+            model = Unit.selectUnitByID(idUnit, conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobUnitSub.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobUnitSub.setModel(defaultComboBoxModel);
+        cobUnitSub.setRenderer(new PanelStore.ItemRenderer());
+        conn = null;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -214,6 +265,8 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         txtNAme = new javax.swing.JTextField();
         txtNumber = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        cobUnitSub = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
         jToolBar1 = new javax.swing.JToolBar();
@@ -245,6 +298,11 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel4.setText("ĐVT:");
 
         cobUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cobUnit.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                cobUnitPropertyChange(evt);
+            }
+        });
 
         btnAddUnit.setText("+");
         btnAddUnit.addActionListener(new java.awt.event.ActionListener() {
@@ -257,7 +315,6 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel5.setForeground(new java.awt.Color(51, 153, 0));
         jLabel5.setText("Số Lượng:");
 
-        txtNumber.setEditable(false);
         txtNumber.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtNumberKeyPressed(evt);
@@ -270,17 +327,24 @@ public class PanelStore extends javax.swing.JPanel {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel6.setText("ĐVT Con");
+
+        cobUnitSub.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(jLabel3)
                     .addComponent(jLabel5)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtNAme)
@@ -289,7 +353,8 @@ public class PanelStore extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAddUnit))
                     .addComponent(txtNumber)
-                    .addComponent(txtID)))
+                    .addComponent(txtID)
+                    .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,11 +372,15 @@ public class PanelStore extends javax.swing.JPanel {
                     .addComponent(jLabel4)
                     .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddUnit))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(7, 7, 7)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(262, Short.MAX_VALUE))
+                .addContainerGap(240, Short.MAX_VALUE))
         );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -393,7 +462,7 @@ public class PanelStore extends javax.swing.JPanel {
         });
         jToolBar1.add(btnCreateInvoice);
 
-        pn.setLayout(new java.awt.GridLayout());
+        pn.setLayout(new java.awt.GridLayout(1, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -430,6 +499,7 @@ public class PanelStore extends javax.swing.JPanel {
         enableControl(false);
         txtNAme.setText("");
         txtNumber.setText("0");
+        txtNumber.setEnabled(false);
         txtNAme.requestFocus();
     }//GEN-LAST:event_btnAddActionPerformed
 
@@ -437,6 +507,8 @@ public class PanelStore extends javax.swing.JPanel {
         add = false;
         enableControl(false);
         txtNAme.requestFocus();
+        txtNumber.setEnabled(true);
+        number = Float.parseFloat(txtNumber.getText());
         name = txtNAme.getText();
     }//GEN-LAST:event_btnEditActionPerformed
 
@@ -444,8 +516,16 @@ public class PanelStore extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
         int _unit = unit.getId();
+        int _unit_sub;
+        try {
+            vn.edu.vttu.model.Unit unitSub = (vn.edu.vttu.model.Unit) cobUnitSub.getSelectedItem();
+            _unit_sub = unitSub.getId();
+        } catch (Exception e) {
+            _unit_sub = 0;
+        }
+
         if (txtNAme.getText().trim().equals("") && txtNAme.getText().trim().length() > 50) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên hoặc tên quá dài");
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên hoặc tên quá dài", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtNAme.requestFocus();
         } else if (txtNumber.getText().trim().equals("")) {
             txtNumber.setText("0");
@@ -454,7 +534,7 @@ public class PanelStore extends javax.swing.JPanel {
                 if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
                     JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
                 } else {
-                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, conn)) {
+                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, _unit_sub, conn)) {
                         loadData();
                         enableControl(true);
                     } else {
@@ -467,19 +547,24 @@ public class PanelStore extends javax.swing.JPanel {
                     if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
                         JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL");
                     } else {
+                        if (Float.parseFloat(txtNumber.getText()) > number) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Bạn vui lòng thực hiện nhập kho!");
+                        }
                         float _number = 0;
                         try {
                             _number = Float.parseFloat(txtNumber.getText().trim().replaceAll("\\.", ""));
                         } catch (Exception e) {
                             _number = Float.parseFloat(txtNumber.getText().trim().replaceAll(",", ""));
                         }
-                        if (RawMaterial.update(txtNAme.getText().trim(), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
+                        if (RawMaterial.update(txtNAme.getText().trim(), _unit, _unit_sub, Integer.parseInt(txtID.getText().trim()),
+                                Float.parseFloat(txtNumber.getText()), conn)) {
                             loadData();
                             enableControl(true);
                         }
                     }
                 } else {
-                    if (RawMaterial.update(txtNAme.getText().trim(), _unit, Integer.parseInt(txtID.getText().trim()), conn)) {
+                    if (RawMaterial.update(txtNAme.getText().trim(), _unit, _unit_sub, Integer.parseInt(txtID.getText().trim()),
+                            Float.parseFloat(txtNumber.getText()), conn)) {
                         loadData();
                         enableControl(true);
                     }
@@ -613,6 +698,15 @@ public class PanelStore extends javax.swing.JPanel {
         loadData();
     }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
+    private void cobUnitPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobUnitPropertyChange
+        try {
+            vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
+            int _unit = unit.getId();
+            fillcobUnitSub(_unit);
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_cobUnitPropertyChange
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
@@ -624,12 +718,14 @@ public class PanelStore extends javax.swing.JPanel {
     private javax.swing.JButton btnReload;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox cobUnit;
+    private javax.swing.JComboBox cobUnitSub;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel pn;

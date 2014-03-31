@@ -34,8 +34,7 @@ WHERE
 	service.isActive=TRUE
 	AND table_service.isActive=TRUE AND
 	service.id=table_service.id_service_id AND
-	table_service.id_table_reservation_id=$P{idReservation}
-	AND table_service.status=TRUE]]>
+	table_service.id_table_reservation_id=$P{idReservation}]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>

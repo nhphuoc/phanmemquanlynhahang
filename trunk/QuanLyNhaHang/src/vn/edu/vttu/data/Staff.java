@@ -217,5 +217,23 @@ public class Staff {
         }
         return result;
     }
+    public static boolean delete(int id, Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL staff_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);                      
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }   
     
 }

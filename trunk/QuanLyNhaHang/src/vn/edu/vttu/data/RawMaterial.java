@@ -126,14 +126,15 @@ public class RawMaterial {
         return tb;
     }
 
-    public static boolean insert(String name, float num, int unit, Connection conn) {
+    public static boolean insert(String name, float num, int unit,int unit_sub, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_add(?,?,?)";
+            String sql = "CALL raw_material_add(?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
             callstate.setFloat(2, num);
             callstate.setInt(3, unit);
+            callstate.setInt(4, unit_sub);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -148,14 +149,16 @@ public class RawMaterial {
         return flag;
     }
 
-    public static boolean update(String name, int unit, int id, Connection conn) {
+    public static boolean update(String name, int unit,int id_unit, int id,float number, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_update(?,?,?)";
+            String sql = "CALL raw_material_update(?,?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
             callstate.setInt(2, unit);
             callstate.setInt(3, id);
+            callstate.setInt(4, id_unit);
+            callstate.setFloat(5, number);
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;

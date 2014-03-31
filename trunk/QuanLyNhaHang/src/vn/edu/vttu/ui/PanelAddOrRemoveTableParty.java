@@ -19,12 +19,12 @@ import javax.swing.JOptionPane;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Table;
 import vn.edu.vttu.data.TableLocation;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableReservationDetail;
 import vn.edu.vttu.data.VariableStatic;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -56,6 +56,7 @@ public class PanelAddOrRemoveTableParty extends javax.swing.JPanel {
     /**
      * Creates new form PanelAddOrRemoveTableParty
      */
+    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
     public PanelAddOrRemoveTableParty() {
         initComponents();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -68,7 +69,7 @@ public class PanelAddOrRemoveTableParty extends javax.swing.JPanel {
     }
 
     private void loadTable(Timestamp ts, int location, Connection conn) {
-        tbDanhSachBan.setModel(Table.getByDateNotReservation(ts, tbRestaurant.getValues().getHourReservationParty(), location, conn));
+        tbDanhSachBan.setModel(Table.getByDateNotReservation(ts, rs.getHourReservationParty(), location, conn));
         try {
             tbDanhSachBan.setRowSelectionInterval(0, 0);
         } catch (Exception e) {

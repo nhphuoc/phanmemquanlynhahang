@@ -48,7 +48,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnPrintInvoice" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnPrinNguyenLieu" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnDsDatBan" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnPrintRaw" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -69,7 +69,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="btnView" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnPrintInvoice" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnPrinNguyenLieu" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnDsDatBan" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnPrintRaw" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="dtSearch" min="-2" max="-2" attributes="0"/>
@@ -270,6 +270,7 @@
             </Property>
           </Properties>
           <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tbServiceMouseClicked"/>
             <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tbServiceMousePressed"/>
           </Events>
           <AuxValues>
@@ -334,12 +335,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrintInvoiceActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnPrinNguyenLieu">
+    <Component class="javax.swing.JButton" name="btnDsDatBan">
       <Properties>
         <Property name="text" type="java.lang.String" value="In Danh S&#xe1;ch &#x110;&#x1eb7;t B&#xe0;n"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPrinNguyenLieuActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDsDatBanActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnPrintRaw">

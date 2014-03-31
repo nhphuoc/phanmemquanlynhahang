@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.ui;
 
 import java.awt.BorderLayout;
+import java.sql.Connection;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ColoredTableCellRenderer;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.Unit;
 
@@ -31,69 +32,82 @@ public class PanelPrintListRawMaterial extends javax.swing.JPanel {
      * Creates new form PanelPrintListRawMaterial
      */
     JTable table;
+
     public PanelPrintListRawMaterial() {
         initComponents();
-         pn.removeAll();
+        pn.removeAll();
         printListRawmetarial();
         pn.updateUI();
         pn.repaint();
     }
+
+    private String dvt(int id, int idunit, float num) {
+        String kq = "";
+        Connection cn = ConnectDB.conn();
+        boolean parent = Unit.getByID(idunit, cn).isParent();
+        int cast = Unit.getByID(idunit, cn).getCast();
+        int x = Unit.getByID(idunit, cn).getId_sub();
+        if (x != 0) {
+            int y = Unit.getBySubID(x, cn).getId();
+            if (((int) num / cast) == 0) {
+                kq = (int) (num % cast) + " " + Unit.getByID(idunit, cn).getName();
+            }
+            if ((int) (num % cast) == 0) {
+                kq = (int) (num / cast) + " " + Unit.getByID(y, cn).getName();
+            }
+            if (((int) num / cast) != 0 && (int) (num % cast) != 0) {
+                kq = (int) (num / cast) + " " + Unit.getByID(y, cn).getName() + " " + (int) (num % cast) + " " + Unit.getByID(idunit, cn).getName();
+            }
+        } else {
+            kq = num + " " + Unit.getByID(idunit, cn).getName();
+        }
+
+        return kq;
+    }
+
     private void printListRawmetarial() {
-       
+
         TableModel tb = TableReservation.getListRecipes(ConnectDB.conn());
         int n = 1;
         String row = "";
         for (int i = 0; i < tb.getRowCount(); i++) {
-            int cast = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 1).toString()), ConnectDB.conn()).getCast();
-            boolean parent = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 1).toString()), ConnectDB.conn()).isParent();
-            String name = tb.getValueAt(i, 0).toString();
-            if (parent == false) {
-                int x = 0, y = 0;
-                String dvt = "", dvt_sub = "";
-                if (Float.parseFloat(tb.getValueAt(i, 2).toString()) < cast) {
-                    x = (int) Float.parseFloat(tb.getValueAt(i, 2).toString());
-                    dvt = x + " " + Unit.getByID(Integer.parseInt(tb.getValueAt(i, 1).toString()), ConnectDB.conn()).getName();
-                } else {
-                    x = (int) (Float.parseFloat(tb.getValueAt(i, 2).toString()) / cast);
-                    int id_sub = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 1).toString()), ConnectDB.conn()).getId_sub();
-                    dvt = x + " " + Unit.getByID(id_sub, ConnectDB.conn()).getName();
-                    y = (int) (Float.parseFloat(tb.getValueAt(i, 2).toString()) % cast);
-                    if (y != 0) {
-                        dvt_sub = y + " " + Unit.getByID(Integer.parseInt(tb.getValueAt(i, 1).toString()), ConnectDB.conn()).getName();
-                    }
-                }
-                row = row + "_" + (n + "," + name + "," + dvt + " " + dvt_sub);
-                n++;
-            }
+            String nameRecipes = tb.getValueAt(i, 0).toString();
+            int idUnit = Integer.parseInt(tb.getValueAt(i, 1).toString());
+            float number = Float.parseFloat(tb.getValueAt(i, 2).toString());
+            int idRawmaterial = Integer.parseInt(tb.getValueAt(i, 3).toString());
+            System.out.println(idRawmaterial);
+            String x = dvt(idRawmaterial, idUnit, number);
+            row = row  + (n + "," + tb.getValueAt(i, 0).toString() + "," + x)+"_";
+            n++;            
         }
-        //System.out.println(row.trim());
+        //System.out.println(row.trim());        
         String[] r = row.split("_");
         Vector<Vector> rowData = new Vector<Vector>();
-        for (int i = 1; i < r.length; i++) {
+        for (int i = 0; i < r.length; i++) {
             Vector<String> rowOne = new Vector<String>();
-            //System.out.println(r[i].toString());
+            System.out.println(r[i].toString());
             String[] rr = r[i].split(",");
             for (int j = 0; j < rr.length; j++) {
                 rowOne.addElement(rr[j].toString());
             }
             rowData.addElement(rowOne);
-        }       
+        }
         Vector<String> columnNames = new Vector<String>();
         columnNames.addElement("STT");
         columnNames.addElement("Tên Nguyên Liệu");
         columnNames.addElement("Số Lượng");
-        table = new JTable(rowData, columnNames);
+        table = new JTable(rowData, columnNames);        
         table.setGridColor(new java.awt.Color(204, 204, 204));
         table.setRowHeight(25);
         table.setSelectionBackground(new java.awt.Color(255, 153, 0));
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table.setFont(new java.awt.Font("Tahoma", 1, 10));
-        table.getColumnModel().getColumn(0).setMaxWidth(30);
-        table.getColumnModel().getColumn(2).setMaxWidth(150);
-        table.getColumnModel().getColumn(2).setMinWidth(140);        
+        //table.getColumnModel().getColumn(0).setMaxWidth(30);
+        //table.getColumnModel().getColumn(1).setMaxWidth(150);
+        //table.getColumnModel().getColumn(2).setMinWidth(140);
         JScrollPane scrollPane = new JScrollPane(table);
-        pn.add(scrollPane, BorderLayout.CENTER);               
-        pn.setSize(300, 150);       
+        pn.add(scrollPane, BorderLayout.CENTER);
+        pn.setSize(300, 150);
     }
 
     /**
@@ -158,10 +172,10 @@ public class PanelPrintListRawMaterial extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
-       JTable.PrintMode mode = JTable.PrintMode.FIT_WIDTH;
-       SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        JTable.PrintMode mode = JTable.PrintMode.FIT_WIDTH;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         MessageFormat header = new MessageFormat("DANH SÁCH NGUYÊN LIỆU ĐẶT BÀN");
-        MessageFormat footer = new MessageFormat("Ngày: "+formatter.format(new Date()));        
+        MessageFormat footer = new MessageFormat("Ngày: " + formatter.format(new Date()));
         try {
             boolean comp = table.print(mode, header, footer, true, null, true, null);
             if (comp) {

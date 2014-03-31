@@ -48,6 +48,33 @@ public class PanelAddStore extends javax.swing.JPanel {
         }
     }
 
+    class ItemRendererUnitSub extends BasicComboBoxRenderer {
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            try {
+                super.getListCellRendererComponent(list, value, index,
+                        isSelected, cellHasFocus);
+
+                if (value != null) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                    // đây là thông tin ta sẽ hiển thị , đối bảng khác sẽ khác cột chúng ta sẽ đổi lại tên tương ứng
+                    setText(item.getName().toUpperCase());
+                }
+
+                if (index == -1) {
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
+                    setText("" + item.getName());
+                }
+
+            } catch (Exception e) {
+            }
+
+            return this;
+        }
+    }
+
     /**
      * Creates new form PanelAddStore
      */
@@ -69,6 +96,19 @@ public class PanelAddStore extends javax.swing.JPanel {
         cobDVT.setRenderer(new PanelAddStore.ItemRenderer());
     }
 
+    private void fillcobUnitSub(int idUnit) {
+        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
+        try {
+            model = Unit.selectUnitByID(idUnit, ConnectDB.conn());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+        cobSubUnit.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+        cobSubUnit.setModel(defaultComboBoxModel);
+        cobSubUnit.setRenderer(new PanelAddStore.ItemRenderer());
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -83,6 +123,8 @@ public class PanelAddStore extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         cobDVT = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        cobSubUnit = new javax.swing.JComboBox();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 153, 0));
@@ -93,6 +135,11 @@ public class PanelAddStore extends javax.swing.JPanel {
         jLabel2.setText("Đơn Vị Tính:");
 
         cobDVT.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cobDVT.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                cobDVTPropertyChange(evt);
+            }
+        });
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon_24x24.png"))); // NOI18N
         jButton1.setText("Lưu");
@@ -101,6 +148,12 @@ public class PanelAddStore extends javax.swing.JPanel {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(51, 153, 0));
+        jLabel3.setText("ĐVT Chia Nhỏ:");
+
+        cobSubUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -112,13 +165,15 @@ public class PanelAddStore extends javax.swing.JPanel {
                         .addGap(19, 19, 19)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
-                            .addComponent(jLabel2))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtName)
-                            .addComponent(cobDVT, 0, 129, Short.MAX_VALUE)))
+                            .addComponent(cobDVT, 0, 129, Short.MAX_VALUE)
+                            .addComponent(cobSubUnit, 0, 129, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
+                        .addGap(98, 98, 98)
                         .addComponent(jButton1)))
                 .addContainerGap(33, Short.MAX_VALUE))
         );
@@ -133,37 +188,54 @@ public class PanelAddStore extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(cobDVT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(cobSubUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobDVT.getSelectedItem();
         int _unit = unit.getId();
+        vn.edu.vttu.model.Unit unit_sub = (vn.edu.vttu.model.Unit) cobSubUnit.getSelectedItem();
+        int _unit_sub = unit_sub.getId();
         if (txtName.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nguyên liệu","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nguyên liệu", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (RawMaterial.testName(txtName.getText().trim(), ConnectDB.conn()) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (txtName.getText().trim().length() > 50) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập tên lơn hơn 50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập tên lơn hơn 50 ký tự", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
-            if (RawMaterial.insert(txtName.getText(),0, _unit, ConnectDB.conn())) {
-                JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+            if (RawMaterial.insert(txtName.getText(), 0, _unit,_unit_sub, ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                 txtName.setText("");
-            }else{
-                JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void cobDVTPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobDVTPropertyChange
+        try {
+            vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobDVT.getSelectedItem();
+            int _unit = unit.getId();
+            fillcobUnitSub(_unit);
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_cobDVTPropertyChange
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cobDVT;
+    private javax.swing.JComboBox cobSubUnit;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables
 }

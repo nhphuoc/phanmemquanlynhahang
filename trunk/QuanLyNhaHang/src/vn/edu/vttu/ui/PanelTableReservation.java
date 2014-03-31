@@ -37,20 +37,24 @@ public class PanelTableReservation extends javax.swing.JPanel {
         lbTableName.setText(VariableStatic.getNameTable());
         loadCustomer();
         getTime();
-        VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+        if (tbCustomer.getRowCount() > 0) {
+            VariableStatic.setIdCustomer(Integer.parseInt(String.valueOf(tbCustomer.getValueAt(0, 0))));
+        }
 
     }
 
     private void loadCustomer() {
         tbCustomer.setModel(Customer.getLimit(conn));
-        tbCustomer.setRowSelectionInterval(0, 0);
+        if (tbCustomer.getRowCount() > 0) {
+            tbCustomer.setRowSelectionInterval(0, 0);
+        }
         tbCustomer.getTableHeader().setReorderingAllowed(false);
     }
 
     private Timestamp getTime() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");        
-        String datetime = formatter.format(dtTableReservation.getDate());        
-        Timestamp ts=Timestamp.valueOf(datetime);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = formatter.format(dtTableReservation.getDate());
+        Timestamp ts = Timestamp.valueOf(datetime);
         return ts;
     }
 
@@ -213,11 +217,11 @@ public class PanelTableReservation extends javax.swing.JPanel {
     }//GEN-LAST:event_tbCustomerMouseClicked
 
     private void dtTableReservationPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dtTableReservationPropertyChange
-        if(dtTableReservation.getDate().compareTo(new Date())<0){
-        dtTableReservation.setDate(new Date());
-        VariableStatic.setDateTimeReservation(getTime());        
+        if (dtTableReservation.getDate().compareTo(new Date()) < 0) {
+            dtTableReservation.setDate(new Date());
+            VariableStatic.setDateTimeReservation(getTime());
         }
-        VariableStatic.setDateTimeReservation(getTime());        
+        VariableStatic.setDateTimeReservation(getTime());
     }//GEN-LAST:event_dtTableReservationPropertyChange
 
     private void txtRepayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRepayKeyTyped
@@ -235,7 +239,7 @@ public class PanelTableReservation extends javax.swing.JPanel {
 
                 evt.consume();
             }
-            
+
         }
     }//GEN-LAST:event_txtRepayKeyTyped
 

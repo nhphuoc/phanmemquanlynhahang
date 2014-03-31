@@ -48,11 +48,11 @@ import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.Unit;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
@@ -98,6 +98,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
     private int cost;
     private int idTableService;
     private int numberOfServiceInvoice;
+    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
 
     public PanelViewReservation() {
         initComponents();
@@ -112,7 +113,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         //btnEdit.setEnabled(true);
         //btnSave.setEnabled(false);
         tbListTable.setEnabled(true);
-        popupmenuService.getComponent(0).setEnabled(false);
+        //popupmenuService.getComponent(0).setEnabled(false);
 
     }
 
@@ -120,10 +121,15 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
         conn = ConnectDB.conn();
         tbListTable.setModel(TableReservation.getListTableReservation(ConnectDB.conn()));
-        if (tbListTable.getRowCount() <= 0) {
-            popupmenuService.getComponent(0).setEnabled(false);
+        if (tbListTable.getRowCount() <= 0) {   
+            btnPrintInvoice.setEnabled(false);
+            btnPrintRaw.setEnabled(false);            
+            btnDsDatBan.setEnabled(false);            
         } else {
             tbListTable.setRowSelectionInterval(0, 0);
+             btnPrintInvoice.setEnabled(true);
+            btnPrintRaw.setEnabled(true);
+            btnDsDatBan.setEnabled(false); 
         }
         tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
         tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
@@ -161,7 +167,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             String datetime = formatter.format(new Date());
                             Timestamp ts = Timestamp.valueOf(datetime);
-                            if (TableReservation.getStatusParty(idTable, ts, tbRestaurant.getValues().getHourReservationParty(), conn)) {
+                            if (TableReservation.getStatusParty(idTable, ts, rs.getHourReservationParty(), conn)) {
                                 conn.setAutoCommit(false);
                                 TableModel tb = TableReservation.getListTableByIdReservation(idreservation, conn);
                                 if (TableReservation.updateBeginDate(idreservation, conn)) {
@@ -489,7 +495,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         Timestamp date = VariableStatic.getDateTimeReservation();
         for (int i = 0; i < tb.getRowCount(); i++) {
             int id = Integer.parseInt(String.valueOf(tb.getValueAt(i, 0)));
-            if (TableReservation.getStatusParty(id, date, tbRestaurant.getValues().getHourReservationParty(), conn) == false) {
+            if (TableReservation.getStatusParty(id, date, rs.getHourReservationParty(), conn) == false) {
                 flag = true;
             } else {
                 return false;
@@ -500,6 +506,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
     }
 
     private void popupTableService() {
+        /*
         try {
             popupmenuService = new JPopupMenu();
             BufferedImage bImgCalService = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/back-icon.png"));
@@ -507,47 +514,14 @@ public class PanelViewReservation extends javax.swing.JPanel {
             popupmenuService.add(new JMenuItem(new AbstractAction("Gọi dịch vụ này", new ImageIcon(imageCalService)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    conn = ConnectDB.conn();
-                    String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);
-                    if (number != null && !number.trim().equals("")) {
-                        if (testNumber(number)) {
-                            if (testStore(idService, Integer.parseInt(number))) {
-                                if (TableService.getServiceByIdService_ByIdReservation(idService, idreservation, conn)) {
-                                    if (TableService.insert(idreservation, idService, Integer.parseInt(number), cost, conn)) {
-                                        loadTableInvoice(idreservation);
-                                    }
-                                } else {
-                                    if (TableService.update(idreservation, idService, Integer.parseInt(number), conn)) {
-                                        loadTableInvoice(idreservation);
-                                    }
-                                }
-                            } else {
-                                if (JOptionPane.showConfirmDialog(getRootPane(), "Số lượng tồn kho sắp hết bạn có muốn đặt tiếp", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                                    if (TableService.getServiceByIdService_ByIdReservation(idService, idreservation, conn)) {
-                                        if (TableService.insert(idreservation, idService, Integer.parseInt(number), cost, conn)) {
-                                            loadTableInvoice(idreservation);
-                                        }
-                                    } else {
-                                        if (TableService.update(idreservation, idService, Integer.parseInt(number), conn)) {
-                                            loadTableInvoice(idreservation);
-                                        }
-                                    }
-                                }
 
-                            }
-
-                        } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Chỉ được nhập số");
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
-                    }
                 }
             }
             ));
             tbService.setComponentPopupMenu(popupmenuService);
         } catch (Exception e) {
         }
+        */
     }
 
     private void popupTableInvoice() {
@@ -688,20 +662,55 @@ public class PanelViewReservation extends javax.swing.JPanel {
         for (int i = 0; i < tb.getRowCount(); i++) {
             float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
             int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-            int idUnitStore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
+            int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
+            int idUnitStore = RawMaterial.getByID(idstore, ConnectDB.conn()).getUnit();
+
             float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, ConnectDB.conn()).getValueAt(0, 0)));
-            //int idUnit = Integer.parseInt(String.valueOf(RawMaterial.getNumber(idstore, ConnectDB.conn()).getValueAt(0, 1)));
-            float x;
-            if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
-                x = (n * number) * Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+            if (idUnitRecipes == idUnitStore) {
+                if (store < (float) (n * number)) {
+                    return false;
+                } else {
+                    flag = true;
+                }
             } else {
-                x = (n * number) / Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+                if (Unit.getByID(idUnitRecipes, ConnectDB.conn()).isParent()) {
+                    if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
+                        int x = Unit.getByID(idUnitStore, ConnectDB.conn()).getId_sub();
+                        if (x == 0) {
+                            // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
+                            // lấy số lượng chế biến chia cho chuyển đổi của con
+                            int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
+                            if (store < (float) (n * number) / cast) {
+                                return false;
+                            } else {
+                                flag = true;
+                            }
+                        } else {
+                            int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+                            if (store < (n * number) * cast) {
+                                return false;
+                            } else {
+                                flag = true;
+                            }
+                        }
+                    } else {
+                        int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+                        if (store < (n * number) * cast) {
+                            return false;
+                        } else {
+                            flag = true;
+                        }
+                    }
+                } else {
+                    int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
+                    if (store < (n * number) * cast) {
+                        return false;
+                    } else {
+                        flag = true;
+                    }
+                }
             }
-            if (store >= x) {
-                flag = true;
-            } else {
-                return false;
-            }
+
         }
         return flag;
     }
@@ -772,12 +781,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         loadTableInvoice(idreservation);
         DecimalFormat df = new DecimalFormat("#,###,###");
         lbTotal.setText(df.format(total()));
-        lbrepay.setText(String.valueOf(tbListTable.getValueAt(index, 8)));
-        if (tbListTable.getRowCount() <= 0) {
-            popupmenuService.getComponent(0).setEnabled(false);
-        } else {
-            popupmenuService.getComponent(0).setEnabled(true);
-        }
+        lbrepay.setText(String.valueOf(tbListTable.getValueAt(index, 8)));        
 
         conn = null;
     }
@@ -815,7 +819,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         lbrepay = new javax.swing.JLabel();
         btnPrintInvoice = new javax.swing.JButton();
-        btnPrinNguyenLieu = new javax.swing.JButton();
+        btnDsDatBan = new javax.swing.JButton();
         btnPrintRaw = new javax.swing.JButton();
 
         tbListTable.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -940,6 +944,9 @@ public class PanelViewReservation extends javax.swing.JPanel {
         tbService.setSelectionBackground(new java.awt.Color(255, 153, 0));
         tbService.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tbService.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbServiceMouseClicked(evt);
+            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 tbServiceMousePressed(evt);
             }
@@ -971,10 +978,10 @@ public class PanelViewReservation extends javax.swing.JPanel {
             }
         });
 
-        btnPrinNguyenLieu.setText("In Danh Sách Đặt Bàn");
-        btnPrinNguyenLieu.addActionListener(new java.awt.event.ActionListener() {
+        btnDsDatBan.setText("In Danh Sách Đặt Bàn");
+        btnDsDatBan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrinNguyenLieuActionPerformed(evt);
+                btnDsDatBanActionPerformed(evt);
             }
         });
 
@@ -1018,7 +1025,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPrintInvoice)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPrinNguyenLieu)
+                        .addComponent(btnDsDatBan)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPrintRaw)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -1035,7 +1042,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnView)
                                 .addComponent(btnPrintInvoice)
-                                .addComponent(btnPrinNguyenLieu)
+                                .addComponent(btnDsDatBan)
                                 .addComponent(btnPrintRaw))
                             .addComponent(dtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1078,15 +1085,14 @@ public class PanelViewReservation extends javax.swing.JPanel {
         try {
 
             tbListTable.setModel(TableReservation.getListTableReservationSearch(txtSearchReservation.getText(), conn));
-            if (tbListTable.getRowCount() <= 0) {
-                popupmenuService.getComponent(0).setEnabled(false);
+            if (tbListTable.getRowCount() <= 0) {                
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
             }
             tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
             tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
-            tbListTable.getColumnModel().getColumn(3).setMaxWidth(100);
-            tbListTable.getColumnModel().getColumn(4).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(3).setMaxWidth(110);
+            tbListTable.getColumnModel().getColumn(4).setMaxWidth(110);
 
             tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
@@ -1115,16 +1121,15 @@ public class PanelViewReservation extends javax.swing.JPanel {
             String datetime = formatter.format(dtSearch.getDate());
             Timestamp ts = Timestamp.valueOf(datetime);
             tbListTable.setModel(TableReservation.getListTableReservationSearchByDate(ts, conn));
-            if (tbListTable.getRowCount() <= 0) {
-                popupmenuService.getComponent(0).setEnabled(false);
+            if (tbListTable.getRowCount() <= 0) {                
             } else {
                 tbListTable.setRowSelectionInterval(0, 0);
 
             }
             tbListTable.getColumnModel().getColumn(0).setMaxWidth(50);
             tbListTable.getColumnModel().getColumn(2).setMaxWidth(100);
-            tbListTable.getColumnModel().getColumn(3).setMaxWidth(100);
-            tbListTable.getColumnModel().getColumn(4).setMaxWidth(100);
+            tbListTable.getColumnModel().getColumn(3).setMaxWidth(110);
+            tbListTable.getColumnModel().getColumn(4).setMaxWidth(110);
 
             tbListTable.getColumnModel().getColumn(5).setMinWidth(0);
             tbListTable.getColumnModel().getColumn(6).setMinWidth(0);
@@ -1179,10 +1184,10 @@ public class PanelViewReservation extends javax.swing.JPanel {
             parameter.put("nhanvien", Staff.getById(LoginInformation.getId_staff(), conn).getName());
             parameter.put("mahoadon", idreservation);
             parameter.put("mahoadon", idreservation);
-            parameter.put("tennhahang", tbRestaurant.getValues().getName());
-            parameter.put("diachi", tbRestaurant.getValues().getAddress());
-            parameter.put("sdtnhahang", tbRestaurant.getValues().getPhone());
-            parameter.put("logo", tbRestaurant.getValues().getLogo());
+            parameter.put("tennhahang", rs.getName());
+            parameter.put("diachi", rs.getAddress());
+            parameter.put("sdtnhahang", rs.getPhone());
+            parameter.put("logo", rs.getLogo());
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/InvoiceReservation.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
             JasperViewer jv = new JasperViewer(jp, false);
@@ -1203,7 +1208,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnPrintInvoiceActionPerformed
 
-    private void btnPrinNguyenLieuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrinNguyenLieuActionPerformed
+    private void btnDsDatBanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDsDatBanActionPerformed
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         JTable.PrintMode mode = JTable.PrintMode.FIT_WIDTH;
         MessageFormat header = new MessageFormat("DANH SÁCH CÁC BÀN ĐƯỢC ĐẶT");
@@ -1215,15 +1220,55 @@ public class PanelViewReservation extends javax.swing.JPanel {
             }
         } catch (Exception e) {
         }
-    }//GEN-LAST:event_btnPrinNguyenLieuActionPerformed
+    }//GEN-LAST:event_btnDsDatBanActionPerformed
 
     private void btnPrintRawActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintRawActionPerformed
         printListRawmetarial();
     }//GEN-LAST:event_btnPrintRawActionPerformed
 
+    private void tbServiceMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbServiceMouseClicked
+        if (evt.getClickCount() == 2) {
+            conn = ConnectDB.conn();
+            String number = JOptionPane.showInputDialog(tbService, "Số Lượng", 1);
+            if (number != null && !number.trim().equals("")) {
+                if (testNumber(number)) {
+                    if (testStore(idService, Integer.parseInt(number))) {
+                        if (TableService.getServiceByIdService_ByIdReservation(idService, idreservation, conn)) {
+                            if (TableService.insert(idreservation, idService, Integer.parseInt(number), cost, conn)) {
+                                loadTableInvoice(idreservation);
+                            }
+                        } else {
+                            if (TableService.update(idreservation, idService, Integer.parseInt(number), conn)) {
+                                loadTableInvoice(idreservation);
+                            }
+                        }
+                    } else {
+                        if (JOptionPane.showConfirmDialog(getRootPane(), "Số lượng tồn kho sắp hết bạn có muốn đặt tiếp", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                            if (TableService.getServiceByIdService_ByIdReservation(idService, idreservation, conn)) {
+                                if (TableService.insert(idreservation, idService, Integer.parseInt(number), cost, conn)) {
+                                    loadTableInvoice(idreservation);
+                                }
+                            } else {
+                                if (TableService.update(idreservation, idService, Integer.parseInt(number), conn)) {
+                                    loadTableInvoice(idreservation);
+                                }
+                            }
+                        }
+
+                    }
+
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Chỉ được nhập số");
+                }
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số lượng");
+            }
+        }
+    }//GEN-LAST:event_tbServiceMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnPrinNguyenLieu;
+    private javax.swing.JButton btnDsDatBan;
     private javax.swing.JButton btnPrintInvoice;
     private javax.swing.JButton btnPrintRaw;
     private javax.swing.JButton btnView;

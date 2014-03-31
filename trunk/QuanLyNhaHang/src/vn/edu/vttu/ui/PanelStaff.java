@@ -6,6 +6,7 @@
 package vn.edu.vttu.ui;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,28 +22,30 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.view.JasperViewer;
+import vn.edu.vttu.data.Account;
 import vn.edu.vttu.data.ConnectDB;
+import vn.edu.vttu.data.LoginInformation;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Staff;
-import vn.edu.vttu.sqlite.tbRestaurant;
 
 /**
  *
  * @author nhphuoc
  */
 public class PanelStaff extends javax.swing.JPanel {
-
+    
     public class EmailValidator {
-
+        
         private Pattern pattern;
         private Matcher matcher;
         private static final String EMAIL_PATTERN
                 = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
                 + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
+        
         public EmailValidator() {
             pattern = Pattern.compile(EMAIL_PATTERN);
         }
-
+        
         public boolean validate(final String hex) {
             if (!hex.equals("")) {
                 matcher = pattern.matcher(hex);
@@ -57,14 +60,15 @@ public class PanelStaff extends javax.swing.JPanel {
      */
     private Connection conn;
     private boolean add = false;
-
+    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
+    
     public PanelStaff() {
         initComponents();
         loadData();
-        bindingText(0);        
+        bindingText(0);
         enableButton(true);
     }
-
+    
     private void enableButton(boolean b) {
         btnAdd.setEnabled(b);
         btnEdit.setEnabled(b);
@@ -76,9 +80,9 @@ public class PanelStaff extends javax.swing.JPanel {
         txtEmail.setEnabled(!b);
         dtBirthDay.setEnabled(!b);
         cobSex.setEnabled(!b);
-        tbStaff.setEnabled(b);        
+        tbStaff.setEnabled(b);
     }
-
+    
     private void loadData() {
         conn = ConnectDB.conn();
         tbStaff.setModel(Staff.getAll(conn));
@@ -86,9 +90,9 @@ public class PanelStaff extends javax.swing.JPanel {
             tbStaff.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
         }
-         tbStaff.getTableHeader().setReorderingAllowed(false);
+        tbStaff.getTableHeader().setReorderingAllowed(false);
     }
-
+    
     private void bindingText(int index) {
         txtID.setText(String.valueOf(tbStaff.getValueAt(index, 0)));
         txtName.setText(String.valueOf(tbStaff.getValueAt(index, 1)));
@@ -241,6 +245,11 @@ public class PanelStaff extends javax.swing.JPanel {
         btnDelete.setBackground(new java.awt.Color(153, 204, 255));
         btnDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/delete-icon-24x24.png"))); // NOI18N
         btnDelete.setText("Xóa");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnDelete);
         jToolBar1.add(jSeparator3);
 
@@ -495,7 +504,7 @@ public class PanelStaff extends javax.swing.JPanel {
                 }
             } else {
                 if (!txtID.getText().trim().equals("")) {
-                    int id=Integer.parseInt(txtID.getText().trim());
+                    int id = Integer.parseInt(txtID.getText().trim());
                     if (Staff.updateStaffInfo(name, sex, (java.sql.Date) ds, phone, address, email, pin, id, conn)) {
                         JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thành công");
                         loadData();
@@ -503,12 +512,12 @@ public class PanelStaff extends javax.swing.JPanel {
                         enableButton(true);
                         
                     }
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn nhân viê nào");
                 }
             }
             conn = null;
-
+            
         }
 
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -535,7 +544,7 @@ public class PanelStaff extends javax.swing.JPanel {
                 flag++;
             }
             if (flag > 0) {
-
+                
                 evt.consume();
             }
         }
@@ -549,10 +558,10 @@ public class PanelStaff extends javax.swing.JPanel {
     private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
         try {
             HashMap<String, Object> parameter = new HashMap<String, Object>();
-            parameter.put("tennhahang", tbRestaurant.getValues().getName());
-            parameter.put("diachi", "Địa Chỉ: " + tbRestaurant.getValues().getAddress());
-            parameter.put("sdt", "Điện Thoại: " + tbRestaurant.getValues().getPhone());
-            parameter.put("logo",tbRestaurant.getValues().getLogo());
+            parameter.put("tennhahang", rs.getName());
+            parameter.put("diachi", "Địa Chỉ: " + rs.getAddress());
+            parameter.put("sdt", "Điện Thoại: " + rs.getPhone());
+            parameter.put("logo", rs.getLogo());
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/staff.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());
             JasperViewer jv = new JasperViewer(jp, false);
@@ -561,6 +570,37 @@ public class PanelStaff extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }//GEN-LAST:event_btnPrintActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        if (txtID.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn nhân viên", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+        }else if(LoginInformation.getId_staff()==Integer.parseInt(txtID.getText())){
+            JOptionPane.showMessageDialog(getRootPane(), "Tài khoản đang đăng nhập không thể xóa", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa nhân viên này", "Thông Báo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                Connection cn = ConnectDB.conn();
+                try {
+                    cn.setAutoCommit(false);
+                    if (Staff.delete(Integer.parseInt(txtID.getText()), cn)) {
+                        if (Account.deleteByStaff(Integer.parseInt(txtID.getText()), cn)) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                            cn.commit();
+                            loadData();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception e) {
+                    try {
+                        cn.rollback();
+                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(PanelStaff.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }                
+            }
+        }
+    }//GEN-LAST:event_btnDeleteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

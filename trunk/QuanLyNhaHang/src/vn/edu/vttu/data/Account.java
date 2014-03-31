@@ -179,6 +179,25 @@ public class Account {
 
         return flag;
     }
+    public static boolean deleteByStaff(int id_staff, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL account_del_by_staff(?)";
+            CallableStatement callstate = conn.prepareCall(sql);;
+            callstate.setInt(1, id_staff);
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
 
     public static boolean testUsername(String username, Connection conn) {
         TableModel tb = null;

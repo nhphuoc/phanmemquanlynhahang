@@ -9,6 +9,7 @@ import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.Unit;
 
 /**
@@ -18,33 +19,23 @@ import vn.edu.vttu.data.Unit;
  *
  */
 public class test {
-   
-    private String dvt(int id, float num) {
-     
+
+    private String dvt(int id, int idunit, float num) {
         String kq = "";
         Connection cn = ConnectDB.conn();
-        float number = RawMaterial.getByID(id, cn).getNumber();
-        int idunit = RawMaterial.getByID(id, cn).getUnit();
         boolean parent = Unit.getByID(idunit, cn).isParent();
-        String name = RawMaterial.getByID(id, cn).getName();
-        if (parent) {
-            if (RawMaterial.getByID(id, cn).getId_unit_sub()!=0) {
-                int idunitsub = RawMaterial.getByID(id, cn).getId_unit_sub();
-                int cast = Unit.getByID(idunitsub, ConnectDB.conn()).getCast();
-                float n = (num * cast) % cast;
-                int m = (int) (num * cast) / cast;
-                kq = m + " " + Unit.getByID(idunit, cn).getName() + " --- "
-                        + n + " " + Unit.getByID(idunitsub, cn).getName();
-            } else {
+        int cast=Unit.getByID(idunit, cn).getCast();        
+            int x=Unit.getByID(idunit, cn).getId_sub();
+            if(x!=0){
+                int y=Unit.getBySubID(x, cn).getId();
+                kq=(int)(num/cast)+" "+Unit.getByID(y, cn).getName()+" "+(num%cast)+" "+Unit.getByID(idunit, cn).getName();
+            }else{
+                kq=num+" "+Unit.getByID(idunit, cn).getName();
+            }        
 
-            }
-        } else {
-            kq = num + " " + Unit.getByID(idunit, cn).getName();
-        }
-        return name + " " + kq;
-              
+        return kq;
     }
- 
+
     private boolean testStore(int id, int n) {
         boolean flag = false;
         TableModel tb = Recipes.getRecipesByIdService(id, ConnectDB.conn());
@@ -180,9 +171,19 @@ public class test {
         }
         return flag;
     }
-
+    private boolean testStatusService(int idReservation) {
+        boolean t = false;
+        TableService[] serviceStatus = TableService.getStatus(idReservation, ConnectDB.conn());
+        for (int i = 0; i < serviceStatus.length; i++) {
+            t = serviceStatus[i].isStatus();
+            if (t == false) {
+                return false;
+            }
+        }
+        return t;
+    }
     public static void main(String[] agrs) throws IOException {
         test t = new test();
-        //System.out.println(t.dvt(id, num));
+        System.out.println(t.testStatusService(63));
     }
 }

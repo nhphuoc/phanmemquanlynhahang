@@ -26,6 +26,15 @@ public class TableService {
     private int NUMBER;
     private int COST;
     private int TOTAL;
+    private boolean status;
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
     public int getID() {
         return ID;
@@ -50,7 +59,29 @@ public class TableService {
     public int getTOTAL() {
         return TOTAL;
     }
-
+    public TableService(boolean status){        
+        this.status=status;
+    }
+    public static TableService[] getStatus(int idreservation, Connection conn) {
+        TableService[] tableservice = null;
+        try {
+            String sql = "call table_service_get_status(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, idreservation);
+            ResultSet rs = callstate.executeQuery();
+            rs.last();
+            tableservice = new TableService[rs.getRow()];
+            rs.beforeFirst();
+            int i=0;
+            while (rs.next()) {
+                tableservice[i] = new TableService(rs.getBoolean(1));
+                i++;               
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tableservice;
+    }
     public static TableModel getByIdReservation(int id, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
