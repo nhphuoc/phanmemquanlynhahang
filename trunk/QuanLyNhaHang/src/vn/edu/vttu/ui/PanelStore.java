@@ -151,6 +151,7 @@ public class PanelStore extends javax.swing.JPanel {
             rowOne.addElement(dvt(Integer.parseInt(tb.getValueAt(i, 0).toString()), Float.parseFloat(tb.getValueAt(i, 2).toString())));
             rowOne.addElement(tb.getValueAt(i, 4).toString());
             rowOne.addElement(tb.getValueAt(i, 2).toString());
+            rowOne.addElement(tb.getValueAt(i, 5).toString());
             rowData.addElement(rowOne);
         }
         Vector<String> columnNames = new Vector<String>();
@@ -159,6 +160,7 @@ public class PanelStore extends javax.swing.JPanel {
         columnNames.addElement("Số Lượng");
         columnNames.addElement("");
         columnNames.addElement("sl");
+        columnNames.addElement("unit_sub");
 
         table = new JTable(rowData, columnNames);
 
@@ -171,6 +173,8 @@ public class PanelStore extends javax.swing.JPanel {
         table.getColumnModel().getColumn(4).setMaxWidth(0);
         table.getColumnModel().getColumn(3).setMinWidth(0);
         table.getColumnModel().getColumn(3).setMaxWidth(0);
+        table.getColumnModel().getColumn(5).setMinWidth(0);
+        table.getColumnModel().getColumn(5).setMaxWidth(0);
         table.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
         JScrollPane scrollPane = new JScrollPane(table);
         pn.add(scrollPane, BorderLayout.CENTER);
@@ -181,6 +185,7 @@ public class PanelStore extends javax.swing.JPanel {
                 txtNAme.setText(table.getValueAt(index, 1).toString());
                 txtNumber.setText(String.valueOf(Float.parseFloat(table.getValueAt(index, 4).toString())));
                 setSelectedValue(cobUnit, Integer.parseInt(table.getValueAt(index, 3).toString()));
+                setSelectedValue(cobUnitSub, Integer.parseInt(table.getValueAt(index, 5).toString()));
             }
         });
         table.getTableHeader().setReorderingAllowed(false);

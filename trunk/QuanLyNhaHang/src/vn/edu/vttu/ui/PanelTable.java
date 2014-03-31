@@ -103,23 +103,43 @@ public class PanelTable extends javax.swing.JPanel {
     class TaskRequest extends TimerTask {
 
         public void run() {
-            conn = ConnectDB.conn();
-            int info1 = VariableStatic.getIdRequest();
-            ClientRequest request = ClientRequest.getMaxRow(ConnectDB.conn());
-            int info2 = request.getId();
-            if (info2 > info1) {
-                loadTableRequire();
-                VariableStatic.setIdRequest(info2);
+            Connection conn = ConnectDB.conn();
+            try {
+                int info1 = VariableStatic.getIdRequest();
+                ClientRequest request = ClientRequest.getMaxRow(ConnectDB.conn());
+                int info2 = request.getId();
+                if (info2 > info1) {
+                    loadTableRequire();
+                    VariableStatic.setIdRequest(info2);
+                }
+            } catch (Exception e) {
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            conn = ConnectDB.conn();
         }
     }
 
     class TaskRequired extends TimerTask {
 
         public void run() {
-            tbListTableRequest.setModel(ClientRequest.getAll(ConnectDB.conn()));
-            tbListTableRequest.getTableHeader().setReorderingAllowed(false);
+            Connection conn = ConnectDB.conn();
+            try {
+
+                tbListTableRequest.setModel(ClientRequest.getAll(conn));
+                tbListTableRequest.getTableHeader().setReorderingAllowed(false);
+            } catch (Exception e) {
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
         }
     }
 
@@ -156,6 +176,12 @@ public class PanelTable extends javax.swing.JPanel {
                 } catch (SQLException ex) {
                     Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
         }
@@ -188,7 +214,7 @@ public class PanelTable extends javax.swing.JPanel {
     private int idLocation = -1;
     private int idRequired;
     private int idTableRequire;
-    private RestaurantInfo rs=RestaurantInfo.getinfo(ConnectDB.conn());
+    private RestaurantInfo rs = RestaurantInfo.getinfo(ConnectDB.conn());
 
     public PanelTable() {
         initComponents();
@@ -229,6 +255,12 @@ public class PanelTable extends javax.swing.JPanel {
 
                     } catch (SQLException ex) {
                         Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        try {
+                            conn.close();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                     setTextLable(idTable);
                 }
@@ -383,6 +415,12 @@ public class PanelTable extends javax.swing.JPanel {
                                     } catch (SQLException ex1) {
                                         Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
                                     }
+                                } finally {
+                                    try {
+                                        conn.close();
+                                    } catch (SQLException ex) {
+                                        Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 }
                             }
                         }
@@ -398,20 +436,30 @@ public class PanelTable extends javax.swing.JPanel {
                         public void actionPerformed(ActionEvent e
                         ) {
                             conn = ConnectDB.conn();
-                            String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn");
-                            if (tablename != null) {
-                                if (Table.testTableName(tablename, conn)) {
-                                    if (Table.insertNewTable(tablename, TableType.getByMaxID(conn).getId(), TableLocation.getByMinID(conn).getID(), 10, conn)) {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn thành công");
-                                        SystemLog.insert("table", conn);
-                                        loadTable(idLocation);
+                            try {
+                                String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn");
+                                if (tablename != null) {
+                                    if (Table.testTableName(tablename, conn)) {
+                                        if (Table.insertNewTable(tablename, TableType.getByMaxID(conn).getId(), TableLocation.getByMinID(conn).getID(), 10, conn)) {
+                                            JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn thành công");
+                                            SystemLog.insert("table", conn);
+                                            loadTable(idLocation);
+                                        } else {
+                                            JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn không thành công");
+                                        }
                                     } else {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Thêm bàn không thành công");
+                                        JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có");
                                     }
-                                } else {
-                                    JOptionPane.showMessageDialog(getRootPane(), "Tên bàn đã có");
+                                }
+                            } catch (Exception exx) {
+                            } finally {
+                                try {
+                                    conn.close();
+                                } catch (SQLException ex) {
+                                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
+
                         }
                     }));
             BufferedImage bImg10 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/editicon.png"));
@@ -423,25 +471,34 @@ public class PanelTable extends javax.swing.JPanel {
                         public void actionPerformed(ActionEvent e
                         ) {
                             conn = ConnectDB.conn();
-                            String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn", Table.getByID(idTable, conn).getNAME());
-                            if (tablename != null) {
-                                if (!tablename.equals(Table.getByID(idTable, conn).getNAME())) {
-                                    if (tablename.length() > 30 || tablename.length() <= 0) {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Tên bàn quá dài hoặc chưa nhập");
-                                    } else if (Table.testTableName(tablename, conn) == false) {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Tên bàn " + tablename + " đã có, vui lòng chọn tên khác");
-                                    } else {
-                                        if (Table.updateTableName(tablename, idTable, conn)) {
-                                            SystemLog.insert("table", conn);
-                                            JOptionPane.showMessageDialog(getRootPane(), "Cập nhật bàn thành công");
-                                            loadTable(idLocation);
+                            try {
+                                String tablename = JOptionPane.showInputDialog(getRootPane(), "Nhập tên bàn", Table.getByID(idTable, conn).getNAME());
+                                if (tablename != null) {
+                                    if (!tablename.equals(Table.getByID(idTable, conn).getNAME())) {
+                                        if (tablename.length() > 30 || tablename.length() <= 0) {
+                                            JOptionPane.showMessageDialog(getRootPane(), "Tên bàn quá dài hoặc chưa nhập");
+                                        } else if (Table.testTableName(tablename, conn) == false) {
+                                            JOptionPane.showMessageDialog(getRootPane(), "Tên bàn " + tablename + " đã có, vui lòng chọn tên khác");
                                         } else {
-                                            JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thất bại");
+                                            if (Table.updateTableName(tablename, idTable, conn)) {
+                                                SystemLog.insert("table", conn);
+                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật bàn thành công");
+                                                loadTable(idLocation);
+                                            } else {
+                                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thất bại");
+                                            }
                                         }
                                     }
                                 }
+                            } catch (Exception ex) {
+                            } finally {
+                                try {
+                                    conn.close();
+                                } catch (SQLException ex) {
+                                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
-                            conn = null;
+
                         }
                     }));
             BufferedImage bImg11 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/delete-icon.png"));
@@ -469,12 +526,18 @@ public class PanelTable extends javax.swing.JPanel {
                     }));
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
 
     private void loadTable(int idLoca) {
-        conn = ConnectDB.conn();
+        final Connection conn = ConnectDB.conn();
         layout_table.removeAll();
         enableButton(false);
         JPanel panel = new JPanel(new GridLayout(0, 3, 5, 5));
@@ -482,7 +545,6 @@ public class PanelTable extends javax.swing.JPanel {
         layout_table.add(panel);
         scrollpane = new JScrollPane(panel);
         layout_table.add(scrollpane, BorderLayout.CENTER);
-
         try {
             Table table[];
             if (idLoca == -1) {
@@ -662,9 +724,7 @@ public class PanelTable extends javax.swing.JPanel {
                         loadTableInvoice();
                         totalPay();
                         VariableStatic.setIdTable(idTable);
-                        conn = ConnectDB.conn();
-                        VariableStatic.setNameTable(Table.getByID(idTable, conn).getNAME());
-                        conn = null;
+                        VariableStatic.setNameTable(Table.getByID(idTable, ConnectDB.conn()).getNAME());
                     }
                     //}
                 });
@@ -672,9 +732,14 @@ public class PanelTable extends javax.swing.JPanel {
             }
             layout_table.updateUI();
             layout_table.repaint();
-            conn = null;
         } catch (Exception e) {
 
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -685,15 +750,28 @@ public class PanelTable extends javax.swing.JPanel {
             tbService.setRowSelectionInterval(0, 0);
             tbService.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         } catch (Exception e) {
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         tbService.getTableHeader().setReorderingAllowed(false);
     }
 
     private void loadTableRequire() {
-        tbListTableRequest.setModel(ClientRequest.getAll(ConnectDB.conn()));
+        Connection conn = ConnectDB.conn();
+        tbListTableRequest.setModel(ClientRequest.getAll(conn));
         try {
             tbListTableRequest.setRowSelectionInterval(0, 0);
         } catch (Exception e) {
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         tbListTableRequest.getTableHeader().setReorderingAllowed(false);
         tbListTableRequest.getColumnModel().getColumn(3).setMaxWidth(0);
@@ -736,6 +814,12 @@ public class PanelTable extends javax.swing.JPanel {
                         } catch (SQLException ex1) {
                             Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
                         }
+                    } finally {
+                        try {
+                            cn.close();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
@@ -767,6 +851,12 @@ public class PanelTable extends javax.swing.JPanel {
                             } catch (SQLException ex1) {
                                 Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
                             }
+                        } finally {
+                            try {
+                                cnn.close();
+                            } catch (SQLException ex) {
+                                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
                 }
@@ -791,7 +881,14 @@ public class PanelTable extends javax.swing.JPanel {
             ));
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
         tbListTableRequest.setComponentPopupMenu(popupTableRequire);
     }
 
@@ -869,6 +966,12 @@ public class PanelTable extends javax.swing.JPanel {
                                 } catch (SQLException ex1) {
                                     Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
                                 }
+                            } finally {
+                                try {
+                                    conn.close();
+                                } catch (SQLException ex) {
+                                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
                         } else {
                             JOptionPane.showMessageDialog(tb_invoice, "Bạn nhập số lượng sai");
@@ -876,8 +979,6 @@ public class PanelTable extends javax.swing.JPanel {
                     } else {
                         JOptionPane.showMessageDialog(tb_invoice, "Bạn chưa nhập số lượng");
                     }
-
-                    conn = null;
                 }
             }
             ));
@@ -925,9 +1026,14 @@ public class PanelTable extends javax.swing.JPanel {
                                     } catch (SQLException ex1) {
                                         Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
                                     }
+                                } finally {
+                                    try {
+                                        conn.close();
+                                    } catch (SQLException ex) {
+                                        Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 }
                             }
-                            conn = null;
                         }
                     }
                     ));
@@ -947,8 +1053,7 @@ public class PanelTable extends javax.swing.JPanel {
                     ));
             tb_invoice.setComponentPopupMenu(popupMenuTableInvoice);
         } catch (Exception e) {
-        }
-        conn = null;
+        } 
     }
 
     private boolean useTable(int id_table, Connection conn) throws SQLException {
@@ -1133,8 +1238,13 @@ public class PanelTable extends javax.swing.JPanel {
             } catch (SQLException ex1) {
                 Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex1);
             }
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        conn = null;
     }
 
     private void changeTable() {
@@ -1186,12 +1296,16 @@ public class PanelTable extends javax.swing.JPanel {
                         } catch (SQLException ex) {
                             Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                    } finally {
+                        try {
+                            conn.close();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
         }
-
-        conn = null;
     }
 
     private void reservationTable() {
@@ -1200,14 +1314,14 @@ public class PanelTable extends javax.swing.JPanel {
             Timestamp ts = VariableStatic.getDateTimeReservation();
             int time;
             boolean t;
-            t = TableReservation.getStatusParty(idTable, ts, rs.getHourReservationParty(), ConnectDB.conn());
+            t = TableReservation.getStatusParty(idTable, ts, rs.getHourReservationParty(), conn);
             if (t) {
                 time = rs.getHourReservationParty();
             } else {
                 time = rs.getHourReservationParty();
             }
             TableModel tb = TableReservation.getByTable_DateTime(idTable, VariableStatic.getDateTimeReservation(),
-                    time, ConnectDB.conn());
+                    time, conn);
             if (tb.getRowCount() <= 0) {
                 JOptionPane.showMessageDialog(getRootPane(), "Ngày đặt phải lớn hơn ngày hiện tại");
             } else {
@@ -1215,7 +1329,7 @@ public class PanelTable extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(getRootPane(), "Bạn không thể đặt bàn vào thời gian này!");
                 } else {
                     JOptionPane.showMessageDialog(getRootPane(), "<html>Bạn không thể đặt bàn <b><font color='green'>"
-                            + Table.getByID(idTable, ConnectDB.conn()).getNAME() + "</font></b> trong thời gian này"
+                            + Table.getByID(idTable, conn).getNAME() + "</font></b> trong thời gian này"
                             + " vì đã có khách hàng đang sử dụng hoặc sẽ nhận bàn vào ngày <font color='blue'><b>"
                             + String.valueOf(tb.getValueAt(0, 3)) + " </b></font>"
                             + "<br>Xin vui lòng chọn thời gian khác hoặc bàn khác!</html>");
@@ -1254,59 +1368,73 @@ public class PanelTable extends javax.swing.JPanel {
                     JOptionPane.showMessageDialog(getRootPane(), "Đặt bàn không thành công", "Thông Báo", JOptionPane.OK_OPTION);
                 } catch (SQLException ex1) {
                 }
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
-        conn = null;
     }
 
     private void setTextLable(int id) {
-        conn = ConnectDB.conn();
-        DecimalFormat df = new DecimalFormat("#,###,###");
-        TableReservation tbReser = TableReservation.getByTableByStatus(id, conn);
-        beginDate = tbReser.getBeginDate();
-        idCustomer = tbReser.getCUSTOMER();
-        nameCustomer = tbReser.getCUSTOMER_NAME();
-        txtPrepay.setText(df.format(tbReser.getPrepay()));
-        idTableReservation = tbReser.getID();
-        // setText lable
-        if (beginDate == null) {
-            lbBeginDate.setText("Chưa sử dụng");
-        } else {
-            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
-            String datetime = formatter.format(beginDate);
-            lbBeginDate.setText(datetime);
+        try {
+            conn = ConnectDB.conn();
+            DecimalFormat df = new DecimalFormat("#,###,###");
+            TableReservation tbReser = TableReservation.getByTableByStatus(id, conn);
+            beginDate = tbReser.getBeginDate();
+            idCustomer = tbReser.getCUSTOMER();
+            nameCustomer = tbReser.getCUSTOMER_NAME();
+            txtPrepay.setText(df.format(tbReser.getPrepay()));
+            idTableReservation = tbReser.getID();
+            // setText lable
+            if (beginDate == null) {
+                lbBeginDate.setText("Chưa sử dụng");
+            } else {
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+                String datetime = formatter.format(beginDate);
+                lbBeginDate.setText(datetime);
 
+            }
+            lbCustomerName.setText(nameCustomer);
+            lbTableName.setText(Table.getByID(id, conn).getNAME() + " - " + Table.getByID(id, conn).getNAME_LOCATION());
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
         }
-        lbCustomerName.setText(nameCustomer);
-        lbTableName.setText(Table.getByID(id, conn).getNAME() + " - " + Table.getByID(id, conn).getNAME_LOCATION());
-        conn = null;
 
     }
 
     private boolean testDate(Timestamp date) {
-        conn = ConnectDB.conn();
         boolean flag = false;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = formatter.format(new Date());
-        Timestamp ts = Timestamp.valueOf(datetime);
-        TableModel tb = TableReservation.getByTable_DateTime(idTable, date, rs.getHourReservationNomal(), ConnectDB.conn());
-        Date dt = new Date();
-        //Date incrementedDate = DateUtils.addHours(dt, 2);
-        if (statusTable == 1) {
-            if (dt.compareTo(date) < 0) {
-                flag = true;
-            } else {
-                flag = false;
-            }
-        } else {
+        try {
+            conn = ConnectDB.conn();
 
-            if (date.compareTo(ts) < 0 || tb.getRowCount() > 0) {
-                flag = false;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String datetime = formatter.format(new Date());
+            Timestamp ts = Timestamp.valueOf(datetime);
+            TableModel tb = TableReservation.getByTable_DateTime(idTable, date, rs.getHourReservationNomal(), ConnectDB.conn());
+            Date dt = new Date();
+            //Date incrementedDate = DateUtils.addHours(dt, 2);
+            if (statusTable == 1) {
+                if (dt.compareTo(date) < 0) {
+                    flag = true;
+                } else {
+                    flag = false;
+                }
             } else {
-                flag = true;
+
+                if (date.compareTo(ts) < 0 || tb.getRowCount() > 0) {
+                    flag = false;
+                } else {
+                    flag = true;
+                }
             }
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
         }
-        conn = null;
         return flag;
     }
 
@@ -1321,20 +1449,25 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void loadTableInvoice() {
-        Connection conn = ConnectDB.conn();
-        tb_invoice.setModel(TableService.getByIdReservation(idTableReservation, conn));
-        if (tb_invoice.getRowCount() > 0) {
-            tb_invoice.setRowSelectionInterval(0, 0);
-            tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
-            tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
-        } else {
-            tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
-            tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
+        try {
+            Connection conn = ConnectDB.conn();
+            tb_invoice.setModel(TableService.getByIdReservation(idTableReservation, conn));
+            if (tb_invoice.getRowCount() > 0) {
+                tb_invoice.setRowSelectionInterval(0, 0);
+                tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
+                tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
+            } else {
+                tb_invoice.getColumnModel().getColumn(6).setMinWidth(0);
+                tb_invoice.getColumnModel().getColumn(6).setMaxWidth(0);
+            }
+            tb_invoice.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+            tb_invoice.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
+            tb_invoice.getTableHeader().setReorderingAllowed(false);
+            totalPay();
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
         }
-        tb_invoice.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
-        tb_invoice.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
-        tb_invoice.getTableHeader().setReorderingAllowed(false);
-        totalPay();
     }
 
     private boolean testNumber(String num) {
@@ -1356,98 +1489,110 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void totalPay() {
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String datetime = formatter.format(new Date());
-        Timestamp ts = Timestamp.valueOf(datetime);
-        if (beginDate == null) {
-            ts = Timestamp.valueOf(datetime);
-        } else {
-            ts = Timestamp.valueOf(formatter.format(beginDate));
-        }
-        conn = ConnectDB.conn();
-        DecimalFormat df = new DecimalFormat("#,###,###");
-        float service_Charges = 0;
-        int discount_money = 0;
-        int discount_percent = 0;
-        int customer_pay = 0;
-        int prepay = 0;
-        double x;
-        if (!txtService_Price.getText().trim().equals("") && testNumber(txtService_Price.getText())) {
-            try {
-                service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
-            } catch (Exception e) {
-                service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll(",", ""));
-            }
-
-        }
-        if (!txtCustomerPay.getText().trim().equals("")) {
-            try {
-                customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
-            } catch (Exception e) {
-                customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll(",", ""));
-            }
-
-        }
-        if (!txtPrepay.getText().trim().equals("")) {
-            try {
-                prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
-            } catch (Exception e) {
-                prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll(",", ""));
-            }
-
-        }
-
-        float total = TableService.totalPayment(idTableReservation, conn);
-        if (!Discount.getByDate(ts, conn).getName().equals("Không có khuyến mãi")) {
-            if (total >= Discount.getByDate(ts, conn).getCondition()) {
-                if (Discount.getByDate(ts, conn).getType() == 0) {
-                    discount_percent = Discount.getByDate(ts, conn).getValue();
-                    txtDiscountPercent.setText(String.valueOf(discount_percent));
-                }
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String datetime = formatter.format(new Date());
+            Timestamp ts = Timestamp.valueOf(datetime);
+            if (beginDate == null) {
+                ts = Timestamp.valueOf(datetime);
             } else {
-                txtDiscountPercent.setText("");
+                ts = Timestamp.valueOf(formatter.format(beginDate));
             }
-            if (Discount.getByDate(ts, conn).getType() == 1) {
+            conn = ConnectDB.conn();
+            DecimalFormat df = new DecimalFormat("#,###,###");
+            float service_Charges = 0;
+            int discount_money = 0;
+            int discount_percent = 0;
+            int customer_pay = 0;
+            int prepay = 0;
+            double x;
+            if (!txtService_Price.getText().trim().equals("") && testNumber(txtService_Price.getText())) {
+                try {
+                    service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll("\\.", ""));
+                } catch (Exception e) {
+                    service_Charges = Float.parseFloat(txtService_Price.getText().trim().replaceAll(",", ""));
+                }
+
+            }
+            if (!txtCustomerPay.getText().trim().equals("")) {
+                try {
+                    customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll("\\.", ""));
+                } catch (Exception e) {
+                    customer_pay = Integer.parseInt(txtCustomerPay.getText().trim().replaceAll(",", ""));
+                }
+
+            }
+            if (!txtPrepay.getText().trim().equals("")) {
+                try {
+                    prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll("\\.", ""));
+                } catch (Exception e) {
+                    prepay = Integer.parseInt(txtPrepay.getText().trim().replaceAll(",", ""));
+                }
+
+            }
+
+            float total = TableService.totalPayment(idTableReservation, conn);
+            if (!Discount.getByDate(ts, conn).getName().equals("Không có khuyến mãi")) {
                 if (total >= Discount.getByDate(ts, conn).getCondition()) {
-                    discount_money = Discount.getByDate(ts, conn).getValue();
-                    txtDiscountMoney.setText(df.format(discount_money));
+                    if (Discount.getByDate(ts, conn).getType() == 0) {
+                        discount_percent = Discount.getByDate(ts, conn).getValue();
+                        txtDiscountPercent.setText(String.valueOf(discount_percent));
+                    }
                 } else {
-                    txtDiscountMoney.setText("");
+                    txtDiscountPercent.setText("");
+                }
+                if (Discount.getByDate(ts, conn).getType() == 1) {
+                    if (total >= Discount.getByDate(ts, conn).getCondition()) {
+                        discount_money = Discount.getByDate(ts, conn).getValue();
+                        txtDiscountMoney.setText(df.format(discount_money));
+                    } else {
+                        txtDiscountMoney.setText("");
+                    }
                 }
             }
-        }
-        //JOptionPane.showMessageDialog(getRootPane(), service_Charges);
-        lbTotal.setText(String.valueOf(df.format(total)));
-        float _discount = (discount_percent * total) / 100;
-        if (total == 0) {
-            totalPay = 0;
-        } else {
-            totalPay = (int) ((total + service_Charges) - (discount_money + _discount));
-        }
+            //JOptionPane.showMessageDialog(getRootPane(), service_Charges);
+            lbTotal.setText(String.valueOf(df.format(total)));
+            float _discount = (discount_percent * total) / 100;
+            if (total == 0) {
+                totalPay = 0;
+            } else {
+                totalPay = (int) ((total + service_Charges) - (discount_money + _discount));
+            }
 
-        lbTotalPay.setText(String.valueOf(df.format(totalPay - prepay)));
-        total = TableService.totalPayment(idTableReservation, conn);
-        lbTotal.setText(String.valueOf(df.format(total)));
-        discount = (int) (_discount + discount_money);
+            lbTotalPay.setText(String.valueOf(df.format(totalPay - prepay)));
+            total = TableService.totalPayment(idTableReservation, conn);
+            lbTotal.setText(String.valueOf(df.format(total)));
+            discount = (int) (_discount + discount_money);
 
-        if ((customer_pay + prepay) < totalPay) {
-            lbChangeForCustomer.setText("Thiếu: " + String.valueOf(df.format(Math.abs(((customer_pay + prepay) - totalPay)))));
-        } else {
-            lbChangeForCustomer.setText(df.format((customer_pay + prepay) - totalPay));
+            if ((customer_pay + prepay) < totalPay) {
+                lbChangeForCustomer.setText("Thiếu: " + String.valueOf(df.format(Math.abs(((customer_pay + prepay) - totalPay)))));
+            } else {
+                lbChangeForCustomer.setText(df.format((customer_pay + prepay) - totalPay));
+            }
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private boolean testStatusService(int idReservation) {
         boolean t = false;
-        TableService[] serviceStatus = TableService.getStatus(idReservation, ConnectDB.conn());
-        for (int i = 0; i < serviceStatus.length; i++) {
-            t = serviceStatus[i].isStatus();
-            if (t == false) {
-                JOptionPane.showMessageDialog(tb_invoice, "Có dịch vụ đã gọi nhưng chưa phục vụ. Vui lòng hủy dịch vụ trước khi thanh toán",
-                        "Thông Báo", JOptionPane.ERROR_MESSAGE);
-                return false;
+        try {
+
+            conn = ConnectDB.conn();
+            TableService[] serviceStatus = TableService.getStatus(idReservation, conn);
+            for (int i = 0; i < serviceStatus.length; i++) {
+                t = serviceStatus[i].isStatus();
+                if (t == false) {
+                    JOptionPane.showMessageDialog(tb_invoice, "Có dịch vụ đã gọi nhưng chưa phục vụ. Vui lòng hủy dịch vụ trước khi thanh toán",
+                            "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
             }
+            conn.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
         }
         return t;
     }
@@ -1527,6 +1672,8 @@ public class PanelTable extends javax.swing.JPanel {
         } catch (Exception e) {
             conn.rollback();
             JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi!");
+        } finally {
+            conn.close();
         }
         return flag;
     }
@@ -1573,56 +1720,79 @@ public class PanelTable extends javax.swing.JPanel {
             jv.setVisible(true);
         } catch (Exception ex) {
             Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
 
     private void fillkhCombo() {
-        conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
         try {
-            model = TableLocation.selectTableLocation(conn);
-        } catch (Exception e) {
-            e.printStackTrace();
+            conn = ConnectDB.conn();
+            Vector<vn.edu.vttu.model.TableLocation> model = new Vector<vn.edu.vttu.model.TableLocation>();
+            try {
+                model = TableLocation.selectTableLocation(conn);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
+            jcomboTableLocation.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
+            jcomboTableLocation.setModel(defaultComboBoxModel);
+            jcomboTableLocation.setRenderer(new PanelTable.ItemRenderer());
+        } catch (Exception ex) {
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+            }
         }
-
-        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
-        jcomboTableLocation.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
-        jcomboTableLocation.setModel(defaultComboBoxModel);
-        jcomboTableLocation.setRenderer(new PanelTable.ItemRenderer());
     }
 
     private boolean testStore(int id, int n) {
         boolean flag = false;
-        TableModel tb = Recipes.getRecipesByIdService(id, ConnectDB.conn());
-        for (int i = 0; i < tb.getRowCount(); i++) {
-            float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-            int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-            int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
-            int idUnitStore = RawMaterial.getByID(idstore, ConnectDB.conn()).getUnit();
+        try {
+            Connection conn = ConnectDB.conn();
+            TableModel tb = Recipes.getRecipesByIdService(id, conn);
+            for (int i = 0; i < tb.getRowCount(); i++) {
+                float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
+                int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
+                int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
+                int idUnitStore = RawMaterial.getByID(idstore, conn).getUnit();
 
-            float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, ConnectDB.conn()).getValueAt(0, 0)));
-            if (idUnitRecipes == idUnitStore) {
-                if (store < (float) (n * number)) {
-                    return false;
+                float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, conn).getValueAt(0, 0)));
+                if (idUnitRecipes == idUnitStore) {
+                    if (store < (float) (n * number)) {
+                        return false;
+                    } else {
+                        flag = true;
+                    }
                 } else {
-                    flag = true;
-                }
-            } else {
-                if (Unit.getByID(idUnitRecipes, ConnectDB.conn()).isParent()) {
-                    if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
-                        int x = Unit.getByID(idUnitStore, ConnectDB.conn()).getId_sub();
-                        if (x == 0) {
-                            // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
-                            // lấy số lượng chế biến chia cho chuyển đổi của con
-                            int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                            if (store < (float) (n * number) / cast) {
-                                return false;
+                    if (Unit.getByID(idUnitRecipes, conn).isParent()) {
+                        if (Unit.getByID(idUnitStore, conn).isParent()) {
+                            int x = Unit.getByID(idUnitStore, conn).getId_sub();
+                            if (x == 0) {
+                                // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
+                                // lấy số lượng chế biến chia cho chuyển đổi của con
+                                int cast = Unit.getByID(idUnitRecipes, conn).getCast();
+                                if (store < (float) (n * number) / cast) {
+                                    return false;
+                                } else {
+                                    flag = true;
+                                }
                             } else {
-                                flag = true;
+                                int cast = Unit.getByID(idUnitStore, conn).getCast();
+                                if (store < (n * number) * cast) {
+                                    return false;
+                                } else {
+                                    flag = true;
+                                }
                             }
                         } else {
-                            int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+                            int cast = Unit.getByID(idUnitStore, conn).getCast();
                             if (store < (n * number) * cast) {
                                 return false;
                             } else {
@@ -1630,23 +1800,24 @@ public class PanelTable extends javax.swing.JPanel {
                             }
                         }
                     } else {
-                        int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
+                        int cast = Unit.getByID(idUnitRecipes, conn).getCast();
                         if (store < (n * number) * cast) {
                             return false;
                         } else {
                             flag = true;
                         }
                     }
-                } else {
-                    int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                    if (store < (n * number) * cast) {
-                        return false;
-                    } else {
-                        flag = true;
-                    }
                 }
             }
 
+        } catch (Exception ex) {
+            Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return flag;
     }

@@ -5,12 +5,18 @@
  */
 package vn.edu.vttu.ui;
 
-import config.InfoRestaurant;
+import com.lowagie.text.pdf.PdfPKCS7;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -24,10 +30,10 @@ import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.MD5;
 import vn.edu.vttu.data.RestaurantInfo;
-import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.Staff;
+import vn.edu.vttu.data.UploadFile;
 import vn.edu.vttu.sqlite.TbConnection;
-import vn.edu.vttu.sqlite.UpdateValues;
+import vn.edu.vttu.sqlite.TbServer;
 
 /**
  *
@@ -69,6 +75,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     private String username;
     private int id_staff;
     private String passs;
+    private String link;
 
     public PanelConfigSystem() {
         initComponents();
@@ -87,25 +94,26 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     }
 
     private void loadInfoRestaurant() {
-        RestaurantInfo rsInfo=RestaurantInfo.getinfo(ConnectDB.conn());
+        RestaurantInfo rsInfo = RestaurantInfo.getinfo(ConnectDB.conn());
         txtName.setText(rsInfo.getName());
         txtPhone.setText(rsInfo.getPhone());
         txtEmail.setText(rsInfo.getEmail());
         txtAddress.setText(rsInfo.getAddress());
-        txtHourNomal.setText(rsInfo.getHourReservationNomal()+"");
-        txtParty.setText(rsInfo.getHourReservationParty()+"");
-        txtWarning.setText(rsInfo.getMinuteWarning()+"");
-        txtLogo.setText(rsInfo.getLogo());
+        txtHourNomal.setText(rsInfo.getHourReservationNomal() + "");
+        txtParty.setText(rsInfo.getHourReservationParty() + "");
+        txtWarning.setText(rsInfo.getMinuteWarning() + "");
+        link=rsInfo.getLogo();
+        Image image = null;
         try {
-            BufferedImage bImg = ImageIO.read(new File(rsInfo.getLogo()));
-            Image image = bImg.getScaledInstance(220, 105, Image.SCALE_SMOOTH);
-            ImageIcon format = new ImageIcon(image);
-            lbLogo.setIcon(format);
-            lbLogo.updateUI();
-            lbLogo.repaint();
-        } catch (Exception e) {
+            URL url = new URL(
+                    "http://" + TbServer.getValues().getIp() + "/Restaurant/" +link );
+            image = ImageIO.read(url);
+            Image newimg = image.getScaledInstance(220, 105, java.awt.Image.SCALE_SMOOTH);
+            lbLogo.setIcon(new ImageIcon(newimg));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        
+
     }
 
     private void enableControl(boolean b) {
@@ -149,15 +157,15 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         vn.edu.vttu.model.Staff staff = (vn.edu.vttu.model.Staff) cobStaff.getSelectedItem();
         int id = staff.getId();
         if (txtUser.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (txtPass.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (txtUser.getText().trim().length() > 50 || txtUser.getText().trim().length() < 3) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (Account.testUsername(txtUser.getText(), ConnectDB.conn()) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (Account.testStaff(id, ConnectDB.conn()) == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
             String pass = MD5.encryptMD5(txtPass.getText());
             int type = 0;
@@ -174,7 +182,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             }
 
             if (Account.insert(id, txtUser.getText(), pass, type, active, ConnectDB.conn())) {
-                JOptionPane.showMessageDialog(getRootPane(), "Thêm tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm tài khoản thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                 tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
                 tbAccount.getTableHeader().setReorderingAllowed(false);
                 enableControl(true);
@@ -185,7 +193,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
                 tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
             } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Thất bại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(), "Thất bại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             }
 
         }
@@ -216,15 +224,15 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             sstaff = true;
         }
         if (txtUser.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập username", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (txtPass.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập password", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (txtUser.getText().trim().length() > 50 || txtUser.getText().trim().length() < 3) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập >3 và <50 ký tự", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (user == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Tên đăng nhập đã được sử dụng", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else if (sstaff == false) {
-            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Nhân viên đã có tài khoản", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
             String pass = "";
             if (passs.equals(txtPass.getText())) {
@@ -246,7 +254,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             }
             int idacc = Integer.parseInt(txtID.getText());
             if (Account.update(id, txtUser.getText(), pass, type, active, idacc, ConnectDB.conn())) {
-                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật tài khoản thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật tài khoản thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                 tbAccount.setModel(Account.accountGetAll(ConnectDB.conn()));
                 tbAccount.getTableHeader().setReorderingAllowed(false);
                 enableControl(true);
@@ -257,7 +265,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 tbAccount.getColumnModel().getColumn(7).setMinWidth(0);
                 tbAccount.getColumnModel().getColumn(7).setMaxWidth(0);
             } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Thất bại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(), "Thất bại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             }
 
         }
@@ -1011,33 +1019,53 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         if (txtName.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nhà hàng","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên nhà hàng", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocus();
         } else if (txtAddress.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập địa chỉ","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập địa chỉ", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtAddress.requestFocus();
         } else if (txtPhone.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtPhone.requestFocus();
         } else if (txtEmail.getText().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập số điện thoại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtEmail.requestFocus();
-        } else {            
-            if (RestaurantInfo.update(
-                    txtName.getText().trim(),
-                    txtPhone.getText().trim(),
-                    txtAddress.getText().trim(),
-                    txtEmail.getText().trim(),
-                    txtLogo.getText(),
-                    Integer.parseInt(txtHourNomal.getText()),
-                    Integer.parseInt(txtParty.getText()),
-                    Integer.parseInt(txtWarning.getText()),
-                    ConnectDB.conn()
-                    )) {
-                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
-                loadInfoRestaurant();
-            } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
+        } else {
+            String img = txtLogo.getText();
+            Connection cn = ConnectDB.conn();
+            try {                
+                cn.setAutoCommit(false);
+                if (!img.equals("")) {
+                    UploadFile ftpUploader = new UploadFile(TbServer.getValues().getIp(),
+                            TbServer.getValues().getUser(), TbServer.getValues().getPass());
+                    ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
+                    ftpUploader.disconnect();
+                    link="images/"+new File(img).getName();
+                }
+                if (RestaurantInfo.update(
+                        txtName.getText().trim(),
+                        txtPhone.getText().trim(),
+                        txtAddress.getText().trim(),
+                        txtEmail.getText().trim(),
+                        link,
+                        Integer.parseInt(txtHourNomal.getText()),
+                        Integer.parseInt(txtParty.getText()),
+                        Integer.parseInt(txtWarning.getText()),
+                        cn
+                )) {                    
+                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                    cn.commit();
+                    loadInfoRestaurant();
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                try {
+                    cn.rollback();
+                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelConfigSystem.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -1141,9 +1169,9 @@ public class PanelConfigSystem extends javax.swing.JPanel {
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         if (txtID.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn tài khoản nào","Thông Báo",JOptionPane.ERROR_MESSAGE);
-        }else if(LoginInformation.getId()==Integer.parseInt(txtID.getText())){
-            JOptionPane.showMessageDialog(getRootPane(), "Tài khoản đang đăng nhập, không thể xóa","Thông Báo",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn tài khoản nào", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+        } else if (LoginInformation.getId() == Integer.parseInt(txtID.getText())) {
+            JOptionPane.showMessageDialog(getRootPane(), "Tài khoản đang đăng nhập, không thể xóa", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
             if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa tài khoản này", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 if (Account.delete(Integer.parseInt(txtID.getText()), ConnectDB.conn())) {
@@ -1166,25 +1194,25 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     }//GEN-LAST:event_btnDelActionPerformed
 
     private void btnSaveChangesPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveChangesPassActionPerformed
-       if(!MD5.encryptMD5(txtPassOld.getText()).equals(LoginInformation.getPass())){
-           JOptionPane.showMessageDialog(getRootPane(), "Mật khẩu cũ không đúng","Thông Báo",JOptionPane.ERROR_MESSAGE);
-           txtPassOld.requestFocus();
-       }else if(txtPassNew.getText().equals("")){
-           JOptionPane.showMessageDialog(getRootPane(), "Chưa nhập mật khẩu mới","Thông Báo",JOptionPane.ERROR_MESSAGE);
-           txtPassOld.requestFocus();
-       }else if(!txtRePass.getText().equals(txtPassNew.getText())){
-           JOptionPane.showMessageDialog(getRootPane(), "Nhập lại mật khẩu không đúng","Thông Báo",JOptionPane.ERROR_MESSAGE);
-           txtRePass.requestFocus();
-       }else{
-           if(Account.updatePass(LoginInformation.getUser(),MD5.encryptMD5(txtRePass.getText()),ConnectDB.conn())){
-               JOptionPane.showMessageDialog(getRootPane(), "Cập nhật mật khẩu thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);    
-               txtPassOld.setText("");
-               txtPassNew.setText("");
-               txtRePass.setText("");
-           }else{
-               JOptionPane.showMessageDialog(getRootPane(), "Thất Bại","Thông Báo",JOptionPane.INFORMATION_MESSAGE);               
-           }
-       }
+        if (!MD5.encryptMD5(txtPassOld.getText()).equals(LoginInformation.getPass())) {
+            JOptionPane.showMessageDialog(getRootPane(), "Mật khẩu cũ không đúng", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            txtPassOld.requestFocus();
+        } else if (txtPassNew.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Chưa nhập mật khẩu mới", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            txtPassOld.requestFocus();
+        } else if (!txtRePass.getText().equals(txtPassNew.getText())) {
+            JOptionPane.showMessageDialog(getRootPane(), "Nhập lại mật khẩu không đúng", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            txtRePass.requestFocus();
+        } else {
+            if (Account.updatePass(LoginInformation.getUser(), MD5.encryptMD5(txtRePass.getText()), ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật mật khẩu thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                txtPassOld.setText("");
+                txtPassNew.setText("");
+                txtRePass.setText("");
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thất Bại", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btnSaveChangesPassActionPerformed
 
 
