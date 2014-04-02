@@ -86,12 +86,16 @@ public class Unit {
         }
         return tb;
     }    
-    public static boolean insert(String name, Connection conn) {
+    public static boolean insert(String name, String id_unit_parent, String cast, boolean parent, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL unit_add(?)";
+            String sql = "CALL unit_add(?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
+            callstate.setString(2,id_unit_parent);
+            callstate.setString(3,cast);
+            callstate.setBoolean(4,parent);
+            
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -106,12 +110,34 @@ public class Unit {
         return flag;
     }
 
-    public static boolean update(String name, int id, Connection conn) {
+    public static boolean update(String name, String id_unit_parent, String cast, boolean parent, int id, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL unit_update(?,?)";
+            String sql = "CALL unit_update(?,?,?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
+            callstate.setString(2,id_unit_parent);
+            callstate.setString(3,cast);
+            callstate.setBoolean(4,parent);
+            callstate.setInt(5, id);
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean updateParent(boolean parent, int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL unit_update_parent(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            callstate.setBoolean(1,parent);
             callstate.setInt(2, id);
             int x = callstate.executeUpdate();
             if (x >= 0) {
@@ -123,10 +149,8 @@ public class Unit {
             flag = false;
             e.printStackTrace();
         }
-
         return flag;
     }
-
     public static boolean delete(int id, Connection conn) {
         boolean flag = false;
         try {
@@ -174,6 +198,23 @@ public class Unit {
             String sql = "call unit_getAll()";
             CallableStatement callstate = conn.prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                vn.edu.vttu.model.Unit tb = new vn.edu.vttu.model.Unit(rs.getInt(1), rs.getString(2));
+                result.add(tb);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public static Vector selectUnitPanelUnit(Connection conn) {
+        Vector result = new Vector();
+        try {
+            String sql = "call unit_getAll()";
+            CallableStatement callstate = conn.prepareCall(sql);
+            ResultSet rs = callstate.executeQuery();
+            vn.edu.vttu.model.Unit tb1 = new vn.edu.vttu.model.Unit(0, "Không có");
+                result.add(tb1);
             while (rs.next()) {
                 vn.edu.vttu.model.Unit tb = new vn.edu.vttu.model.Unit(rs.getInt(1), rs.getString(2));
                 result.add(tb);

@@ -1,13 +1,13 @@
 package vn.edu.vttu.ui;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
-import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.ResultSet;
 import javax.swing.table.TableModel;
+import net.proteanit.sql.DbUtils;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.RawMaterial;
+import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.Unit;
@@ -24,153 +24,37 @@ public class test {
         String kq = "";
         Connection cn = ConnectDB.conn();
         boolean parent = Unit.getByID(idunit, cn).isParent();
-        int cast=Unit.getByID(idunit, cn).getCast();        
-            int x=Unit.getByID(idunit, cn).getId_sub();
-            if(x!=0){
-                int y=Unit.getBySubID(x, cn).getId();
-                kq=(int)(num/cast)+" "+Unit.getByID(y, cn).getName()+" "+(num%cast)+" "+Unit.getByID(idunit, cn).getName();
-            }else{
-                kq=num+" "+Unit.getByID(idunit, cn).getName();
-            }        
+        int cast = Unit.getByID(idunit, cn).getCast();
+        int x = Unit.getByID(idunit, cn).getId_sub();
+        if (x != 0) {
+            int y = Unit.getBySubID(x, cn).getId();
+            kq = (int) (num / cast) + " " + Unit.getByID(y, cn).getName() + " " + (num % cast) + " " + Unit.getByID(idunit, cn).getName();
+        } else {
+            kq = num + " " + Unit.getByID(idunit, cn).getName();
+        }
 
         return kq;
     }
 
-    private boolean testStore(int id, int n) {
+    private boolean testStore(int id_service, int n) {
         boolean flag = false;
-        TableModel tb = Recipes.getRecipesByIdService(id, ConnectDB.conn());
+        Connection conn = ConnectDB.conn();
+        TableModel tb = Recipes.getRecipesByIdService(id_service, conn);
+        System.out.println(tb.getRowCount());
+        int id_recipes_sub=0,id_unit;
         for (int i = 0; i < tb.getRowCount(); i++) {
-            float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-            int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-            int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
-            int idUnitStore = RawMaterial.getByID(idstore, ConnectDB.conn()).getUnit();
-
-            float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, ConnectDB.conn()).getValueAt(0, 0)));
-            if (idUnitRecipes == idUnitStore) {
-                if (store < (float) (n * number)) {
-                    return false;
-                } else {
-                    flag = true;
-                }
-            } else {
-                if (Unit.getByID(idUnitRecipes, ConnectDB.conn()).isParent()) {
-                    if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
-                        int x = Unit.getByID(idUnitStore, ConnectDB.conn()).getId_sub();
-                        if (x == 0) {
-                            // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
-                            // lấy số lượng chế biến chia cho chuyển đổi của con
-                            int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                            if (store < (float) (n * number) / cast) {
-                                return false;
-                            } else {
-                                flag = true;
-                            }
-                        } else {
-                            int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
-                            if (store < (n * number) * cast) {
-                                return false;
-                            } else {
-                                flag = true;
-                            }
-                        }
-                    } else {
-                        int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
-                        if (store < (n * number) * cast) {
-                            return false;
-                        } else {
-                            flag = true;
-                        }
-                    }
-                } else {
-                    int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                    if (store < (n * number) * cast) {
-                        return false;
-                    } else {
-                        flag = true;
-                    }
-                }
+            while(id_recipes_sub !=idStore){
+                id_recipes_sub = Unit.getByID(id_unit_recipes, conn).getId_sub();   
+                id_unit_recipes=Unit.getBySubID(id_recipes_sub, conn).getId();
+                System.out.println(id_recipes_sub);
             }
-        }
-        System.out.println(flag);
-        return flag;
-    }
-
-    private boolean updateStore(int idService, int n, Connection conn) {
-        boolean flag = false;
-        if (testStore(idService, n)) {
-            try {
-                conn.setAutoCommit(false);
-                TableModel tb = Recipes.getRecipesByIdService(idService, conn);
-                for (int i = 0; i < tb.getRowCount(); i++) {
-                    float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-                    int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-                    int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
-                    int idUnitStore = RawMaterial.getByID(idstore, conn).getUnit();
-
-                    float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, conn).getValueAt(0, 0)));
-                    if (idUnitRecipes == idUnitStore) {
-                        if (RawMaterial.updateNumber(idstore, (n * number), conn)) {
-                            conn.commit();
-                            flag = true;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        if (Unit.getByID(idUnitRecipes, ConnectDB.conn()).isParent()) {
-                            if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
-                                int x = Unit.getByID(idUnitStore, conn).getId_sub();
-                                if (x == 0) {
-                                    // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
-                                    // lấy số lượng chế biến chia cho chuyển đổi của con
-                                    int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                                    if (RawMaterial.updateNumber(idstore, (float) (n * number) / cast, conn)) {
-                                        conn.commit();
-                                        flag = true;
-                                    } else {
-                                        return false;
-                                    }
-                                } else {
-                                    int cast = Unit.getByID(idUnitStore, conn).getCast();
-                                    if (RawMaterial.updateNumber(idstore, (n * number) * cast, conn)) {
-                                        conn.commit();
-                                        flag = true;
-                                    } else {
-                                        return false;
-                                    }
-                                }
-                            } else {
-                                int cast = Unit.getByID(idUnitStore, conn).getCast();
-                                if (RawMaterial.updateNumber(idstore, (n * number) * cast, conn)) {
-                                    conn.commit();
-                                    flag = true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        } else {
-                            int cast = Unit.getByID(idUnitRecipes, conn).getCast();
-                            if (RawMaterial.updateNumber(idstore, (n * number) * cast, conn)) {
-                                conn.commit();
-                                flag = true;
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                try {
-                    conn.rollback();
-                    return false;
-                } catch (Exception ex) {
-                    return false;
-                }
-            }
-        } else {
-            return false;
+            System.out.println("xxx");
         }
         return flag;
     }
+
+    
+
     private boolean testStatusService(int idReservation) {
         boolean t = false;
         TableService[] serviceStatus = TableService.getStatus(idReservation, ConnectDB.conn());
@@ -182,8 +66,50 @@ public class test {
         }
         return t;
     }
-    public static void main(String[] agrs) throws IOException {
+
+    private String dvt(int id, double number) {
+        String ketqua = "";
+        try {
+            TableModel tb = RawMaterialUnit.getListRawmetarialUnit(id, ConnectDB.conn());
+            System.out.println("So luong dvt" + tb.getRowCount());
+            TableModel tb1 = RawMaterialUnit.getUnitRawMetarialParent(id, ConnectDB.conn());
+            int idParent = Integer.parseInt(tb1.getValueAt(0, 0).toString());
+            String nameParent = Unit.getByID(idParent, ConnectDB.conn()).getName();
+            TableModel tb2;
+            int idUnitSon;
+            String[] name = new String[tb.getRowCount()];
+            double[] cast = new double[tb.getRowCount()];
+            for (int i = 0; i < tb.getRowCount() - 1; i++) {
+                //System.out.println("Cha: "+idParent);
+                tb2 = RawMaterialUnit.getUnitSon(id, idParent, ConnectDB.conn());
+                idUnitSon = Integer.parseInt(tb2.getValueAt(0, 0).toString());
+                number = number * Unit.getByID(idUnitSon, ConnectDB.conn()).getCast();
+                cast[i] = Unit.getByID(idUnitSon, ConnectDB.conn()).getCast();
+                name[i] = Unit.getByID(idUnitSon, ConnectDB.conn()).getName();
+                idParent = idUnitSon;
+            }
+            int x = 0;
+            String kq = "";
+            double y = number;
+            for (int i = tb.getRowCount() - 2; i >= 0; i--) {
+                x = (int) (y % cast[i]);
+                y = (int) (y / cast[i]);
+                kq = kq + " " + x + " " + name[i] + "@";
+            }
+            String[] z = kq.split("@");
+
+            for (int i = z.length - 1; i >= 0; i--) {
+                ketqua = ketqua + " " + z[i];
+            }
+            ketqua = (int) y + " " + nameParent + " " + ketqua;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ketqua;
+    }
+
+    public static void main(String[] agrs) {
         test t = new test();
-        System.out.println(t.testStatusService(63));
+        System.out.println(t.testStore(5, 51, 49, 2));
     }
 }

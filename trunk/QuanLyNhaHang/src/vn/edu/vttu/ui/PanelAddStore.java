@@ -210,7 +210,7 @@ public class PanelAddStore extends javax.swing.JPanel {
         } else if (txtName.getText().trim().length() > 50) {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập tên lơn hơn 50 ký tự", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         } else {
-            if (RawMaterial.insert(txtName.getText(), 0, _unit,_unit_sub, ConnectDB.conn())) {
+            if (RawMaterial.insert(txtName.getText(), 0, ConnectDB.conn())) {
                 JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                 txtName.setText("");
             } else {

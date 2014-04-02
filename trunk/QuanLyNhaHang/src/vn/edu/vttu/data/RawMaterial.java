@@ -74,12 +74,12 @@ public class RawMaterial {
         this.id_unit_sub = id_unit_sub;
     }
 
-    public RawMaterial(int id, String name, float number, int unit,int id_unit_sub, String nameunit) {
+    public RawMaterial(int id, String name, float number, int unit, int id_unit_sub, String nameunit) {
         this.id = id;
         this.name = name;
         this.number = number;
         this.unit = unit;
-        this.id_unit_sub=id_unit_sub;
+        this.id_unit_sub = id_unit_sub;
         this.namenit = nameunit;
     }
 
@@ -91,7 +91,7 @@ public class RawMaterial {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5),rs.getInt(6), rs.getString(4));
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getInt(6), rs.getString(4));
                 return raw;
             }
         } catch (Exception e) {
@@ -126,15 +126,13 @@ public class RawMaterial {
         return tb;
     }
 
-    public static boolean insert(String name, float num, int unit,int unit_sub, Connection conn) {
+    public static boolean insert(String name, float num, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_add(?,?,?,?)";
+            String sql = "CALL raw_material_add(?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
             callstate.setFloat(2, num);
-            callstate.setInt(3, unit);
-            callstate.setInt(4, unit_sub);
             int x = callstate.executeUpdate();
             if (x == 1) {
                 flag = true;
@@ -149,16 +147,14 @@ public class RawMaterial {
         return flag;
     }
 
-    public static boolean update(String name, int unit,int id_unit, int id,float number, Connection conn) {
+    public static boolean update(String name, int id, float number, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_update(?,?,?,?,?)";
+            String sql = "CALL raw_material_update(?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setString(1, name);
-            callstate.setInt(2, unit);
-            callstate.setInt(3, id);
-            callstate.setInt(4, id_unit);
-            callstate.setFloat(5, number);
+            callstate.setInt(2, id);
+            callstate.setFloat(3, number);
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;
@@ -262,6 +258,21 @@ public class RawMaterial {
         } catch (Exception e) {
         }
         return result;
+    }
+
+    public static int getMaxId(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        int id = 0;
+        try {
+            CallableStatement calState = conn.prepareCall("call raw_material_get_max_id()");
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);
+            id = Integer.parseInt(tb.getValueAt(0, 0).toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
 }

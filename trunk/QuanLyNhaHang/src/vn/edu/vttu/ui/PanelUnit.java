@@ -57,14 +57,10 @@ public class PanelUnit extends javax.swing.JPanel {
 
     public PanelUnit() {
         initComponents();
-        pn.removeAll();
+
         loadUnit();
         enableControl(true);
-        pn.updateUI();
-        pn.repaint();
         fillcobUnit();
-        table.getColumnModel().getColumn(3).setMaxWidth(0);
-        table.getColumnModel().getColumn(3).setMinWidth(0);
     }
 
     private void loadData() {
@@ -74,49 +70,21 @@ public class PanelUnit extends javax.swing.JPanel {
     }
 
     private void loadUnit() {
-        Vector<Vector> rowData = new Vector<Vector>();
-        TableModel tb = Unit.getAll(ConnectDB.conn());
-        for (int i = 0; i < tb.getRowCount(); i++) {
-            String name = Unit.getByID(Integer.parseInt(tb.getValueAt(i, 3).toString()), ConnectDB.conn()).getName();
-            Vector<String> rowOne = new Vector<String>();
-            for (int j = 0; j < tb.getColumnCount(); j++) {
-                rowOne.addElement(tb.getValueAt(i, j).toString());
+        tbUnit.setModel(Unit.getAll(ConnectDB.conn()));
+        tbUnit.getColumnModel().getColumn(4).setMinWidth(0);
+        tbUnit.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbUnit.getTableHeader().setReorderingAllowed(false);
+    }
+
+    public void setSelectedValue(JComboBox comboBox, int value) {
+        vn.edu.vttu.model.Unit item;
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            item = (vn.edu.vttu.model.Unit) comboBox.getItemAt(i);
+            if (item.getId() == value) {
+                comboBox.setSelectedIndex(i);
+                break;
             }
-            rowOne.addElement(name);
-            rowData.add(rowOne);
         }
-        Vector<String> columnNames = new Vector<String>();
-        columnNames.addElement("Mã ĐVT");
-        columnNames.addElement("Tên ĐVT");
-        columnNames.addElement("Giá Trị");
-        columnNames.addElement("MÃ ĐVT Cha");
-        columnNames.addElement("ĐVT Cha");
-        table = new JTable(rowData, columnNames);
-        table.setGridColor(new java.awt.Color(204, 204, 204));
-        table.setRowHeight(25);
-        table.setSelectionBackground(new java.awt.Color(255, 153, 0));
-        table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        table.setFont(new java.awt.Font("Tahoma", 1, 10));
-
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                tbServiceMouseReleased(evt);
-            }
-
-            private void tbServiceMouseReleased(MouseEvent evt) {
-                int index = table.getSelectedRow();
-                txtID.setText(table.getValueAt(index, 0).toString());
-                txtName.setText(table.getValueAt(index, 1).toString());
-                txtCast.setText(table.getValueAt(index, 2).toString());
-                try {
-                    setSelectedUnit(cobDVT, Integer.parseInt(String.valueOf(table.getValueAt(index, 3))));
-                } catch (Exception e) {
-                }
-
-            }
-        });
-        JScrollPane scrollPane = new JScrollPane(table);
-        pn.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void fillcobUnit() {
@@ -124,7 +92,7 @@ public class PanelUnit extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
         try {
-            model = Unit.selectUnit(conn);
+            model = Unit.selectUnitPanelUnit(conn);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,7 +121,7 @@ public class PanelUnit extends javax.swing.JPanel {
         btnEdit.setEnabled(b);
         btnDel.setEnabled(b);
         btnSave.setEnabled(!b);
-        //tbUnit.setEnabled(b);
+        tbUnit.setEnabled(b);
         txtName.setEnabled(!b);
     }
 
@@ -176,13 +144,15 @@ public class PanelUnit extends javax.swing.JPanel {
         btnEdit = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JToolBar.Separator();
         btnDel = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JToolBar.Separator();
         btnSave = new javax.swing.JButton();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
+        btnReload = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         cobDVT = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
         txtCast = new javax.swing.JTextField();
-        pn = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbUnit = new javax.swing.JTable();
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 153, 0));
@@ -201,6 +171,7 @@ public class PanelUnit extends javax.swing.JPanel {
         btnadd.setBackground(new java.awt.Color(102, 153, 255));
         btnadd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnadd.setForeground(new java.awt.Color(255, 255, 255));
+        btnadd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/add-icon_24x24.png"))); // NOI18N
         btnadd.setText("Thêm");
         btnadd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -213,6 +184,7 @@ public class PanelUnit extends javax.swing.JPanel {
         btnEdit.setBackground(new java.awt.Color(102, 153, 255));
         btnEdit.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnEdit.setForeground(new java.awt.Color(255, 255, 255));
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/edit-icon-24x24.png"))); // NOI18N
         btnEdit.setText("Sửa");
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -223,33 +195,35 @@ public class PanelUnit extends javax.swing.JPanel {
         jToolBar1.add(jSeparator2);
 
         btnDel.setBackground(new java.awt.Color(102, 153, 255));
-        btnDel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        btnDel.setForeground(new java.awt.Color(255, 255, 255));
+        btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Button-Close-icon_24x24.png"))); // NOI18N
         btnDel.setText("Xóa");
-        btnDel.setFocusable(false);
-        btnDel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnDel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDelActionPerformed(evt);
             }
         });
         jToolBar1.add(btnDel);
-        jToolBar1.add(jSeparator3);
 
         btnSave.setBackground(new java.awt.Color(102, 153, 255));
-        btnSave.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        btnSave.setForeground(new java.awt.Color(255, 255, 255));
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Save-icon-24x24.png"))); // NOI18N
         btnSave.setText("Lưu");
-        btnSave.setFocusable(false);
-        btnSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
             }
         });
         jToolBar1.add(btnSave);
+        jToolBar1.add(jSeparator3);
+
+        btnReload.setBackground(new java.awt.Color(102, 153, 255));
+        btnReload.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Refresh-icon-24x24.png"))); // NOI18N
+        btnReload.setText("Reload");
+        btnReload.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnReload);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(51, 153, 0));
@@ -261,13 +235,39 @@ public class PanelUnit extends javax.swing.JPanel {
         jLabel4.setForeground(new java.awt.Color(51, 153, 0));
         jLabel4.setText("Chuyển Đổi");
 
-        pn.setLayout(new java.awt.GridLayout());
+        tbUnit = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
+        tbUnit.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tbUnit.setGridColor(new java.awt.Color(204, 204, 204));
+        tbUnit.setRowHeight(25);
+        tbUnit.setSelectionBackground(new java.awt.Color(255, 102, 0));
+        tbUnit.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tbUnit.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tbUnitMouseReleased(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tbUnit);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
@@ -285,9 +285,6 @@ public class PanelUnit extends javax.swing.JPanel {
                     .addComponent(txtCast)
                     .addComponent(txtName))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(pn, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,16 +300,18 @@ public class PanelUnit extends javax.swing.JPanel {
                     .addComponent(cobDVT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
                     .addComponent(txtCast, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pn, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
+                .addGap(19, 19, 19)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnaddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnaddActionPerformed
         add = true;
         enableControl(false);
+        txtName.setText("");
         txtName.requestFocus();
 
     }//GEN-LAST:event_btnaddActionPerformed
@@ -322,59 +321,154 @@ public class PanelUnit extends javax.swing.JPanel {
         enableControl(false);
         txtName.requestFocus();
         x = txtName.getText().trim();
-
     }//GEN-LAST:event_btnEditActionPerformed
 
+    private void tbUnitMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbUnitMouseReleased
+        int index = tbUnit.getSelectedRow();
+        txtID.setText(tbUnit.getValueAt(index, 0).toString());
+        txtName.setText(tbUnit.getValueAt(index, 1).toString());
+        try {
+            txtCast.setText(tbUnit.getValueAt(index, 3).toString());
+        } catch (Exception e) {
+            txtCast.setText("");
+        }
+        try {
+            setSelectedUnit(cobDVT, Integer.parseInt(tbUnit.getValueAt(index, 4).toString()));
+        } catch (Exception e) {
+            setSelectedUnit(cobDVT, 0);
+        }
+
+    }//GEN-LAST:event_tbUnitMouseReleased
+
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        conn = ConnectDB.conn();
-        if (txtName.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên đơn vị tính");
+        if (txtName.getText().equals("")) {
+            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên đơn vị tính", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             txtName.requestFocus();
-        } else if (txtName.getText().length() > 30) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn nhập đơn vị tính quá dài");
         } else {
-            if (add == true) {
-                if (Unit.testName(txtName.getText().trim(), conn) == false) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Tên đơn vị tính đã có trong CSDL");
-                } else {
-
-                    if (Unit.insert(txtName.getText().trim(), conn)) {
-                        loadData();
-                        enableControl(true);
-                    } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Thêm đơn vị tính không thành công");
-                    }
-                }
+            String name = txtName.getText();
+            vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobDVT.getSelectedItem();
+            String id_unit_parent = null;
+            if (unit.getId() == 0) {
             } else {
-                if (x.equals(txtName.getText().trim())) {
-                    loadData();
-                    enableControl(true);
-                } else {
-                    if (Unit.testName(txtName.getText().trim(), conn) == false) {
-                        JOptionPane.showMessageDialog(getRootPane(), "Tên đơn vị tính đã có trong CSDL");
-                    } else {
-
-                        if (Unit.update(txtName.getText().trim(), Integer.parseInt(txtID.getText().trim()), conn)) {
-                            loadData();
+                id_unit_parent = unit.getId() + "";
+            }
+            String cast = txtCast.getText();
+            Connection conn = ConnectDB.conn();
+            try {
+                if (add == true) {
+                    if (id_unit_parent == null) {
+                        if (Unit.insert(name, id_unit_parent, cast, true, conn)) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Thêm đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                            loadUnit();
+                            fillcobUnit();
                             enableControl(true);
                         } else {
-                            JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công");
+                            JOptionPane.showMessageDialog(getRootPane(), "Thêm đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                            loadUnit();
+                            fillcobUnit();
+                        }
+                    } else {
+                        if (Unit.insert(name, id_unit_parent, cast, false, conn)) {
+                            if (Unit.updateParent(true, Integer.parseInt(id_unit_parent), conn)) {
+                                JOptionPane.showMessageDialog(getRootPane(), "Thêm đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                                loadUnit();
+                                fillcobUnit();
+                                enableControl(true);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(getRootPane(), "Thêm đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                            loadUnit();
+                            fillcobUnit();
                         }
                     }
+                } else {
+                    if (!x.equals(txtName.getText())) {
+                        if (Unit.testName(txtName.getText().trim(), conn) == false) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Tên đơn vị tính đã có", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                            txtName.setText("");
+                            txtName.requestFocus();
+                        } else {
+                            if (id_unit_parent == null) {
+                                if (Unit.update(name, id_unit_parent, cast, true, Integer.parseInt(txtID.getText()), conn)) {
+                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                                    loadUnit();
+                                    fillcobUnit();
+                                    enableControl(true);
+                                } else {
+                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                                }
+                            } else {
+                                if (Unit.update(name, id_unit_parent, cast, false, Integer.parseInt(txtID.getText()), conn)) {
+                                    if (Unit.updateParent(true, Integer.parseInt(id_unit_parent), conn)) {
+                                        JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                                        loadUnit();
+                                        fillcobUnit();
+                                        enableControl(true);
+                                    }
+                                } else {
+                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                    } else {
+                        if (id_unit_parent == null) {
+                            if (Unit.update(name, id_unit_parent, cast, true, Integer.parseInt(txtID.getText()), conn)) {
+                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                                loadUnit();
+                                fillcobUnit();
+                                enableControl(true);
+                            } else {
+                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } else {
+                            if (Unit.update(name, id_unit_parent, cast, false, Integer.parseInt(txtID.getText()), conn)) {
+                                if (Unit.updateParent(true, Integer.parseInt(id_unit_parent), conn)) {
+                                    JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                                    loadUnit();
+                                    fillcobUnit();
+                                    enableControl(true);
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(getRootPane(), "Cập nhật đơn vị tính không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+            } finally {
+                try {
+                    conn.close();
+                } catch (Exception e) {
                 }
             }
         }
     }//GEN-LAST:event_btnSaveActionPerformed
 
+    private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
+        loadUnit();
+        enableControl(true);
+    }//GEN-LAST:event_btnReloadActionPerformed
+
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
-        if (txtID.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn đơn vị tính");
-        } else {
-            if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa không", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                if (Unit.delete(Integer.parseInt(txtID.getText().trim()), ConnectDB.conn())) {
-                    loadData();
-                    JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công");
+        Connection conn = ConnectDB.conn();
+        try {
+            if (txtID.getText().equals("")) {
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn đơn vị tính", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            } else {
+                if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn thật sự muốn xóa", "Thông Báo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                    if (Unit.delete(Integer.parseInt(txtID.getText()), conn)) {
+                        JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                        loadUnit();
+                    } else {
+                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
+            }
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
             }
         }
     }//GEN-LAST:event_btnDelActionPerformed
@@ -383,6 +477,7 @@ public class PanelUnit extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnReload;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnadd;
     private javax.swing.JComboBox cobDVT;
@@ -390,11 +485,12 @@ public class PanelUnit extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JPanel pn;
+    private javax.swing.JTable tbUnit;
     private javax.swing.JTextField txtCast;
     private javax.swing.JTextField txtID;
     private javax.swing.JTextField txtName;

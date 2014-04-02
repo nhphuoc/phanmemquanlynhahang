@@ -8,8 +8,11 @@ package vn.edu.vttu.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JList;
@@ -21,6 +24,7 @@ import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
+import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Unit;
 
 /**
@@ -100,47 +104,55 @@ public class PanelStore extends javax.swing.JPanel {
         enableControl(true);
     }
 
-    private String dvt(int id, float num) {
-        String kq = "";
-        Connection cn = ConnectDB.conn();
-        int idunit = RawMaterial.getByID(id, cn).getUnit();
-        boolean parent = Unit.getByID(idunit, cn).isParent();
-        String name = RawMaterial.getByID(id, cn).getName();
-        if (parent) {
-            int x = RawMaterial.getByID(id, cn).getId_unit_sub();
-            if (x != 0) {
-                int idunitsub = RawMaterial.getByID(id, cn).getId_unit_sub();                
-                int cast = Unit.getByID(idunitsub, ConnectDB.conn()).getCast();
-                if(cast==0){
-                    cast=1;
-                }
-                int n;
-                n = (int) (num * cast) % cast;
-                int m;
-                m = (int) (num * cast) / cast;
-
-                if (n == 0) {
-                    kq = m + " " + Unit.getByID(idunit, cn).getName();
-                } else {
-                    if (m == 0) {
-                        kq = n + " " + Unit.getByID(idunitsub, cn).getName();
-                    } else {
-                        kq = m + " " + Unit.getByID(idunit, cn).getName() + " "
-                                + n + " " + Unit.getByID(idunitsub, cn).getName();
-                    }
-                }
-            } else {
-
+    private String dvt(int id, double number) {
+        String ketqua = "";
+        Connection conn = ConnectDB.conn();
+        try {
+            TableModel tb = RawMaterialUnit.getListRawmetarialUnit(id, conn);
+            TableModel tb1 = RawMaterialUnit.getUnitRawMetarialParent(id, conn);
+            int idParent = Integer.parseInt(tb1.getValueAt(0, 0).toString());
+            String nameParent = Unit.getByID(idParent, conn).getName();
+            TableModel tb2;
+            int idUnitSon;
+            String[] name = new String[tb.getRowCount()];
+            double[] cast = new double[tb.getRowCount()];
+            for (int i = 0; i < tb.getRowCount() - 1; i++) {
+                //System.out.println("Cha: "+idParent);
+                tb2 = RawMaterialUnit.getUnitSon(id, idParent, conn);
+                idUnitSon = Integer.parseInt(tb2.getValueAt(0, 0).toString());
+                number = number * Unit.getByID(idUnitSon, conn).getCast();
+                cast[i] = Unit.getByID(idUnitSon, conn).getCast();
+                name[i] = Unit.getByID(idUnitSon, conn).getName();
+                idParent = idUnitSon;
             }
-        } else {
-            kq = (int) num + " " + Unit.getByID(idunit, cn).getName();
+            int x = 0;
+            String kq = "";
+            double y = number;
+            for (int i = tb.getRowCount() - 2; i >= 0; i--) {
+                x = (int) (y % cast[i]);
+                y = (int) (y / cast[i]);
+                kq = kq + " " + x + " " + name[i] + "@";
+            }
+            String[] z = kq.split("@");
+
+            for (int i = z.length - 1; i >= 0; i--) {
+                ketqua = ketqua + " " + z[i];
+            }
+            ketqua = (int) y + " " + nameParent + " " + ketqua;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+            }
         }
-        return kq;
+        return ketqua;
     }
 
     private void loadData() {
         pn.removeAll();
-        TableModel tb = RawMaterial.getAll(ConnectDB.conn());
+        final TableModel tb = RawMaterial.getAll(ConnectDB.conn());
         Vector<Vector> rowData = new Vector<Vector>();
         for (int i = 0; i < tb.getRowCount(); i++) {
             Vector<String> rowOne = new Vector<String>();
@@ -149,18 +161,14 @@ public class PanelStore extends javax.swing.JPanel {
             }
 
             rowOne.addElement(dvt(Integer.parseInt(tb.getValueAt(i, 0).toString()), Float.parseFloat(tb.getValueAt(i, 2).toString())));
-            rowOne.addElement(tb.getValueAt(i, 4).toString());
             rowOne.addElement(tb.getValueAt(i, 2).toString());
-            rowOne.addElement(tb.getValueAt(i, 5).toString());
             rowData.addElement(rowOne);
         }
         Vector<String> columnNames = new Vector<String>();
         columnNames.addElement("Mã Nguyên Liệu");
         columnNames.addElement("Tên Nguyên Liệu");
         columnNames.addElement("Số Lượng");
-        columnNames.addElement("");
         columnNames.addElement("sl");
-        columnNames.addElement("unit_sub");
 
         table = new JTable(rowData, columnNames);
 
@@ -169,13 +177,9 @@ public class PanelStore extends javax.swing.JPanel {
         table.setSelectionBackground(new java.awt.Color(255, 153, 0));
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table.setFont(new java.awt.Font("Tahoma", 1, 12));
-        table.getColumnModel().getColumn(4).setMinWidth(0);
-        table.getColumnModel().getColumn(4).setMaxWidth(0);
         table.getColumnModel().getColumn(3).setMinWidth(0);
         table.getColumnModel().getColumn(3).setMaxWidth(0);
-        table.getColumnModel().getColumn(5).setMinWidth(0);
-        table.getColumnModel().getColumn(5).setMaxWidth(0);
-        table.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
+        table.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
         JScrollPane scrollPane = new JScrollPane(table);
         pn.add(scrollPane, BorderLayout.CENTER);
         table.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -183,9 +187,9 @@ public class PanelStore extends javax.swing.JPanel {
                 int index = table.getSelectedRow();
                 txtID.setText(table.getValueAt(index, 0).toString());
                 txtNAme.setText(table.getValueAt(index, 1).toString());
-                txtNumber.setText(String.valueOf(Float.parseFloat(table.getValueAt(index, 4).toString())));
-                setSelectedValue(cobUnit, Integer.parseInt(table.getValueAt(index, 3).toString()));
-                setSelectedValue(cobUnitSub, Integer.parseInt(table.getValueAt(index, 5).toString()));
+                txtNumber.setText(String.valueOf(Float.parseFloat(tb.getValueAt(index, 2).toString())));
+                setSelectedValue(cobUnit, Integer.parseInt(tb.getValueAt(index, 3).toString()));
+                //setSelectedValue(cobUnitSub, Integer.parseInt(table.getValueAt(index, 5).toString()));
             }
         });
         table.getTableHeader().setReorderingAllowed(false);
@@ -233,23 +237,6 @@ public class PanelStore extends javax.swing.JPanel {
         conn = null;
     }
 
-    private void fillcobUnitSub(int idUnit) {
-
-        conn = ConnectDB.conn();
-        Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
-        try {
-            model = Unit.selectUnitByID(idUnit, conn);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
-        cobUnitSub.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
-        cobUnitSub.setModel(defaultComboBoxModel);
-        cobUnitSub.setRenderer(new PanelStore.ItemRenderer());
-        conn = null;
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -270,8 +257,6 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         txtNAme = new javax.swing.JTextField();
         txtNumber = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        cobUnitSub = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
         jToolBar1 = new javax.swing.JToolBar();
@@ -332,12 +317,6 @@ public class PanelStore extends javax.swing.JPanel {
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(51, 153, 0));
-        jLabel6.setText("ĐVT Con");
-
-        cobUnitSub.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -348,8 +327,7 @@ public class PanelStore extends javax.swing.JPanel {
                     .addComponent(jLabel4)
                     .addComponent(jLabel3)
                     .addComponent(jLabel5)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtNAme)
@@ -358,8 +336,7 @@ public class PanelStore extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAddUnit))
                     .addComponent(txtNumber)
-                    .addComponent(txtID)
-                    .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtID)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -377,15 +354,11 @@ public class PanelStore extends javax.swing.JPanel {
                     .addComponent(jLabel4)
                     .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddUnit))
-                .addGap(7, 7, 7)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(cobUnitSub, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(240, Short.MAX_VALUE))
+                .addContainerGap(262, Short.MAX_VALUE))
         );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -519,63 +492,76 @@ public class PanelStore extends javax.swing.JPanel {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         conn = ConnectDB.conn();
-        vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
-        int _unit = unit.getId();
-        int _unit_sub;
         try {
-            vn.edu.vttu.model.Unit unitSub = (vn.edu.vttu.model.Unit) cobUnitSub.getSelectedItem();
-            _unit_sub = unitSub.getId();
-        } catch (Exception e) {
-            _unit_sub = 0;
-        }
+            vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
+            int _unit = unit.getId();
 
-        if (txtNAme.getText().trim().equals("") && txtNAme.getText().trim().length() > 50) {
-            JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên hoặc tên quá dài", "Thông Báo", JOptionPane.ERROR_MESSAGE);
-            txtNAme.requestFocus();
-        } else if (txtNumber.getText().trim().equals("")) {
-            txtNumber.setText("0");
-        } else {
-            if (add == true) {
-                if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
-                    JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
-                } else {
-                    if (RawMaterial.insert(txtNAme.getText(), 0, _unit, _unit_sub, conn)) {
-                        loadData();
-                        enableControl(true);
-                    } else {
-                        JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
-                        enableControl(true);
-                    }
-                }
+            if (txtNAme.getText().trim().equals("") && txtNAme.getText().trim().length() > 50) {
+                JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa nhập tên hoặc tên quá dài", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+                txtNAme.requestFocus();
+            } else if (txtNumber.getText().trim().equals("")) {
+                txtNumber.setText("0");
             } else {
-                if (!name.equals(txtNAme.getText().trim())) {
+                if (add == true) {
                     if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
-                        JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL");
+                        JOptionPane.showMessageDialog(getRootPane(), "Tên hàng hóa đã có");
                     } else {
-                        if (Float.parseFloat(txtNumber.getText()) > number) {
-                            JOptionPane.showMessageDialog(getRootPane(), "Bạn vui lòng thực hiện nhập kho!");
+                        conn.setAutoCommit(false);
+                        if (RawMaterial.insert(txtNAme.getText(), 0, conn)) {
+                            int id_raw = RawMaterial.getMaxId(conn);
+                            if (RawMaterialUnit.insert(id_raw, _unit, conn)) {
+                                conn.commit();
+                                loadData();
+                                enableControl(true);
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(getRootPane(), "Đã xảy ra lỗi");
+                            enableControl(true);
                         }
-                        float _number = 0;
-                        try {
-                            _number = Float.parseFloat(txtNumber.getText().trim().replaceAll("\\.", ""));
-                        } catch (Exception e) {
-                            _number = Float.parseFloat(txtNumber.getText().trim().replaceAll(",", ""));
+                    }
+                } else {
+                    if (!name.equals(txtNAme.getText().trim())) {
+                        if (RawMaterial.testName(txtNAme.getText().trim(), conn) == false) {
+                            JOptionPane.showMessageDialog(getRootPane(), "Tên đã có trong CSDL");
+                        } else {
+                            if (Float.parseFloat(txtNumber.getText()) > number) {
+                                JOptionPane.showMessageDialog(getRootPane(), "Bạn vui lòng thực hiện nhập kho!");
+                            }
+                            float _number = 0;
+                            try {
+                                _number = Float.parseFloat(txtNumber.getText().trim().replaceAll("\\.", ""));
+                            } catch (Exception e) {
+                                _number = Float.parseFloat(txtNumber.getText().trim().replaceAll(",", ""));
+                            }
+                            if (RawMaterial.update(txtNAme.getText().trim(), Integer.parseInt(txtID.getText().trim()),
+                                    Float.parseFloat(txtNumber.getText()), conn)) {
+                                loadData();
+                                enableControl(true);
+                            }
                         }
-                        if (RawMaterial.update(txtNAme.getText().trim(), _unit, _unit_sub, Integer.parseInt(txtID.getText().trim()),
+                    } else {
+                        if (RawMaterial.update(txtNAme.getText().trim(), Integer.parseInt(txtID.getText().trim()),
                                 Float.parseFloat(txtNumber.getText()), conn)) {
                             loadData();
                             enableControl(true);
                         }
                     }
-                } else {
-                    if (RawMaterial.update(txtNAme.getText().trim(), _unit, _unit_sub, Integer.parseInt(txtID.getText().trim()),
-                            Float.parseFloat(txtNumber.getText()), conn)) {
-                        loadData();
-                        enableControl(true);
-                    }
                 }
             }
+        } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
@@ -585,20 +571,9 @@ public class PanelStore extends javax.swing.JPanel {
     }//GEN-LAST:event_btnReloadActionPerformed
 
     private void btnAddUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitActionPerformed
-        String input = JOptionPane.showInputDialog(btnAddUnit, "Nhập đơn vị tính");
-        conn = ConnectDB.conn();
-        if (input != null && !input.equals("")) {
-            if (Unit.testName(input, conn)) {
-                if (Unit.insert(input, conn)) {
-                    JOptionPane.showMessageDialog(btnAddUnit, "Thành công");
-                    fillcobUnit();
-                } else {
-                    JOptionPane.showMessageDialog(btnAddUnit, "Không thành công");
-                }
-            } else {
-                JOptionPane.showMessageDialog(btnAddUnit, "Tên Đơn vị tính đã có");
-            }
-        }
+        JOptionPane.showOptionDialog(null, new PanelUnit(),
+                "Quản lý đơn vị tính", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+
     }//GEN-LAST:event_btnAddUnitActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
@@ -704,12 +679,7 @@ public class PanelStore extends javax.swing.JPanel {
     }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
     private void cobUnitPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobUnitPropertyChange
-        try {
-            vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
-            int _unit = unit.getId();
-            fillcobUnitSub(_unit);
-        } catch (Exception e) {
-        }
+
     }//GEN-LAST:event_cobUnitPropertyChange
 
 
@@ -723,14 +693,12 @@ public class PanelStore extends javax.swing.JPanel {
     private javax.swing.JButton btnReload;
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox cobUnit;
-    private javax.swing.JComboBox cobUnitSub;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel pn;
