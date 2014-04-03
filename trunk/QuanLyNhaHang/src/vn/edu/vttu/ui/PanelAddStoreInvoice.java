@@ -6,11 +6,9 @@
 package vn.edu.vttu.ui;
 
 import java.awt.Component;
-import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +24,6 @@ import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.RawMaterialInvoice;
 import vn.edu.vttu.data.RawMaterialInvoiceDetail;
-import vn.edu.vttu.data.TableLocation;
-import vn.edu.vttu.data.Unit;
 
 /**
  *
@@ -605,8 +601,8 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         try {
             vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
             int idNguyenLieu = store.getId();
-            lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
-        } catch (Exception e) {
+            lbDVT.setText(RawMaterial.getByID(19, ConnectDB.conn()).getNamenit());
+        } catch (Exception e) {            
         }
 
     }//GEN-LAST:event_cobNguyenLieuPropertyChange

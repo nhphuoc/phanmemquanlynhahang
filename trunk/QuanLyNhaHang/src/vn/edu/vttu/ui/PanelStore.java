@@ -26,6 +26,7 @@ import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Unit;
+import vn.edu.vttu.data.VariableStatic;
 
 /**
  *
@@ -186,6 +187,7 @@ public class PanelStore extends javax.swing.JPanel {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 int index = table.getSelectedRow();
                 txtID.setText(table.getValueAt(index, 0).toString());
+                VariableStatic.setId_store(Integer.parseInt(table.getValueAt(index, 0).toString()));
                 txtNAme.setText(table.getValueAt(index, 1).toString());
                 txtNumber.setText(String.valueOf(Float.parseFloat(tb.getValueAt(index, 2).toString())));
                 setSelectedValue(cobUnit, Integer.parseInt(tb.getValueAt(index, 3).toString()));
@@ -257,6 +259,7 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel5 = new javax.swing.JLabel();
         txtNAme = new javax.swing.JTextField();
         txtNumber = new javax.swing.JTextField();
+        btnAddUnitSub = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         txtSearch = new javax.swing.JTextField();
         jToolBar1 = new javax.swing.JToolBar();
@@ -317,11 +320,18 @@ public class PanelStore extends javax.swing.JPanel {
             }
         });
 
+        btnAddUnitSub.setText("Thêm Đơn vị tính con");
+        btnAddUnitSub.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddUnitSubActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
@@ -330,13 +340,15 @@ public class PanelStore extends javax.swing.JPanel {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtNAme)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddUnit))
-                    .addComponent(txtNumber)
-                    .addComponent(txtID)))
+                    .addComponent(btnAddUnitSub, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(txtNAme)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnAddUnit))
+                        .addComponent(txtNumber)
+                        .addComponent(txtID))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -354,11 +366,13 @@ public class PanelStore extends javax.swing.JPanel {
                     .addComponent(jLabel4)
                     .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddUnit))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddUnitSub)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(262, Short.MAX_VALUE))
+                .addContainerGap(238, Short.MAX_VALUE))
         );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -509,7 +523,7 @@ public class PanelStore extends javax.swing.JPanel {
                         conn.setAutoCommit(false);
                         if (RawMaterial.insert(txtNAme.getText(), 0, conn)) {
                             int id_raw = RawMaterial.getMaxId(conn);
-                            if (RawMaterialUnit.insert(id_raw, _unit, conn)) {
+                            if (RawMaterialUnit.insert(id_raw, _unit,true, conn)) {
                                 conn.commit();
                                 loadData();
                                 enableControl(true);
@@ -682,10 +696,18 @@ public class PanelStore extends javax.swing.JPanel {
 
     }//GEN-LAST:event_cobUnitPropertyChange
 
+    private void btnAddUnitSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitSubActionPerformed
+        
+        JOptionPane.showOptionDialog(null, new PanelAddUnitStore(),
+                "Thêm đơn vị tính con", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+        loadData();
+    }//GEN-LAST:event_btnAddUnitSubActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnAddUnit;
+    private javax.swing.JButton btnAddUnitSub;
     private javax.swing.JButton btnCreateInvoice;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;

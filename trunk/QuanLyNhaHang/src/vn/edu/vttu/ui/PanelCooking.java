@@ -114,9 +114,7 @@ public class PanelCooking extends javax.swing.JPanel {
             //tbStore.setRowSelectionInterval(0, 0);
         } else {
             tbStore.setRowSelectionInterval(0, 0);
-        }
-        tbStore.getColumnModel().getColumn(4).setMinWidth(0);
-        tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+        }        
         tbStore.getTableHeader().setReorderingAllowed(false);
         tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }

@@ -40,20 +40,64 @@ public class test {
         boolean flag = false;
         Connection conn = ConnectDB.conn();
         TableModel tb = Recipes.getRecipesByIdService(id_service, conn);
-        System.out.println(tb.getRowCount());
-        int id_recipes_sub=0,id_unit;
+        int id_unit_recipes, id_store, id_sub, cast, id_parent;
         for (int i = 0; i < tb.getRowCount(); i++) {
-            while(id_recipes_sub !=idStore){
-                id_recipes_sub = Unit.getByID(id_unit_recipes, conn).getId_sub();   
-                id_unit_recipes=Unit.getBySubID(id_recipes_sub, conn).getId();
-                System.out.println(id_recipes_sub);
+            id_unit_recipes = Integer.parseInt(tb.getValueAt(i, 4).toString());
+            id_store = Integer.parseInt(tb.getValueAt(i, 5).toString());
+            float number = Float.parseFloat(tb.getValueAt(i, 2).toString());
+            id_parent = Integer.parseInt(RawMaterialUnit.getUnitRawMetarialParent(id_store, conn).getValueAt(0, 0).toString());
+            float store = Float.parseFloat(RawMaterial.getNumber(id_store, conn).getValueAt(0, 0).toString());
+            int idUnit = id_unit_recipes;
+            for (int j = 0;; j++) {
+                id_sub = Unit.getByID(idUnit, conn).getId_sub();
+                cast = Unit.getByID(idUnit, conn).getCast();
+                number = number / cast;
+                if (id_sub == id_parent) {
+                    break;
+                }
+                idUnit = id_sub;
             }
-            System.out.println("xxx");
+            if (n * number > store) {
+                return false;
+            } else {
+                flag = true;
+            }
         }
         return flag;
     }
 
-    
+    private boolean updatestore(int idService, int n, boolean b, Connection conn) {        
+        boolean t = false;
+        if (b) {
+            TableModel tb = Recipes.getRecipesByIdService(idService, conn);
+            int id_unit_recipes, id_store, id_sub, cast, id_parent;
+            for (int i = 0; i < tb.getRowCount(); i++) {
+                id_unit_recipes = Integer.parseInt(tb.getValueAt(i, 4).toString());
+                id_store = Integer.parseInt(tb.getValueAt(i, 5).toString());
+                float number = Float.parseFloat(tb.getValueAt(i, 2).toString());
+                id_parent = Integer.parseInt(RawMaterialUnit.getUnitRawMetarialParent(id_store, conn).getValueAt(0, 0).toString());
+                float store = Float.parseFloat(RawMaterial.getNumber(id_store, conn).getValueAt(0, 0).toString());
+                int idUnit = id_unit_recipes;
+                for (int j = 0;; j++) {
+                    id_sub = Unit.getByID(idUnit, conn).getId_sub();
+                    cast = Unit.getByID(idUnit, conn).getCast();
+                    number = number / cast;
+                    if (id_sub == id_parent) {
+                        break;
+                    }
+                    idUnit = id_sub;
+                }
+                if (RawMaterial.updateNumber(id_store, n * number, conn)) {
+                    t = true;
+                } else {
+                    t = false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return t;
+    }
 
     private boolean testStatusService(int idReservation) {
         boolean t = false;
@@ -110,6 +154,6 @@ public class test {
 
     public static void main(String[] agrs) {
         test t = new test();
-        System.out.println(t.testStore(5, 51, 49, 2));
+        System.out.println(t.updatestore(5, 2,t.testStore(5, 2), ConnectDB.conn()));
     }
 }

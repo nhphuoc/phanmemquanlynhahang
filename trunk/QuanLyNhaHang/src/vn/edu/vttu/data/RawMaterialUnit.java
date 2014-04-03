@@ -60,13 +60,14 @@ public class RawMaterialUnit {
         return tb;
     }
     
-    public static boolean insert(int id_raw, int id_unit, Connection conn) {
+    public static boolean insert(int id_raw, int id_unit,boolean b, Connection conn) {
         boolean flag = false;
         try {
-            String sql = "CALL raw_material_unit_add(?,?)";
+            String sql = "CALL raw_material_unit_add(?,?,?)";
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id_raw);
             callstate.setInt(2, id_unit);
+            callstate.setBoolean(3, b);
             int x = callstate.executeUpdate();
             if (x >= 0) {
                 flag = true;

@@ -74,12 +74,11 @@ public class RawMaterial {
         this.id_unit_sub = id_unit_sub;
     }
 
-    public RawMaterial(int id, String name, float number, int unit, int id_unit_sub, String nameunit) {
+    public RawMaterial(int id, String name, float number, int unit, String nameunit) {
         this.id = id;
         this.name = name;
         this.number = number;
-        this.unit = unit;
-        this.id_unit_sub = id_unit_sub;
+        this.unit = unit;        
         this.namenit = nameunit;
     }
 
@@ -91,7 +90,7 @@ public class RawMaterial {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getInt(6), rs.getString(4));
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getString(4));
                 return raw;
             }
         } catch (Exception e) {

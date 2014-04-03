@@ -47,6 +47,7 @@ import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.RawMaterial;
+import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Service;
@@ -656,89 +657,35 @@ public class PanelViewReservation extends javax.swing.JPanel {
         return test;
     }
 
-    private boolean testStore(int id, int n) {
+    private boolean testStore(int id_service, int n) {
         boolean flag = false;
-        TableModel tb = Recipes.getRecipesByIdService(id, ConnectDB.conn());
+        Connection conn = ConnectDB.conn();
+        TableModel tb = Recipes.getRecipesByIdService(id_service, conn);
+        int id_unit_recipes, id_store, id_sub, cast, id_parent;
         for (int i = 0; i < tb.getRowCount(); i++) {
-            float number = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-            int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-            int idUnitRecipes = Integer.parseInt(String.valueOf(tb.getValueAt(i, 5)));
-            int idUnitStore = RawMaterial.getByID(idstore, ConnectDB.conn()).getUnit();
-
-            float store = Float.parseFloat(String.valueOf(RawMaterial.getNumber(idstore, ConnectDB.conn()).getValueAt(0, 0)));
-            if (idUnitRecipes == idUnitStore) {
-                if (store < (float) (n * number)) {
-                    return false;
-                } else {
-                    flag = true;
+            id_unit_recipes = Integer.parseInt(tb.getValueAt(i, 4).toString());
+            id_store = Integer.parseInt(tb.getValueAt(i, 5).toString());
+            float number = Float.parseFloat(tb.getValueAt(i, 2).toString());
+            id_parent = Integer.parseInt(RawMaterialUnit.getUnitRawMetarialParent(id_store, conn).getValueAt(0, 0).toString());
+            float store = Float.parseFloat(RawMaterial.getNumber(id_store, conn).getValueAt(0, 0).toString());
+            int idUnit = id_unit_recipes;
+            for (int j = 0;; j++) {
+                id_sub = Unit.getByID(idUnit, conn).getId_sub();
+                cast = Unit.getByID(idUnit, conn).getCast();
+                number = number / cast;
+                if (id_sub == id_parent) {
+                    break;
                 }
-            } else {
-                if (Unit.getByID(idUnitRecipes, ConnectDB.conn()).isParent()) {
-                    if (Unit.getByID(idUnitStore, ConnectDB.conn()).isParent()) {
-                        int x = Unit.getByID(idUnitStore, ConnectDB.conn()).getId_sub();
-                        if (x == 0) {
-                            // ĐVT Trong kho là cha thì sẽ lấy giá trị chuyển đổi của con là ĐVT chế biến
-                            // lấy số lượng chế biến chia cho chuyển đổi của con
-                            int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                            if (store < (float) (n * number) / cast) {
-                                return false;
-                            } else {
-                                flag = true;
-                            }
-                        } else {
-                            int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
-                            if (store < (n * number) * cast) {
-                                return false;
-                            } else {
-                                flag = true;
-                            }
-                        }
-                    } else {
-                        int cast = Unit.getByID(idUnitStore, ConnectDB.conn()).getCast();
-                        if (store < (n * number) * cast) {
-                            return false;
-                        } else {
-                            flag = true;
-                        }
-                    }
-                } else {
-                    int cast = Unit.getByID(idUnitRecipes, ConnectDB.conn()).getCast();
-                    if (store < (n * number) * cast) {
-                        return false;
-                    } else {
-                        flag = true;
-                    }
-                }
+                idUnit = id_sub;
             }
-
+            if (n * number > store) {
+                return false;
+            } else {
+                flag = true;
+            }
         }
         return flag;
-    }
-
-    private boolean updateStore(int idService, int n, boolean flag, Connection conn) {
-        boolean succ = false;
-        try {
-
-            TableModel tb = Recipes.getRecipesByIdService(idService, conn);
-            if (flag) {
-                for (int i = 0; i < tb.getRowCount(); i++) {
-                    float num = Float.parseFloat(String.valueOf(tb.getValueAt(i, 3)));
-                    int idstore = Integer.parseInt(String.valueOf(tb.getValueAt(i, 4)));
-                    if (RawMaterial.updateNumber(idstore, (n * num), conn)) {
-                        succ = true;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                succ = false;
-            }
-        } catch (Exception e) {
-        }
-
-        return succ;
-    }
-
+    }    
     private int total() {
         int total = 0;
         for (int i = 0; i < tbInvoice.getRowCount(); i++) {

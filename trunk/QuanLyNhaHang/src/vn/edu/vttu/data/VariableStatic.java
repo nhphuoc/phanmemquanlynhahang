@@ -26,6 +26,15 @@ public class VariableStatic {
     private static int idService;    
     private static String nameService;   
     private static int prePay;
+    private static int id_store;
+
+    public static int getId_store() {
+        return id_store;
+    }
+
+    public static void setId_store(int id_store) {
+        VariableStatic.id_store = id_store;
+    }
 
     public static int getPrePay() {
         return prePay;
