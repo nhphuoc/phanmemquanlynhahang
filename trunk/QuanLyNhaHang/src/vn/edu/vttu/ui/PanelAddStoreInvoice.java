@@ -601,9 +601,9 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         try {
             vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
             int idNguyenLieu = store.getId();
-            lbDVT.setText(RawMaterial.getByID(19, ConnectDB.conn()).getNamenit());
+            lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
         } catch (Exception e) {            
-        }
+        }        
 
     }//GEN-LAST:event_cobNguyenLieuPropertyChange
 

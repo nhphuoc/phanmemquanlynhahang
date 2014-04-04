@@ -43,7 +43,6 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
         pnThongKeDoanhThu = new javax.swing.JPanel();
         pnThongKeDichVu = new javax.swing.JPanel();
         pnThongKeChi = new javax.swing.JPanel();
-        pnThongKeThuChi = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridLayout(1, 0));
 
@@ -56,21 +55,8 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
         pnThongKeDichVu.setLayout(new java.awt.GridLayout(1, 0));
         jTabbedPane1.addTab("Thống Kê Dịch Vụ", pnThongKeDichVu);
 
-        pnThongKeChi.setLayout(new java.awt.GridLayout());
+        pnThongKeChi.setLayout(new java.awt.GridLayout(1, 0));
         jTabbedPane1.addTab("Thống Kê Chi", pnThongKeChi);
-
-        javax.swing.GroupLayout pnThongKeThuChiLayout = new javax.swing.GroupLayout(pnThongKeThuChi);
-        pnThongKeThuChi.setLayout(pnThongKeThuChiLayout);
-        pnThongKeThuChiLayout.setHorizontalGroup(
-            pnThongKeThuChiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 719, Short.MAX_VALUE)
-        );
-        pnThongKeThuChiLayout.setVerticalGroup(
-            pnThongKeThuChiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 271, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Thống Kê Thu - Chi", pnThongKeThuChi);
 
         add(jTabbedPane1);
     }// </editor-fold>//GEN-END:initComponents
@@ -81,6 +67,5 @@ public class PanelMenuStatistics extends javax.swing.JPanel {
     private javax.swing.JPanel pnThongKeChi;
     private javax.swing.JPanel pnThongKeDichVu;
     private javax.swing.JPanel pnThongKeDoanhThu;
-    private javax.swing.JPanel pnThongKeThuChi;
     // End of variables declaration//GEN-END:variables
 }

@@ -510,7 +510,24 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-                            //new frmAddService(room_id).setVisible(true);
+                            if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn thật sự muốn xóa", "Thông Báo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                Connection conn = ConnectDB.conn();
+                                try {
+                                    if (Table.delete(idTable, conn)) {
+                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                                        loadTable(idLocation);
+                                    }else{
+                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
+                                    }
+                                } catch (Exception ex) {
+                                } finally {
+                                    try {
+                                        conn.close();
+                                    } catch (SQLException ex) {
+                                        Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                            }
                         }
                     }));
             BufferedImage bImg12 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/khuvuc-icon.png"));
@@ -1054,7 +1071,7 @@ public class PanelTable extends javax.swing.JPanel {
                     ));
             tb_invoice.setComponentPopupMenu(popupMenuTableInvoice);
         } catch (Exception e) {
-        } 
+        }
     }
 
     private boolean useTable(int id_table, Connection conn) throws SQLException {
@@ -1774,7 +1791,7 @@ public class PanelTable extends javax.swing.JPanel {
                 }
                 idUnit = id_sub;
             }
-            if (n * number > store) {
+            if (n * number >= store) {
                 return false;
             } else {
                 flag = true;
@@ -1784,7 +1801,7 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private boolean updateStore(int idService, int n, boolean b, Connection conn) {
-         boolean t = false;
+        boolean t = false;
         if (b) {
             TableModel tb = Recipes.getRecipesByIdService(idService, conn);
             int id_unit_recipes, id_store, id_sub, cast, id_parent;

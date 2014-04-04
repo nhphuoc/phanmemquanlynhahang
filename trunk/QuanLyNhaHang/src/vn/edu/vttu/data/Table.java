@@ -432,6 +432,25 @@ public class Table {
         }
         return tb;
     }
+    public static boolean delete(int id_table, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id_table);            
+            int x = callstate.executeUpdate();
+            if (x >= 0) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }
    
 
 }

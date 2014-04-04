@@ -9,6 +9,7 @@ import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Recipes;
+import vn.edu.vttu.data.TableReservation;
 import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.Unit;
 
@@ -50,6 +51,7 @@ public class test {
             int idUnit = id_unit_recipes;
             for (int j = 0;; j++) {
                 id_sub = Unit.getByID(idUnit, conn).getId_sub();
+                System.out.println(id_sub);
                 cast = Unit.getByID(idUnit, conn).getCast();
                 number = number / cast;
                 if (id_sub == id_parent) {
@@ -57,6 +59,8 @@ public class test {
                 }
                 idUnit = id_sub;
             }
+            System.out.println(n*number);
+            System.out.println(store);
             if (n * number > store) {
                 return false;
             } else {
@@ -154,6 +158,10 @@ public class test {
 
     public static void main(String[] agrs) {
         test t = new test();
-        System.out.println(t.updatestore(5, 2,t.testStore(5, 2), ConnectDB.conn()));
+       TableModel tb = TableReservation.getListRecipes(ConnectDB.conn());
+       for(int i=0;i<tb.getRowCount();i++){
+           System.out.println(tb.getValueAt(i, 0));
+           //Recipes.
+       }
     }
 }

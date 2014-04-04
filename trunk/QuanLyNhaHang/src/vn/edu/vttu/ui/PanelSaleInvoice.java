@@ -169,10 +169,10 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
 
     private void loadInvoiceDetail(int id) {
         tbInvoiceDetail.setModel(TableService.getByIdReservationInvoice(id, ConnectDB.conn()));
-        tbInvoiceDetail.getColumnModel().getColumn(0).setMinWidth(0);
-        tbInvoiceDetail.getColumnModel().getColumn(0).setMaxWidth(0);
-        tbInvoiceDetail.getColumnModel().getColumn(5).setMaxWidth(0);
-        tbInvoiceDetail.getColumnModel().getColumn(5).setMinWidth(0);
+        tbInvoiceDetail.getColumnModel().getColumn(0).setMinWidth(0);        
+        tbInvoiceDetail.getColumnModel().getColumn(6).setMinWidth(0);
+        tbInvoiceDetail.getColumnModel().getColumn(0).setMaxWidth(0);        
+        tbInvoiceDetail.getColumnModel().getColumn(6).setMaxWidth(0);
         tbInvoiceDetail.getColumnModel().getColumn(4).setCellRenderer(new NumberCellRenderer());
         tbInvoiceDetail.getColumnModel().getColumn(5).setCellRenderer(new NumberCellRenderer());
     }
@@ -406,7 +406,7 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Tên Dịch Vụ", "Số Lượng", "ĐVT", "Đơn Giá", "Thành Tiền"
             }
         ));
         tbInvoiceDetail.setGridColor(new java.awt.Color(204, 204, 204));
@@ -477,7 +477,7 @@ public class PanelSaleInvoice extends javax.swing.JPanel {
         String sheetName = "THỐNG KÊ HÓA ĐƠN";
         String header = "THỐNG KÊ HÓA ĐƠN TỪ NGÀY " + from + " ĐẾN " + to;
         int col = tbInvoiceList.getColumnCount() - 1;
-        int row = tbInvoiceList.getRowCount();        
+        int row = tbInvoiceList.getRowCount();
         ex.exportExcel(fileName, header, sheetName, col, row, tbInvoiceList.getModel());
     }//GEN-LAST:event_btnExportToExcelActionPerformed
 

@@ -24,6 +24,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Customer;
 import vn.edu.vttu.data.RestaurantInfo;
+import vn.edu.vttu.sqlite.TbServer;
 
 /**
  *
@@ -541,7 +542,7 @@ public class PanelCustomer extends javax.swing.JPanel {
             parameter.put("tennhahang", rs.getName());
             parameter.put("diachi", "Địa Chỉ: " + rs.getAddress());
             parameter.put("sdt", "Điện Thoại: " + rs.getPhone());
-            parameter.put("logo",rs.getLogo());
+            parameter.put("logo","http://" + TbServer.getValues().getIp() + "/Restaurant/"+rs.getLogo());
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/customer.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());
             JasperViewer jv = new JasperViewer(jp, false);

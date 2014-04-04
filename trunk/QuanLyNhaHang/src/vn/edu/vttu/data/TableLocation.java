@@ -125,6 +125,44 @@ public class TableLocation {
         }
         return flag;
     }
+    public static boolean update(String name,String detail,int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_location_update(?,?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);
+            callstate.setString(2, detail);
+            callstate.setInt(3, id);
+            int x = callstate.executeUpdate();
+            if (x ==1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    public static boolean delete(int id, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL table_location_delete(?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            int x = callstate.executeUpdate();
+            if (x ==1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
     public static boolean tableLocationTestName(String name,Connection conn) {
         TableModel tb = null;
         ResultSet rs;
@@ -145,6 +183,18 @@ public class TableLocation {
         System.out.println(tb.getRowCount());
         return t;
     }
-    
+    public static TableModel getAllTable(Connection conn) {
+        TableModel tb = null;
+        ResultSet rs;
+        boolean t=false;
+        try {
+            CallableStatement calState = conn.prepareCall("{CALL table_location_getAll()}");
+            rs = calState.executeQuery();
+            tb = DbUtils.resultSetToTableModel(rs);           
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tb;
+    }
     
 }

@@ -42,26 +42,8 @@ public class PanelPrintListRawMaterial extends javax.swing.JPanel {
     }
 
     private String dvt(int id, int idunit, float num) {
-        String kq = "";
-        Connection cn = ConnectDB.conn();
-        boolean parent = Unit.getByID(idunit, cn).isParent();
-        int cast = Unit.getByID(idunit, cn).getCast();
-        int x = Unit.getByID(idunit, cn).getId_sub();
-        if (x != 0) {
-            int y = Unit.getBySubID(x, cn).getId();
-            if (((int) num / cast) == 0) {
-                kq = (int) (num % cast) + " " + Unit.getByID(idunit, cn).getName();
-            }
-            if ((int) (num % cast) == 0) {
-                kq = (int) (num / cast) + " " + Unit.getByID(y, cn).getName();
-            }
-            if (((int) num / cast) != 0 && (int) (num % cast) != 0) {
-                kq = (int) (num / cast) + " " + Unit.getByID(y, cn).getName() + " " + (int) (num % cast) + " " + Unit.getByID(idunit, cn).getName();
-            }
-        } else {
-            kq = num + " " + Unit.getByID(idunit, cn).getName();
-        }
-
+        String kq="";
+        
         return kq;
     }
 

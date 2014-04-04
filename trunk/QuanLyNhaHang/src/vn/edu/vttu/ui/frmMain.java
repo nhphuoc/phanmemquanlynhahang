@@ -5,16 +5,30 @@
  */
 package vn.edu.vttu.ui;
 
+import vn.edu.vttu.data.MarqueeLabel;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+import javax.swing.table.TableModel;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.LoginInformation;
+import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Staff;
+import vn.edu.vttu.data.Table;
+import vn.edu.vttu.data.TableReservation;
 
 /**
  *
@@ -22,10 +36,36 @@ import vn.edu.vttu.data.Staff;
  */
 public class frmMain extends javax.swing.JFrame {
 
+    class TaskWarningUser extends TimerTask {
+
+        public void run() {
+            Connection conn = ConnectDB.conn();            
+            try {
+                TableModel tb = TableReservation.getByTable_DateTime(rs.getMinuteWarning(), conn);
+                for (int i = 0; i < tb.getRowCount(); i++) {
+                    status =Table.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()),conn).getNAME()+" "+status;
+                    System.out.println(status);
+                }
+            } catch (Exception e) {
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        }
+    }
+
     /**
      * Creates new form frmMain
      */
-    int x=0;int y=100;
+    int x = 0;
+    int y = 100;
+    private String status="";
+    private RestaurantInfo rs = RestaurantInfo.getinfo(ConnectDB.conn());
+
     public frmMain() {
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -43,21 +83,18 @@ public class frmMain extends javax.swing.JFrame {
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         String u = Staff.getById(LoginInformation.getId_staff(), ConnectDB.conn()).getName();
         lbLoginUser.setText("Nhân Viên: " + u);
+        TimerTask taskwarninguser = new frmMain.TaskWarningUser();
+        Timer timer = new Timer();                
+        timer.schedule(taskwarninguser, new Date(), rs.getMinuteWarning() * 60000);
         main.removeAll();
         PanelTable pn_table = new PanelTable();
         main.add(pn_table);
         main.revalidate();
-        main.repaint();                
-    }  
-    public void paint() {        
-        Graphics2D g2 = null;
-        g2.drawString("abc", x, y);
-        try{Thread.sleep(100);}catch(Exception ex){};
-        x+=10;
-        if(x>lbInfo.getWidth()){
-            x=0;
-        }
-        repaint();
+        main.repaint();
+        JLabel lb = new MarqueeLabel("Cảnh Báo: "+status,MarqueeLabel.RIGHT_TO_LEFT, 20);
+        panelStatus.add(lb);
+        panelStatus.repaint();
+        panelStatus.updateUI();
     }
 
     /**
@@ -84,9 +121,8 @@ public class frmMain extends javax.swing.JFrame {
         btnDistributor = new javax.swing.JButton();
         btnDanhMuc = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
+        panelStatus = new javax.swing.JPanel();
         lbLoginUser = new javax.swing.JLabel();
-        lbInfo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PHẦN MỀM QUẢN LÝ NHÀ HÀNG - RSM");
@@ -287,46 +323,31 @@ public class frmMain extends javax.swing.JFrame {
         jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton7);
 
+        panelStatus.setLayout(new java.awt.GridLayout());
+
         lbLoginUser.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lbLoginUser.setForeground(new java.awt.Color(255, 0, 51));
         lbLoginUser.setText("Đăng Nhập:nhphuo ");
-
-        lbInfo.setText("info");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(lbLoginUser, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbLoginUser)
-                    .addComponent(lbInfo)))
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 963, Short.MAX_VALUE)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 963, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 760, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbLoginUser, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lbLoginUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(panelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(main, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
@@ -423,7 +444,7 @@ public class frmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDistributorActionPerformed
 
     private void btnDanhMucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDanhMucActionPerformed
-       main.removeAll();
+        main.removeAll();
         PanelCatolog panelcatolog = new PanelCatolog();
         main.add(panelcatolog);
         main.revalidate();
@@ -479,10 +500,9 @@ public class frmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnWaiter;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton7;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JLabel lbInfo;
     private javax.swing.JLabel lbLoginUser;
     private javax.swing.JPanel main;
+    private javax.swing.JPanel panelStatus;
     // End of variables declaration//GEN-END:variables
 }

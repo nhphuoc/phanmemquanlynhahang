@@ -90,7 +90,7 @@ public class RawMaterial {
             callstate.setInt(1, id);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
-                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(5), rs.getString(4));
+                raw = new RawMaterial(rs.getInt(1), rs.getString(2), rs.getFloat(3), rs.getInt(4), rs.getString(5));
                 return raw;
             }
         } catch (Exception e) {

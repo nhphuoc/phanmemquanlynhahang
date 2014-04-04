@@ -32,7 +32,7 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
                 super.getListCellRendererComponent(list, value, index,
                         isSelected, cellHasFocus);
                 if (value != null) {
-                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;                    
+                    vn.edu.vttu.model.Unit item = (vn.edu.vttu.model.Unit) value;
                     setText(item.getName().toUpperCase());
                 }
                 if (index == -1) {
@@ -52,6 +52,7 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
     public PanelAddUnitStore() {
         initComponents();
         fillcobUnit();
+        loadData();
     }
 
     private void fillcobUnit() {
@@ -70,6 +71,10 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
         cobUnit.setRenderer(new PanelAddUnitStore.ItemRenderer());
     }
 
+    private void loadData() {
+        tbRawUnit.setModel(RawMaterialUnit.getByIdRawmetaril(VariableStatic.getId_store(), ConnectDB.conn()));
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -84,6 +89,9 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
         cobUnit = new javax.swing.JComboBox();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbRawUnit = new javax.swing.JTable();
+        jButton4 = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -108,24 +116,55 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
             }
         });
 
+        tbRawUnit.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Tên ĐVT"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tbRawUnit.setGridColor(new java.awt.Color(204, 204, 204));
+        tbRawUnit.setRowHeight(23);
+        tbRawUnit.setSelectionBackground(new java.awt.Color(255, 153, 0));
+        tbRawUnit.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(tbRawUnit);
+
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/Button-Close-icon_24x24.png"))); // NOI18N
+        jButton4.setText("Xóa");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(cobUnit, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(jButton3)
-                        .addGap(0, 82, Short.MAX_VALUE)))
-                .addGap(27, 27, 27))
+                .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addGap(52, 52, 52))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,18 +174,26 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton3))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        vn.edu.vttu.model.Unit unit=(vn.edu.vttu.model.Unit)cobUnit.getSelectedItem();
-        Connection conn=ConnectDB.conn();
-        if (RawMaterialUnit.insert(VariableStatic.getId_store(), unit.getId(),false, conn)) {
-            JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+        vn.edu.vttu.model.Unit unit = (vn.edu.vttu.model.Unit) cobUnit.getSelectedItem();
+        Connection conn = ConnectDB.conn();
+        if (RawMaterialUnit.testUnit(unit.getId(), VariableStatic.getId_store(), conn)) {
+            if (RawMaterialUnit.insert(VariableStatic.getId_store(), unit.getId(), false, conn)) {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            }
         }else{
-            JOptionPane.showMessageDialog(getRootPane(), "Thêm không thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(getRootPane(), "Đơn vị tính đã có", "Thông Báo", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -156,12 +203,28 @@ public class PanelAddUnitStore extends javax.swing.JPanel {
         fillcobUnit();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        int index=tbRawUnit.getSelectedRow();
+        Connection conn=ConnectDB.conn();
+        if(JOptionPane.showConfirmDialog(getRootPane(), "Bạn có muốn xóa", "Thông Báo", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+            if(RawMaterialUnit.delete(Integer.parseInt(tbRawUnit.getValueAt(index, 0).toString()), conn)){
+                JOptionPane.showMessageDialog(getRootPane(), "xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                loadData();
+            }else{
+                JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cobUnit;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable tbRawUnit;
     // End of variables declaration//GEN-END:variables
 }

@@ -27,6 +27,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
+import vn.edu.vttu.data.RawMaterialUnit;
 import vn.edu.vttu.data.Recipes;
 import vn.edu.vttu.data.ServiceType;
 import vn.edu.vttu.data.TableReservation;
@@ -95,7 +96,7 @@ public class PanelCooking extends javax.swing.JPanel {
         conn = ConnectDB.conn();
         Vector<vn.edu.vttu.model.Unit> model = new Vector<vn.edu.vttu.model.Unit>();
         try {
-            model = Unit.selectUnitByID(id, conn);
+            model = RawMaterialUnit.selectUnitByIdRawMaterial(id, conn);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,20 +104,20 @@ public class PanelCooking extends javax.swing.JPanel {
         DefaultComboBoxModel defaultComboBoxModel = new javax.swing.DefaultComboBoxModel(model);
         cobUnitSub.putClientProperty("JComboBox.isTableCellEditor", Boolean.TRUE);
         cobUnitSub.setModel(defaultComboBoxModel);
-        cobUnitSub.setRenderer(new PanelCooking.ItemRenderer());
-        conn = null;
-
+        cobUnitSub.setRenderer(new PanelCooking.ItemRenderer());        
     }
 
     private void loadStore() {
         tbStore.setModel(RawMaterial.getAll(ConnectDB.conn()));
-        if (tbStore.getRowCount() <= 0) {
-            //tbStore.setRowSelectionInterval(0, 0);
+        if (tbStore.getRowCount() <= 0) {            
         } else {
             tbStore.setRowSelectionInterval(0, 0);
-        }        
+        }                
+        tbStore.getColumnModel().getColumn(4).setPreferredWidth(0);
+        tbStore.getColumnModel().getColumn(4).setMinWidth(0);
+        tbStore.getColumnModel().getColumn(4).setMaxWidth(0);
+        tbStore.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         tbStore.getTableHeader().setReorderingAllowed(false);
-        tbStore.getColumnModel().getColumn(3).setCellRenderer(new NumberCellRenderer());
     }
 
     private void loadRecipes() {
@@ -144,7 +145,7 @@ public class PanelCooking extends javax.swing.JPanel {
             popup.add(new JMenuItem(new AbstractAction("Cập nhật số lượng", new ImageIcon(image1)) {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    String number = JOptionPane.showInputDialog(tbStore, "Số Lượng", String.valueOf(tbCook.getValueAt(tbCook.getSelectedRow(), 3))).replaceAll(",", ".");
+                    String number = JOptionPane.showInputDialog(tbStore, "Số Lượng", String.valueOf(tbCook.getValueAt(tbCook.getSelectedRow(), 2))).replaceAll(",", ".");
                     if (number != null && !number.trim().equals("")) {
                         if (testNumber(number)) {
                             if (Recipes.update(idRecipes, Float.parseFloat(number), ConnectDB.conn())) {
@@ -426,7 +427,7 @@ public class PanelCooking extends javax.swing.JPanel {
 
     private void tbStoreMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbStoreMousePressed
         int index = tbStore.getSelectedRow();
-        fillcobUnit(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 4))));
+        fillcobUnit(Integer.parseInt(String.valueOf(tbStore.getValueAt(index, 0))));
     }//GEN-LAST:event_tbStoreMousePressed
 
     private void tbCookMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbCookMousePressed

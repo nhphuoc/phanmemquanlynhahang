@@ -98,7 +98,8 @@ public class PanelStore extends javax.swing.JPanel {
     public PanelStore() {
         initComponents();
         pn.removeAll();
-        loadData();
+        TableModel tb = RawMaterial.getAll(ConnectDB.conn());
+        loadData(tb);
         pn.updateUI();
         pn.repaint();
         fillcobUnit();
@@ -151,9 +152,9 @@ public class PanelStore extends javax.swing.JPanel {
         return ketqua;
     }
 
-    private void loadData() {
+    private void loadData(TableModel _table) {
         pn.removeAll();
-        final TableModel tb = RawMaterial.getAll(ConnectDB.conn());
+        final TableModel tb = _table;
         Vector<Vector> rowData = new Vector<Vector>();
         for (int i = 0; i < tb.getRowCount(); i++) {
             Vector<String> rowOne = new Vector<String>();
@@ -190,8 +191,7 @@ public class PanelStore extends javax.swing.JPanel {
                 VariableStatic.setId_store(Integer.parseInt(table.getValueAt(index, 0).toString()));
                 txtNAme.setText(table.getValueAt(index, 1).toString());
                 txtNumber.setText(String.valueOf(Float.parseFloat(tb.getValueAt(index, 2).toString())));
-                setSelectedValue(cobUnit, Integer.parseInt(tb.getValueAt(index, 3).toString()));
-                //setSelectedValue(cobUnitSub, Integer.parseInt(table.getValueAt(index, 5).toString()));
+                setSelectedValue(cobUnit, Integer.parseInt(tb.getValueAt(index, 4).toString()));
             }
         });
         table.getTableHeader().setReorderingAllowed(false);
@@ -271,6 +271,7 @@ public class PanelStore extends javax.swing.JPanel {
         btnPrint = new javax.swing.JButton();
         btnCreateInvoice = new javax.swing.JButton();
         pn = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
 
         jButton1.setText("jButton1");
 
@@ -341,14 +342,13 @@ public class PanelStore extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnAddUnitSub, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txtNAme)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnAddUnit))
-                        .addComponent(txtNumber)
-                        .addComponent(txtID))))
+                    .addComponent(txtNAme)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(cobUnit, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAddUnit))
+                    .addComponent(txtNumber)
+                    .addComponent(txtID)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -380,8 +380,8 @@ public class PanelStore extends javax.swing.JPanel {
         jLabel1.setText("Tìm Kiếm:");
 
         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtSearchKeyPressed(evt);
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtSearchKeyTyped(evt);
             }
         });
 
@@ -456,6 +456,10 @@ public class PanelStore extends javax.swing.JPanel {
 
         pn.setLayout(new java.awt.GridLayout(1, 0));
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 0, 51));
+        jLabel6.setText("Ấn Enter để tìm kiếm");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -469,6 +473,8 @@ public class PanelStore extends javax.swing.JPanel {
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
@@ -479,7 +485,8 @@ public class PanelStore extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -523,9 +530,9 @@ public class PanelStore extends javax.swing.JPanel {
                         conn.setAutoCommit(false);
                         if (RawMaterial.insert(txtNAme.getText(), 0, conn)) {
                             int id_raw = RawMaterial.getMaxId(conn);
-                            if (RawMaterialUnit.insert(id_raw, _unit,true, conn)) {
+                            if (RawMaterialUnit.insert(id_raw, _unit, true, conn)) {
                                 conn.commit();
-                                loadData();
+                                loadData(RawMaterial.getAll(conn));
                                 enableControl(true);
                             }
                         } else {
@@ -549,14 +556,14 @@ public class PanelStore extends javax.swing.JPanel {
                             }
                             if (RawMaterial.update(txtNAme.getText().trim(), Integer.parseInt(txtID.getText().trim()),
                                     Float.parseFloat(txtNumber.getText()), conn)) {
-                                loadData();
+                                loadData(RawMaterial.getAll(conn));
                                 enableControl(true);
                             }
                         }
                     } else {
                         if (RawMaterial.update(txtNAme.getText().trim(), Integer.parseInt(txtID.getText().trim()),
                                 Float.parseFloat(txtNumber.getText()), conn)) {
-                            loadData();
+                            loadData(RawMaterial.getAll(conn));
                             enableControl(true);
                         }
                     }
@@ -579,9 +586,18 @@ public class PanelStore extends javax.swing.JPanel {
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnReloadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadActionPerformed
+        Connection conn = ConnectDB.conn();
+        try {
+            loadData(RawMaterial.getAll(conn));
+            enableControl(true);
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+            }
+        }
 
-        loadData();
-        enableControl(true);
     }//GEN-LAST:event_btnReloadActionPerformed
 
     private void btnAddUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitActionPerformed
@@ -596,15 +612,21 @@ public class PanelStore extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(getRootPane(), "Bạn chưa chọn hàng hóa để xóa");
         } else {
             if (JOptionPane.showConfirmDialog(getRootPane(), "Bạn thật sự muốn xóa", "Hỏi", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                Connection conn = ConnectDB.conn();
                 try {
-                    if (RawMaterial.delete(Integer.parseInt(txtID.getText().trim()), ConnectDB.conn())) {
-                        loadData();
+                    if (RawMaterial.delete(Integer.parseInt(txtID.getText().trim()), conn)) {
+                        loadData(RawMaterial.getAll(conn));
                         JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công");
                     } else {
                         throw new Exception();
                     }
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(getRootPane(), "<html><font color='red'>Xóa không thành công, Vì có nhiều dữ liệu liên quan</font></html>");
+                } finally {
+                    try {
+                        conn.close();
+                    } catch (Exception e) {
+                    }
                 }
 
             }
@@ -612,18 +634,6 @@ public class PanelStore extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_btnDeleteActionPerformed
-
-    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
-
-        try {
-            TableModel tb = (RawMaterial.search(txtSearch.getText().trim(), ConnectDB.conn()));
-            loadData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }//GEN-LAST:event_txtSearchKeyPressed
 
     private void txtNumberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumberKeyPressed
         int key = evt.getKeyChar();
@@ -686,10 +696,16 @@ public class PanelStore extends javax.swing.JPanel {
     }//GEN-LAST:event_txtNumberKeyTyped
 
     private void btnCreateInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateInvoiceActionPerformed
-        JOptionPane.showOptionDialog(null, new PanelAddStoreInvoice(),
-                "Viết Phiếu Chi", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
-        TableModel tb = RawMaterial.getAll(ConnectDB.conn());
-        loadData();
+        try {
+            JOptionPane.showOptionDialog(null, new PanelAddStoreInvoice(),
+                    "Viết Phiếu Chi", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+            Connection conn = ConnectDB.conn();
+            TableModel tb = RawMaterial.getAll(ConnectDB.conn());
+            loadData(RawMaterial.getAll(conn));
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelStore.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
     private void cobUnitPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_cobUnitPropertyChange
@@ -697,11 +713,25 @@ public class PanelStore extends javax.swing.JPanel {
     }//GEN-LAST:event_cobUnitPropertyChange
 
     private void btnAddUnitSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitSubActionPerformed
-        
+        Connection conn = ConnectDB.conn();
         JOptionPane.showOptionDialog(null, new PanelAddUnitStore(),
                 "Thêm đơn vị tính con", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
-        loadData();
+        loadData(RawMaterial.getAll(conn));
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(PanelStore.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btnAddUnitSubActionPerformed
+
+    private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
+        if(evt.getKeyChar()==evt.VK_ENTER){
+            loadData(RawMaterial.search(txtSearch.getText(), ConnectDB.conn()));
+        }        
+        if(txtSearch.getText().equals("")){
+            loadData(RawMaterial.search(txtSearch.getText(), ConnectDB.conn()));
+        }
+    }//GEN-LAST:event_txtSearchKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -721,6 +751,7 @@ public class PanelStore extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel pn;

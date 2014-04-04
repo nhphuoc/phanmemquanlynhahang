@@ -322,7 +322,8 @@ public class PanelCatolog extends javax.swing.JPanel {
     }//GEN-LAST:event_jPanel1MouseClicked
 
     private void jPanel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel2MouseClicked
-        // TODO add your handling code here:
+        JOptionPane.showOptionDialog(null, new PanelTableLocation(),
+                "Quản lý vị trí bàn", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }//GEN-LAST:event_jPanel2MouseClicked
 
     private void panelDVTMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelDVTMouseClicked

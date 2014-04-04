@@ -54,6 +54,7 @@ import vn.edu.vttu.data.Service;
 import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.data.TableService;
 import vn.edu.vttu.data.Unit;
+import vn.edu.vttu.sqlite.TbServer;
 
 /**
  *
@@ -1134,7 +1135,7 @@ public class PanelViewReservation extends javax.swing.JPanel {
             parameter.put("tennhahang", rs.getName());
             parameter.put("diachi", rs.getAddress());
             parameter.put("sdtnhahang", rs.getPhone());
-            parameter.put("logo", rs.getLogo());
+            parameter.put("logo", "http://" + TbServer.getValues().getIp() + "/Restaurant/"+rs.getLogo());
             JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/InvoiceReservation.jrxml"));
             JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, conn);
             JasperViewer jv = new JasperViewer(jp, false);
