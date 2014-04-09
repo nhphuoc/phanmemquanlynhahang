@@ -29,6 +29,7 @@ import vn.edu.vttu.data.Account;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.LoginInformation;
 import vn.edu.vttu.data.MD5;
+import vn.edu.vttu.data.PasswordChange;
 import vn.edu.vttu.data.RestaurantInfo;
 import vn.edu.vttu.data.Staff;
 import vn.edu.vttu.data.UploadFile;
@@ -102,11 +103,11 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         txtHourNomal.setText(rsInfo.getHourReservationNomal() + "");
         txtParty.setText(rsInfo.getHourReservationParty() + "");
         txtWarning.setText(rsInfo.getMinuteWarning() + "");
-        link=rsInfo.getLogo();
+        link = rsInfo.getLogo();
         Image image = null;
         try {
             URL url = new URL(
-                    "http://" + TbServer.getValues().getIp() + "/Restaurant/" +link );
+                    "http://" + TbServer.getValues().getIp() + "/Restaurant/" + link);
             image = ImageIO.read(url);
             Image newimg = image.getScaledInstance(220, 105, java.awt.Image.SCALE_SMOOTH);
             lbLogo.setIcon(new ImageIcon(newimg));
@@ -271,6 +272,26 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         }
     }
 
+    public boolean backupDB(String dbName, String dbUserName, String dbPassword, String path) {
+
+        String executeCmd = "mysqldump -u " + dbUserName + " -p" + dbPassword + " " + dbName + " -r " + path;
+        Process runtimeProcess;
+        try {
+            runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+            int processComplete = runtimeProcess.waitFor();
+            System.out.println("Tiến trình:"+processComplete);
+            if (processComplete == 0) {
+                System.out.println("Backup created successfully");
+                return true;
+            } else {
+                System.out.println("Could not create the backup");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -326,6 +347,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         jLabel20 = new javax.swing.JLabel();
         txtLogo = new javax.swing.JTextField();
         btnChooseLogo = new javax.swing.JButton();
+        btnCreatePassAccept = new javax.swing.JButton();
         panelRestoreData = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
@@ -448,7 +470,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
                             .addComponent(jLabel9))))
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -487,7 +509,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 198, Short.MAX_VALUE)
+            .addGap(0, 202, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -498,7 +520,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 199, Short.MAX_VALUE)
+            .addGap(0, 203, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -513,7 +535,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 51, Short.MAX_VALUE)
+            .addGap(0, 52, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -524,7 +546,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 83, Short.MAX_VALUE)
+            .addGap(0, 84, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout panelUserLayout = new javax.swing.GroupLayout(panelUser);
@@ -563,7 +585,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 454, Short.MAX_VALUE)
+            .addGap(0, 456, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -574,7 +596,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 454, Short.MAX_VALUE)
+            .addGap(0, 456, Short.MAX_VALUE)
         );
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
@@ -653,6 +675,14 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             }
         });
 
+        btnCreatePassAccept.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/secrecy-icon.png"))); // NOI18N
+        btnCreatePassAccept.setText("Tạo mật khẩu xác nhận");
+        btnCreatePassAccept.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreatePassAcceptActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
@@ -686,7 +716,10 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                         .addComponent(btnChooseLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSave)
+                            .addGroup(jPanel9Layout.createSequentialGroup()
+                                .addComponent(btnSave)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnCreatePassAccept))
                             .addGroup(jPanel9Layout.createSequentialGroup()
                                 .addComponent(txtHourNomal, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(24, 24, 24)
@@ -735,7 +768,9 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 .addGap(5, 5, 5)
                 .addComponent(lbLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSave)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnCreatePassAccept, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -756,7 +791,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(panelRestaurantInfoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 445, Short.MAX_VALUE))
         );
 
         tabTrash.addTab("Thông Tin Nhà Hàng", panelRestaurantInfo);
@@ -892,10 +927,6 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addGroup(panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelRestoreDataLayout.createSequentialGroup()
-                                .addComponent(jLabel21)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cobStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(panelRestoreDataLayout.createSequentialGroup()
                                 .addComponent(jLabel15)
                                 .addGap(18, 18, 18)
                                 .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -904,12 +935,17 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                                 .addGap(18, 18, 18)
                                 .addComponent(cobType, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(29, 29, 29)
-                                .addComponent(check))))
+                                .addComponent(check))
+                            .addGroup(panelRestoreDataLayout.createSequentialGroup()
+                                .addComponent(jLabel21)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cobStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(25, 25, 25))))
                     .addGroup(panelRestoreDataLayout.createSequentialGroup()
                         .addComponent(jLabel24)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 125, Short.MAX_VALUE))
+                .addGap(0, 137, Short.MAX_VALUE))
         );
         panelRestoreDataLayout.setVerticalGroup(
             panelRestoreDataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -936,7 +972,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                     .addComponent(jLabel24)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
         );
 
         tabTrash.addTab("Quản Lý Tài Khoản", panelRestoreData);
@@ -973,7 +1009,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(43, 43, 43)
                         .addComponent(jButton1)))
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addContainerGap(169, Short.MAX_VALUE))
         );
         panelBackupdataLayout.setVerticalGroup(
             panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -986,7 +1022,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 .addGroup(panelBackupdataLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
                     .addComponent(jButton1))
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addContainerGap(239, Short.MAX_VALUE))
         );
 
         tabTrash.addTab("Sao Lưu Dữ Liệu", panelBackupdata);
@@ -1033,14 +1069,14 @@ public class PanelConfigSystem extends javax.swing.JPanel {
         } else {
             String img = txtLogo.getText();
             Connection cn = ConnectDB.conn();
-            try {                
+            try {
                 cn.setAutoCommit(false);
                 if (!img.equals("")) {
                     UploadFile ftpUploader = new UploadFile(TbServer.getValues().getIp(),
                             TbServer.getValues().getUser(), TbServer.getValues().getPass());
                     ftpUploader.uploadFile(img, new File(img).getName(), "/images/");
                     ftpUploader.disconnect();
-                    link="images/"+new File(img).getName();
+                    link = "images/" + new File(img).getName();
                 }
                 if (RestaurantInfo.update(
                         txtName.getText().trim(),
@@ -1052,7 +1088,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                         Integer.parseInt(txtParty.getText()),
                         Integer.parseInt(txtWarning.getText()),
                         cn
-                )) {                    
+                )) {
                     JOptionPane.showMessageDialog(getRootPane(), "Cập nhật thông tin nhà hàng thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                     cn.commit();
                     loadInfoRestaurant();
@@ -1087,24 +1123,7 @@ public class PanelConfigSystem extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        String executeCmd = "";
-        String u = TbConnection.getValues().getUser();
-        String p = TbConnection.getValues().getPass();
-        String db = TbConnection.getValues().getDbname();
-        //String Mysqlpath = getMysqlBinPath(u, p, db);
-        executeCmd = "mysqldump - u " + u + " -p" + p + " " + db
-                + " -r, backup.sql";
-        try {
-            Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
-            int processComplete = runtimeProcess.waitFor();
-            if (processComplete == 0) {
-                System.out.println("Thành Công");
-            } else {
-                System.out.println("Thất bại");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        backupDB("c9","root","","");
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -1210,15 +1229,27 @@ public class PanelConfigSystem extends javax.swing.JPanel {
                 txtPassNew.setText("");
                 txtRePass.setText("");
             } else {
-                JOptionPane.showMessageDialog(getRootPane(), "Thất Bại", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(getRootPane(), "Thất Bại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_btnSaveChangesPassActionPerformed
+
+    private void btnCreatePassAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreatePassAcceptActionPerformed
+        String input = JOptionPane.showInputDialog(getRootPane(), "Nhập mật khẩu");
+        if (input != null) {
+            if (PasswordChange.insert(MD5.encryptMD5(input), ConnectDB.conn())) {
+                JOptionPane.showMessageDialog(getRootPane(), "Tạo mật khẩu thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(getRootPane(), "Thất Bại", "Thông Báo", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnCreatePassAcceptActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnChooseLogo;
+    private javax.swing.JButton btnCreatePassAccept;
     private javax.swing.JButton btnDel;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnReload;

@@ -150,5 +150,24 @@ public class ClientRequest {
         }
         return flag;
     }
+    public static boolean acceptbytable(int id, boolean accept, Connection conn) {
+        boolean flag = false;
+        try {
+            String sql = "CALL client_request_accept_by_table(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setInt(1, id);
+            callstate.setBoolean(2, accept);
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
 }

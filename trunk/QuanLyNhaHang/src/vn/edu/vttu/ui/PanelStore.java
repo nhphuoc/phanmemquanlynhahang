@@ -10,6 +10,9 @@ import java.awt.Component;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -442,6 +445,11 @@ public class PanelStore extends javax.swing.JPanel {
         btnPrint.setBackground(new java.awt.Color(153, 204, 255));
         btnPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vn/edu/vttu/image/print-icon-24x24.png"))); // NOI18N
         btnPrint.setText("Print");
+        btnPrint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPrintActionPerformed(evt);
+            }
+        });
         jToolBar1.add(btnPrint);
 
         btnCreateInvoice.setBackground(new java.awt.Color(153, 204, 255));
@@ -732,6 +740,20 @@ public class PanelStore extends javax.swing.JPanel {
             loadData(RawMaterial.search(txtSearch.getText(), ConnectDB.conn()));
         }
     }//GEN-LAST:event_txtSearchKeyTyped
+
+    private void btnPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrintActionPerformed
+        JTable.PrintMode mode = JTable.PrintMode.FIT_WIDTH;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        MessageFormat header = new MessageFormat("DANH SÁCH NGUYÊN LIỆU");
+        MessageFormat footer = new MessageFormat("Ngày: " + formatter.format(new Date()));
+        try {
+            boolean comp = table.print(mode, header, footer, true, null, true, null);
+            if (comp) {
+                JOptionPane.showMessageDialog(getRootPane(), "Đã in");
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_btnPrintActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

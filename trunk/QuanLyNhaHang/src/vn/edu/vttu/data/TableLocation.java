@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package vn.edu.vttu.data;
 
 import java.sql.CallableStatement;
@@ -20,6 +19,7 @@ import net.proteanit.sql.DbUtils;
  * @author nhphuoc
  */
 public class TableLocation {
+
     private int ID;
     private String NAME;
 
@@ -30,18 +30,21 @@ public class TableLocation {
     public String getNAME() {
         return NAME;
     }
-    public TableLocation (int ID, String NAME){
-        this.ID=ID;
-        this.NAME=NAME;
+
+    public TableLocation(int ID, String NAME) {
+        this.ID = ID;
+        this.NAME = NAME;
     }
-    public TableLocation(int id){
-        this.ID=id;
+
+    public TableLocation(int id) {
+        this.ID = id;
     }
+
     public static TableLocation getByMinID(Connection conn) {
         TableLocation tablelocation;
         try {
             String sql = "call table_location_get_min_id()";
-            CallableStatement callstate = conn.prepareCall(sql);            
+            CallableStatement callstate = conn.prepareCall(sql);
             ResultSet rs = callstate.executeQuery();
             while (rs.next()) {
                 tablelocation = new TableLocation(rs.getInt("id"));
@@ -51,45 +54,48 @@ public class TableLocation {
         }
         return null;
     }
-    public static TableLocation[] getAll(Connection conn) {     
+
+    public static TableLocation[] getAll(Connection conn) {
         TableLocation tables_location[] = null;
         try {
             String sql = "call table_location_getAll()";
             CallableStatement calState = conn.prepareCall(sql);
-        ResultSet rs = calState.executeQuery(sql);
-        rs.last();
-        tables_location = new TableLocation[rs.getRow()];
-        rs.beforeFirst();
-        int i = 0;
-        while (rs.next()) {
-            tables_location[i] = new TableLocation(rs.getInt("id"), rs.getString("name"));
-            i++;
-        }
-        
+            ResultSet rs = calState.executeQuery(sql);
+            rs.last();
+            tables_location = new TableLocation[rs.getRow()];
+            rs.beforeFirst();
+            int i = 0;
+            while (rs.next()) {
+                tables_location[i] = new TableLocation(rs.getInt("id"), rs.getString("name"));
+                i++;
+            }
+
         } catch (Exception e) {
         }
         return tables_location;
-    }  
-    public static TableLocation[] getTableById(Integer id,Connection conn) {     
+    }
+
+    public static TableLocation[] getTableById(Integer id, Connection conn) {
         TableLocation tables_location[] = null;
         try {
-            String sql = "SELECT * FROM customer WHERE customer.id="+id;
-            CallableStatement calState = conn.prepareCall(sql);            
-        ResultSet rs = calState.executeQuery(sql);
-        rs.last();
-        tables_location = new TableLocation[rs.getRow()];
-        rs.beforeFirst();
-        int i = 0;
-        while (rs.next()) {
-            tables_location[i] = new TableLocation(rs.getInt("id"), rs.getString("name"));
-            i++;
-        }
-        
+            String sql = "SELECT * FROM customer WHERE customer.id=" + id;
+            CallableStatement calState = conn.prepareCall(sql);
+            ResultSet rs = calState.executeQuery(sql);
+            rs.last();
+            tables_location = new TableLocation[rs.getRow()];
+            rs.beforeFirst();
+            int i = 0;
+            while (rs.next()) {
+                tables_location[i] = new TableLocation(rs.getInt("id"), rs.getString("name"));
+                i++;
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tables_location;
     }
+
     public static Vector selectTableLocation(Connection conn) {
         Vector result = new Vector();
         try {
@@ -106,7 +112,8 @@ public class TableLocation {
         }
         return result;
     }
-    public static boolean insert(String name,String detail, Connection conn) {
+
+    public static boolean insert(String name, String detail, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL table_location_add(?,?)";
@@ -114,7 +121,7 @@ public class TableLocation {
             callstate.setString(1, name);
             callstate.setString(2, detail);
             int x = callstate.executeUpdate();
-            if (x ==1) {
+            if (x == 1) {
                 flag = true;
             } else {
                 flag = false;
@@ -125,7 +132,8 @@ public class TableLocation {
         }
         return flag;
     }
-    public static boolean update(String name,String detail,int id, Connection conn) {
+
+    public static boolean update(String name, String detail, int id, Connection conn) {
         boolean flag = false;
         try {
             String sql = "CALL table_location_update(?,?,?)";
@@ -134,7 +142,7 @@ public class TableLocation {
             callstate.setString(2, detail);
             callstate.setInt(3, id);
             int x = callstate.executeUpdate();
-            if (x ==1) {
+            if (x == 1) {
                 flag = true;
             } else {
                 flag = false;
@@ -145,6 +153,7 @@ public class TableLocation {
         }
         return flag;
     }
+
     public static boolean delete(int id, Connection conn) {
         boolean flag = false;
         try {
@@ -152,7 +161,7 @@ public class TableLocation {
             CallableStatement callstate = conn.prepareCall(sql);
             callstate.setInt(1, id);
             int x = callstate.executeUpdate();
-            if (x ==1) {
+            if (x == 1) {
                 flag = true;
             } else {
                 flag = false;
@@ -163,19 +172,20 @@ public class TableLocation {
         }
         return flag;
     }
-    public static boolean tableLocationTestName(String name,Connection conn) {
+
+    public static boolean tableLocationTestName(String name, Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        boolean t=false;
+        boolean t = false;
         try {
             CallableStatement calState = conn.prepareCall("{CALL table_location_test_name(?)}");
             calState.setString(1, name);
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
-            if(tb.getRowCount()<=0){
-                t=true;
-            }else{
-                t=false;
+            if (tb.getRowCount() <= 0) {
+                t = true;
+            } else {
+                t = false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -183,18 +193,19 @@ public class TableLocation {
         System.out.println(tb.getRowCount());
         return t;
     }
+
     public static TableModel getAllTable(Connection conn) {
         TableModel tb = null;
         ResultSet rs;
-        boolean t=false;
+        boolean t = false;
         try {
             CallableStatement calState = conn.prepareCall("{CALL table_location_getAll()}");
             rs = calState.executeQuery();
-            tb = DbUtils.resultSetToTableModel(rs);           
+            tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return tb;
     }
-    
+
 }

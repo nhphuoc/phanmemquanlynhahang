@@ -19,6 +19,22 @@ import net.proteanit.sql.DbUtils;
  */
 public class RawMaterialInvoice {
     private int id;
+    private Timestamp date;
+    private int id_staff;
+    private int id_isdistributor;
+
+    public Timestamp getDate() {
+        return date;
+    }
+
+    public int getId_staff() {
+        return id_staff;
+    }
+
+    public int getId_isdistributor() {
+        return id_isdistributor;
+    }
+    
 
     public int getId() {
         return id;
@@ -29,6 +45,10 @@ public class RawMaterialInvoice {
     }
     public RawMaterialInvoice(int id){
         this.id=id;
+    }
+    public RawMaterialInvoice(int id,int id_distributor){
+        this.id=id;
+        this.id_isdistributor=id_distributor;
     }
     public static TableModel getByDate(Timestamp fromdate, Timestamp todate,Connection conn) {
         TableModel tb = null;
@@ -79,6 +99,19 @@ public class RawMaterialInvoice {
         }
         return null;
     }
-    
+    public static RawMaterialInvoice getDistributor(Connection conn) {
+        RawMaterialInvoice rawinvoice;
+        try {
+            String sql = "call raw_material_invoice_get_id_distributor()";
+            CallableStatement callstate = conn.prepareCall(sql);            
+            ResultSet rs = callstate.executeQuery();
+            while (rs.next()) {
+                rawinvoice = new RawMaterialInvoice(rs.getInt("id"),rs.getInt("id_istributor_id"));
+                return rawinvoice;
+            }
+        } catch (Exception e) {
+        }
+        return null;
+    }
     
 }

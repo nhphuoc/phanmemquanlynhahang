@@ -18,6 +18,8 @@ import java.sql.Statement;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.table.TableModel;
 import net.proteanit.sql.DbUtils;
 
@@ -117,10 +119,12 @@ public class Table {
 
     public static Table[] getAll(Connection conn) {
         Table[] tables = null;
+        ResultSet rs = null;
+        CallableStatement calState = null;
         try {
             String sql = "call table_getAll()";
-            CallableStatement calState = conn.prepareCall(sql);
-            ResultSet rs = calState.executeQuery(sql);
+            calState = conn.prepareCall(sql);
+            rs = calState.executeQuery(sql);
             rs.last();
             tables = new Table[rs.getRow()];
             rs.beforeFirst();
@@ -131,6 +135,15 @@ public class Table {
             }
 
         } catch (Exception e) {
+        }
+        finally{
+            try {
+                conn.close();
+                calState.close();            
+                rs.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Table.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return tables;
     }

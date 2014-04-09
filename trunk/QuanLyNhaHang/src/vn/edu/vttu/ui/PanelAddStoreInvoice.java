@@ -6,17 +6,28 @@
 package vn.edu.vttu.ui;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 import vn.edu.vttu.data.ConnectDB;
 import vn.edu.vttu.data.Distributor;
 import vn.edu.vttu.data.LoginInformation;
@@ -24,6 +35,8 @@ import vn.edu.vttu.data.NumberCellRenderer;
 import vn.edu.vttu.data.RawMaterial;
 import vn.edu.vttu.data.RawMaterialInvoice;
 import vn.edu.vttu.data.RawMaterialInvoiceDetail;
+import vn.edu.vttu.data.RestaurantInfo;
+import vn.edu.vttu.sqlite.TbServer;
 
 /**
  *
@@ -154,6 +167,39 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
         cobNhaCungCap.setModel(defaultComboBoxModel);
         cobNhaCungCap.setRenderer(new PanelAddStoreInvoice.ItemRendererDistributor());
 
+    }
+
+    private void printInvoice() {
+        /*
+        RestaurantInfo rs = RestaurantInfo.getinfo(conn);
+        RawMaterialInvoice raw = RawMaterialInvoice.getDistributor(conn);
+        try {
+            HashMap<String, Object> parameter = new HashMap<String, Object>();
+            parameter.put("tennhahang", rs.getName());
+            parameter.put("diachi", "Địa Chỉ: " + rs.getAddress());
+            parameter.put("sdt", "Điện Thoại: " + rs.getPhone());
+            parameter.put("logo", "http://" + TbServer.getValues().getIp() + "/Restaurant/" + rs.getLogo());
+            parameter.put("nhacungcap", Distributor.getByID(raw.getId_isdistributor(), conn).getName());
+            parameter.put("diachi_cungcap", Distributor.getByID(raw.getId_isdistributor(), conn).getAddress());
+            parameter.put("sdt_nhacungcap", Distributor.getByID(raw.getId_isdistributor(), conn).getPhone());
+            parameter.put("id_store_invoice", raw.getId_isdistributor());
+            JasperReport jr = JasperCompileManager.compileReport(getClass().getResourceAsStream("/vn/edu/vttu/report/storeInvoice.jrxml"));
+            JasperPrint jp = (JasperPrint) JasperFillManager.fillReport(jr, parameter, ConnectDB.conn());
+            JasperViewer jv = new JasperViewer(jp, false);
+            Container container = jv.getContentPane();
+            JPanel panel = new JPanel(new GridLayout(0, 1));
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int width = (int) screenSize.getWidth();
+            int height = (int) screenSize.getHeight();
+            panel.setPreferredSize(new Dimension(width, height));
+            panel.add(container);
+            JOptionPane.showOptionDialog(null, panel,
+                    "Xem Hóa Đơn", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        */
     }
 
     /**
@@ -602,8 +648,8 @@ public class PanelAddStoreInvoice extends javax.swing.JPanel {
             vn.edu.vttu.model.StoreList store = (vn.edu.vttu.model.StoreList) cobNguyenLieu.getSelectedItem();
             int idNguyenLieu = store.getId();
             lbDVT.setText(RawMaterial.getByID(idNguyenLieu, ConnectDB.conn()).getNamenit());
-        } catch (Exception e) {            
-        }        
+        } catch (Exception e) {
+        }
 
     }//GEN-LAST:event_cobNguyenLieuPropertyChange
 

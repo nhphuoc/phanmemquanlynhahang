@@ -105,13 +105,20 @@ public class Service {
     }    
     public static TableModel serviceGetAll(Connection conn) {
         TableModel tb = null;
-        ResultSet rs;
+        ResultSet rs = null;
         try {                    
             CallableStatement calState = conn.prepareCall("{CALL service_get_all()}");            
             rs = calState.executeQuery();
             tb = DbUtils.resultSetToTableModel(rs);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally{
+            try {
+                rs.close();
+                conn.close();
+            } catch (Exception e) {
+            }
         }
         return tb;
     }    

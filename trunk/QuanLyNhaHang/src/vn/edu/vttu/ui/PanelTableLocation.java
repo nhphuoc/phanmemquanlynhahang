@@ -139,6 +139,11 @@ public class PanelTableLocation extends javax.swing.JPanel {
         });
         jToolBar1.add(btnReload);
 
+        tbLocation = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbLocation.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 

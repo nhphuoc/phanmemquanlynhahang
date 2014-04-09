@@ -246,6 +246,11 @@ public class PanelAddTable extends javax.swing.JPanel {
             }
         });
 
+        tbTable = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                return false;   //Disallow the editing of any cell
+            }
+        };
         tbTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

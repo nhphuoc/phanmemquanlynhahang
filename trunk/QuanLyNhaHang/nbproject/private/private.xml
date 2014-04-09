@@ -3,19 +3,26 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/MarqueeLabel.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelService.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/frmMain.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/MarqueeTest.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/TableLocation.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/DiscountDetail.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/ServiceCost.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Service.java</file>
             <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Table.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelInvoce.java</file>
             <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/TableService.java</file>
             <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/TableReservation.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelStatiticsRevenue.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Unit.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Distributor.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Staff.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/RawMaterialInvoice.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Invoice.java</file>
             <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/RawMaterial.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelStore.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelTable.java</file>
-            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/ui/PanelSaleInvoice.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Discount.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/ServiceType.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/ClientRequest.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/Recipes.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/RawMaterialInvoiceDetail.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/RawMaterialUnit.java</file>
+            <file>file:/E:/LUAN-VAN-2014/phanmemquanlynhahang/QuanLyNhaHang/src/vn/edu/vttu/data/TableReservationDetail.java</file>
         </group>
     </open-files>
 </project-private>

@@ -105,7 +105,27 @@ public class ServiceType {
         }
 
         return flag;
-    }    
+    }  
+    public static boolean update(String name,int id,Connection conn) {
+        boolean flag = false;
+        try {            
+            String sql = "CALL service_type_update(?,?)";
+            CallableStatement callstate = conn.prepareCall(sql);
+            callstate.setString(1, name);                       
+            callstate.setInt(2, id);                       
+            int x = callstate.executeUpdate();
+            if (x == 1) {
+                flag = true;
+            } else {
+                flag = false;
+            }
+        } catch (Exception e) {
+            flag = false;
+            e.printStackTrace();
+        }
+
+        return flag;
+    }   
      public static boolean testName(String name,Connection conn) {
         TableModel tb = null;
         ResultSet rs;

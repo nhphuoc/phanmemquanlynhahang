@@ -35,35 +35,14 @@ import vn.edu.vttu.data.TableReservation;
  * @author nhphuoc
  */
 public class frmMain extends javax.swing.JFrame {
-
-    class TaskWarningUser extends TimerTask {
-
-        public void run() {
-            Connection conn = ConnectDB.conn();            
-            try {
-                TableModel tb = TableReservation.getByTable_DateTime(rs.getMinuteWarning(), conn);
-                for (int i = 0; i < tb.getRowCount(); i++) {
-                    status =Table.getByID(Integer.parseInt(tb.getValueAt(i, 0).toString()),conn).getNAME()+" "+status;
-                    System.out.println(status);
-                }
-            } catch (Exception e) {
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-        }
-    }
+    
 
     /**
      * Creates new form frmMain
      */
     int x = 0;
     int y = 100;
-    private String status="";
+    private String status = "";
     private RestaurantInfo rs = RestaurantInfo.getinfo(ConnectDB.conn());
 
     public frmMain() {
@@ -82,19 +61,12 @@ public class frmMain extends javax.swing.JFrame {
 
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         String u = Staff.getById(LoginInformation.getId_staff(), ConnectDB.conn()).getName();
-        lbLoginUser.setText("Nhân Viên: " + u);
-        TimerTask taskwarninguser = new frmMain.TaskWarningUser();
-        Timer timer = new Timer();                
-        timer.schedule(taskwarninguser, new Date(), rs.getMinuteWarning() * 60000);
+        lbLoginUser.setText("Nhân Viên: " + u);                
         main.removeAll();
         PanelTable pn_table = new PanelTable();
         main.add(pn_table);
         main.revalidate();
-        main.repaint();
-        JLabel lb = new MarqueeLabel("Cảnh Báo: "+status,MarqueeLabel.RIGHT_TO_LEFT, 20);
-        panelStatus.add(lb);
-        panelStatus.repaint();
-        panelStatus.updateUI();
+        main.repaint();        
     }
 
     /**
@@ -323,10 +295,11 @@ public class frmMain extends javax.swing.JFrame {
         jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jButton7);
 
-        panelStatus.setLayout(new java.awt.GridLayout());
+        panelStatus.setLayout(new java.awt.GridLayout(1, 0));
 
         lbLoginUser.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lbLoginUser.setForeground(new java.awt.Color(255, 0, 51));
+        lbLoginUser.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lbLoginUser.setText("Đăng Nhập:nhphuo ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

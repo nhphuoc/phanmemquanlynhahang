@@ -1114,9 +1114,7 @@ public class PanelService extends javax.swing.JPanel {
     private void btnAddUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddUnitActionPerformed
         int result = JOptionPane.showConfirmDialog(null, new PanelUnit(),
                 "Thêm Đơn Vị Tính", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            fillcobUnit();
-        }
+        fillcobUnit();
     }//GEN-LAST:event_btnAddUnitActionPerformed
 
 

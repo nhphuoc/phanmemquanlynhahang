@@ -104,6 +104,7 @@ public class PanelTable extends javax.swing.JPanel {
     class TaskRequest extends TimerTask {
 
         public void run() {
+            System.out.println("xxxx");
             Connection conn = ConnectDB.conn();
             try {
                 int info1 = VariableStatic.getIdRequest();
@@ -129,7 +130,6 @@ public class PanelTable extends javax.swing.JPanel {
         public void run() {
             Connection conn = ConnectDB.conn();
             try {
-
                 tbListTableRequest.setModel(ClientRequest.getAll(conn));
                 tbListTableRequest.getTableHeader().setReorderingAllowed(false);
             } catch (Exception e) {
@@ -225,14 +225,12 @@ public class PanelTable extends javax.swing.JPanel {
         loadTableRequire();
         loadTableService();
         popupTableRequire();
-        fillkhCombo();
-
+        fillkhCombo();        
         TimerTask taskrequest = new TaskRequest();
         TimerTask taskrequired = new TaskRequired();
         TimerTask taskwarninguser = new TaskWarningUser();
         Timer timer = new Timer();
-        timer.schedule(taskrequest, new Date(), 2000);
-        //timer.schedule(taskrequired, new Date(), 2000);        
+        timer.schedule(taskrequest, new Date(), 4000);                      
         timer.schedule(taskwarninguser, new Date(), rs.getMinuteWarning() * 60000);
         try {
             popup = new JPopupMenu();
@@ -328,33 +326,9 @@ public class PanelTable extends javax.swing.JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e
                         ) {
-                            try {
-                                if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                                    if (billing()) {
-                                        if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công, Bạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                                            printInvoice();
-                                        }
-                                        loadTableInvoice();
-                                        loadTable(idLocation);
-                                        setTextLable(idTable);
-                                        totalPay();
-                                        loadTableInvoice();
-                                    } else {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Không thể thanh toán");
-                                    }
-                                } else {
-                                    if (billing()) {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Thanh toán thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
-                                        loadTableInvoice();
-                                        loadTable(idLocation);
-                                        setTextLable(idTable);
-                                        totalPay();
-                                    } else {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Không thể thanh toán");
-                                    }
-                                }
-                            } catch (Exception ex) {
-                            }
+                            thanhtoan();
+                            ClientRequest.acceptbytable(idTable, true, ConnectDB.conn());
+                            loadTableRequire();
                         }
                     }));
             BufferedImage bImg6 = ImageIO.read(getClass().getResourceAsStream("/vn/edu/vttu/image/print-icon.png"));
@@ -367,6 +341,7 @@ public class PanelTable extends javax.swing.JPanel {
                         ) {
                             try {
                                 printInvoice();
+
                             } catch (Exception ex) {
                             }
 
@@ -514,10 +489,10 @@ public class PanelTable extends javax.swing.JPanel {
                                 Connection conn = ConnectDB.conn();
                                 try {
                                     if (Table.delete(idTable, conn)) {
-                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công","Thông Báo",JOptionPane.INFORMATION_MESSAGE);
+                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
                                         loadTable(idLocation);
-                                    }else{
-                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công","Thông Báo",JOptionPane.ERROR_MESSAGE);
+                                    } else {
+                                        JOptionPane.showMessageDialog(getRootPane(), "Xóa không thành công", "Thông Báo", JOptionPane.ERROR_MESSAGE);
                                     }
                                 } catch (Exception ex) {
                                 } finally {
@@ -754,7 +729,7 @@ public class PanelTable extends javax.swing.JPanel {
 
         } finally {
             try {
-                conn.close();
+                conn.close();                
             } catch (SQLException ex) {
                 Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -808,9 +783,12 @@ public class PanelTable extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent e) {
                     Connection cn = ConnectDB.conn();
                     try {
+
                         cn.setAutoCommit(false);
-                        if (ClientRequest.getById(idRequired, cn).getId_request() >= 2) {
-                            if (ClientRequest.accept(idRequired, true, ConnectDB.conn())) {
+                        if (ClientRequest.getById(idRequired, cn).getId_request() == 2) {
+                            if (ClientRequest.accept(idRequired, true, cn)) {
+                                thanhtoan();
+                                cn.commit();
                                 loadTableRequire();
                             } else {
                                 throw new SQLException();
@@ -1397,8 +1375,9 @@ public class PanelTable extends javax.swing.JPanel {
     }
 
     private void setTextLable(int id) {
+        Connection conn = ConnectDB.conn();
         try {
-            conn = ConnectDB.conn();
+            
             DecimalFormat df = new DecimalFormat("#,###,###");
             TableReservation tbReser = TableReservation.getByTableByStatus(id, conn);
             beginDate = tbReser.getBeginDate();
@@ -1420,6 +1399,13 @@ public class PanelTable extends javax.swing.JPanel {
             conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally{
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
@@ -1617,10 +1603,10 @@ public class PanelTable extends javax.swing.JPanel {
 
     private boolean billing() throws SQLException {
         Connection conn = ConnectDB.conn();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:00");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Timestamp ts;
         if (beginDate == null) {
-            ts = Timestamp.valueOf(formatter.format(formatter.format(new Date())));
+            ts = Timestamp.valueOf(formatter.format(new Date()));
         } else {
             ts = Timestamp.valueOf(formatter.format(beginDate));
         }
@@ -1905,6 +1891,37 @@ public class PanelTable extends javax.swing.JPanel {
             } catch (SQLException ex) {
                 Logger.getLogger(PanelTable.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+
+    private void thanhtoan() {
+        try {
+            if (JOptionPane.showConfirmDialog(tb_invoice, "Bạn muốn thanh toán hóa đơn này?", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                if (billing()) {
+                    if (JOptionPane.showConfirmDialog(tb_invoice, "Thanh toán thành công, Bạn muốn in hóa đơn không", "Hỏi?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        printInvoice();
+                    }
+                    loadTableInvoice();
+                    loadTable(idLocation);
+                    setTextLable(idTable);
+                    totalPay();
+                    loadTableInvoice();
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Không thể thanh toán");
+                }
+            } else {
+                if (billing()) {
+                    JOptionPane.showMessageDialog(getRootPane(), "Thanh toán thành công", "Thông Báo", JOptionPane.INFORMATION_MESSAGE);
+                    loadTableInvoice();
+                    loadTable(idLocation);
+                    setTextLable(idTable);
+                    totalPay();
+                } else {
+                    JOptionPane.showMessageDialog(getRootPane(), "Không thể thanh toán");
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -2636,11 +2653,19 @@ public class PanelTable extends javax.swing.JPanel {
         //JOptionPane.showMessageDialog(getRootPane(), idTableService);
     }//GEN-LAST:event_tb_invoiceMousePressed
     private void txtSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyTyped
+        Connection conn =ConnectDB.conn();
         try {
+            
             tbService.setModel(Service.searchByName(txtSearch.getText(), conn));
             tbService.setRowSelectionInterval(0, 0);
             tbService.getColumnModel().getColumn(2).setCellRenderer(new NumberCellRenderer());
         } catch (Exception e) {
+        }
+        finally{
+            try {
+                conn.close();
+            } catch (Exception e) {
+            }
         }
     }//GEN-LAST:event_txtSearchKeyTyped
     private void txtService_PriceKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtService_PriceKeyReleased
@@ -2830,6 +2855,7 @@ public class PanelTable extends javax.swing.JPanel {
         int index = tbListTableRequest.getSelectedRow();
         idRequired = Integer.parseInt(tbListTableRequest.getValueAt(index, 3).toString());
         idTableRequire = Integer.parseInt(tbListTableRequest.getValueAt(index, 0).toString());
+        setTextLable(idTableRequire);
     }//GEN-LAST:event_tbListTableRequestMouseReleased
 
 

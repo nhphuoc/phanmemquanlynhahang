@@ -332,7 +332,8 @@ public class PanelCatolog extends javax.swing.JPanel {
     }//GEN-LAST:event_panelDVTMouseClicked
 
     private void jPanel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseClicked
-        // TODO add your handling code here:
+        JOptionPane.showOptionDialog(null, new PanelServiceType(),
+                "Quản lý đơn vị tính", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }//GEN-LAST:event_jPanel6MouseClicked
 
 
